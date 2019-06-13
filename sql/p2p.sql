@@ -4,67 +4,67 @@ use p2p;
 
 drop table if exists `user`;
 create table `user` (
-	`user_id` varchar(12) not null comment 'ÓÃ»§id£¬ ¹¤ºÅ',
-	`password` varchar(64) not null comment 'ÃÜÂë',
-	`phone` varchar(11) not null comment 'ÊÖ»úºÅ',
-	`id_card` varchar(20) not null comment 'Éí·İÖ¤',
-	`third_party_id` varchar(12) not null comment 'µÚÈı·½Æ½Ì¨ÕËºÅ',
-	`name` varchar(64) not null comment 'ĞÕÃû',
-	`address` varchar(255) not null comment 'µØÖ·',
+	`user_id` varchar(12) not null comment 'ç”¨æˆ·idï¼Œ å·¥å·',
+	`password` varchar(64) not null comment 'å¯†ç ',
+	`phone` varchar(11) not null comment 'æ‰‹æœºå·',
+	`id_card` varchar(20) not null comment 'èº«ä»½è¯',
+	`third_party_id` varchar(12) not null comment 'ç¬¬ä¸‰æ–¹å¹³å°è´¦å·',
+	`name` varchar(64) not null comment 'å§“å',
+	`address` varchar(255) not null comment 'åœ°å€',
 	primary key(`user_id`)
-) engine=InnoDB default charset=utf8mb4 comment 'ÓÃ»§ĞÅÏ¢±í';
+) engine=InnoDB default charset=utf8mb4 comment 'ç”¨æˆ·ä¿¡æ¯è¡¨';
 
 drop table if exists `credit_info`;
 create table `credit_id` (
 	`user_id` varchar(12) not null,
-	`income` decimal(10,2) not null comment 'ÊÕÈë',
-	`famiy_income` decimal(10,2) not null comment '¼ÒÍ¥ÊÕÈë',
-	`assets` decimal(12,2) not null comment '¸öÈË×Ê²ú',
-	`family_number` int(2) not null comment '¼ÒÍ¥³ÉÔ±Êı',
-	`debt` decimal(12,2) not null comment 'Õ®Îñ',
-	`credit_score` int(3) not null comment 'ĞÅÓÃ»ı·Ö',
+	`income` decimal(10,2) not null comment 'æ”¶å…¥',
+	`famiy_income` decimal(10,2) not null comment 'å®¶åº­æ”¶å…¥',
+	`assets` decimal(12,2) not null comment 'ä¸ªäººèµ„äº§',
+	`family_number` int(2) not null comment 'å®¶åº­æˆå‘˜æ•°',
+	`debt` decimal(12,2) not null comment 'å€ºåŠ¡',
+	`credit_score` int(3) not null comment 'ä¿¡ç”¨ç§¯åˆ†',
 	primary key(`user_id`)
 -- 	foreign key(`user_id`) references `user`(`user_id`)
-) engine=InnoDB default charset=utf8mb4 comment 'ÓÃ»§Õ÷ĞÅ±í';
+) engine=InnoDB default charset=utf8mb4 comment 'ç”¨æˆ·å¾ä¿¡è¡¨';
 
 drop table if exists `product`;
 create table `product` (
 	`product_id` int(12) not null auto_increment,
-	`borrower_id` varchar(12) not null comment '´û¿îÈËid',
-	`state` int(1) not null comment '²úÆ·×´Ì¬',
-	`amount`decimal(12, 2) not null comment '´û¿î½ğ¶î',
-	`interest_rate` decimal(5, 4) not null comment 'ÀûÂÊ',
-	`repay_deadline` date not null comment '»¹¿îÆÚÏŞ',
-	`purchase_deadline` date not null comment 'ÈÏ¹ºÆÚÏŞ',
-	`repay_data` int(2) not null comment 'Ã¿ÔÂ»¹¿îÊ±¼ä',
-	`create_time` timestamp not null default current_timestamp comment '´´½¨Ê±¼ä',
-	`update_time` timestamp not null default current_timestamp on update current_timestamp comment 'ĞŞ¸ÄÊ±¼ä',
+	`borrower_id` varchar(12) not null comment 'è´·æ¬¾äººid',
+	`state` int(1) not null comment 'äº§å“çŠ¶æ€',
+	`amount`decimal(12, 2) not null comment 'è´·æ¬¾é‡‘é¢',
+	`interest_rate` decimal(5, 4) not null comment 'åˆ©ç‡',
+	`repay_deadline` date not null comment 'è¿˜æ¬¾æœŸé™',
+	`purchase_deadline` date not null comment 'è®¤è´­æœŸé™',
+	`repay_data` int(2) not null comment 'æ¯æœˆè¿˜æ¬¾æ—¶é—´',
+	`create_time` timestamp not null default current_timestamp comment 'åˆ›å»ºæ—¶é—´',
+	`update_time` timestamp not null default current_timestamp on update current_timestamp comment 'ä¿®æ”¹æ—¶é—´',
 	primary key (`product_id`)
 -- 	foreign key (`borrower_id`) references `user`(`user_id`)
-) engine=InnoDB default charset=utf8mb4 comment '²úÆ·ĞÅÏ¢±í';
+) engine=InnoDB default charset=utf8mb4 comment 'äº§å“ä¿¡æ¯è¡¨';
 
 drop table if exists `purchase`;
 create table `purchase` (
 	`product_id` int(12) not null,
-	`investor_id` varchar(12) not null comment 'Í¶×ÊÈËid',
-	`purchase_time` date not null comment 'ÈÏ¹ºÊ±¼ä',
-	`amount` decimal(12, 2) not null comment '½ğ¶î',
-	`state` int(1) not null comment '×´Ì¬£¬ 0±íÊ¾ºÏÔ¼ÖĞ£¬1±íÊ¾ÓâÆÚ',
-	`repay_time` date not null comment '»¹¿îÈÕÆÚ',
+	`investor_id` varchar(12) not null comment 'æŠ•èµ„äººid',
+	`purchase_time` date not null comment 'è®¤è´­æ—¶é—´',
+	`amount` decimal(12, 2) not null comment 'é‡‘é¢',
+	`state` int(1) not null comment 'çŠ¶æ€ï¼Œ 0è¡¨ç¤ºåˆçº¦ä¸­ï¼Œ1è¡¨ç¤ºé€¾æœŸ',
+	`repay_time` date not null comment 'è¿˜æ¬¾æ—¥æœŸ',
 	primary key (`product_id`)
 -- 	foreign key (`product_id`) references `product`(`product_id`),
 -- 	foreign key (`investor_id`) references `user`(`user_id`)
-) engine=InnoDB default charset=utf8mb4 comment 'ÈÏ¹ºĞÅÏ¢±í';
+) engine=InnoDB default charset=utf8mb4 comment 'è®¤è´­ä¿¡æ¯è¡¨';
 
 drop table if exists `water_bill`;
 create table `water_bill` (
 	`water_bill_id` varchar(32) not null,
-	`payee_id` varchar(12) not null comment 'ÊÕ¿îÈËid',
-	`payer_id` varchar(12) not null comment 'Ö§¸¶ÈËid',
-	`amount` decimal(12, 2) not null comment '½ğ¶î',
-	`mode` int(1) not null comment 'Ä£Ê½£¬0Îª´û¿î£¬ 1Îª»¹¿î',
-	`time` timestamp not null default current_timestamp comment '½»Ò×Ê±¼ä',
+	`payee_id` varchar(12) not null comment 'æ”¶æ¬¾äººid',
+	`payer_id` varchar(12) not null comment 'æ”¯ä»˜äººid',
+	`amount` decimal(12, 2) not null comment 'é‡‘é¢',
+	`mode` int(1) not null comment 'æ¨¡å¼ï¼Œ0ä¸ºè´·æ¬¾ï¼Œ 1ä¸ºè¿˜æ¬¾',
+	`time` timestamp not null default current_timestamp comment 'äº¤æ˜“æ—¶é—´',
 	primary key(`water_bill_id`)
 -- 	foreign key(`payee_id`) references `user`(`user_id`),
 -- 	foreign key(`payer_id`) references `user`(`user_id`)
-) engine=InnoDB default charset=utf8mb4 comment 'Á÷Ë®ÕË';
+) engine=InnoDB default charset=utf8mb4 comment 'æµæ°´è´¦';
