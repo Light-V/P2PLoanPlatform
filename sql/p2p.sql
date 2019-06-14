@@ -131,11 +131,12 @@ create table `repay_plan` (
 	`plan_id` binary(32) not null comment '计划ID',
 	`purchase_id` int(12) not null comment '认购ID',
 	`repay_date` date not null comment '计划还款日期',
-	`real_repay_date` date not null comment '实际还款日期',
+	`real_repay_date` date comment '实际还款日期',
 	`amount` decimal(12, 2) not null comment '还款金额',
 	`status` int not null comment '还款状态，0为未还，1为已还, 2为逾期未还',
 	primary key(`plan_id`),
-	key `index_repay_data`(`repay_date`)
+	key `index_repay_date`(`repay_date`),
+    key `index_status`(`status`)
 --	foreign key(`purchase_id`) references `purchase`(`purchase_id`)
 ) engine=InnoDB default charset=utf8mb4 comment '还款计划';
 
