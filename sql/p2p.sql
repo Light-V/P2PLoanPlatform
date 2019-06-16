@@ -140,12 +140,14 @@ create table `repay_plan` (
 --	foreign key(`purchase_id`) references `purchase`(`purchase_id`)
 ) engine=InnoDB default charset=utf8mb4 comment '还款计划';
 
-drop table if exists `notify`;
-create table `notify` (
+drop table if exists `notice`;
+create table `notice` (
+	`notice_id` int not null auto_increment,
 	`user_id` varchar(12) not null,
 	`content` text not null,
 	`time` timestamp not null comment '通知时间',
 	`status` int not null comment '读取状态，1为已读，0为未读',
+	primary key(`notice_id`),
 	key `index_user_id`(`user_id`)
 --	foreign key (`user_id`) references `user`(`user_id`)
 ) engine=InnoDB default charset=utf8mb4 comment '通知表';
