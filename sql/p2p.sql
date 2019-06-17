@@ -57,7 +57,7 @@ drop table if exists `credit_info`;
 create table `credit_info` (
 	`user_id` varchar(12) not null,
 	`income` decimal(10,2) not null comment '月收入',
-	`famiy_income` decimal(10,2) not null comment '家庭收入',
+	`family_income` decimal(10,2) not null comment '家庭收入',
 	`assets` decimal(12,2) not null comment '个人资产',
 	`family_number` int(2) not null comment '家庭成员数',
 	`debt` decimal(12,2) not null comment '债务',
@@ -104,7 +104,7 @@ create table `purchase` (
 	`interest_rate` decimal(5, 4) not null comment '利率',
 	`loan_month` int not null comment '借款月数',
 	`amount` decimal(12, 2) not null comment '贷款金额',
-	`status` int(1) not null comment '状态， 0表示合约中，1表示逾期',
+	`status` int not null comment '状态， 0表示合约中，1表示逾期',
 	`create_time` timestamp not null default current_timestamp comment '创建时间',
 	`update_time` timestamp not null default current_timestamp on update current_timestamp comment '修改时间',
 	primary key (`purchase_id`)
@@ -119,7 +119,7 @@ create table `water_bill` (
 	`payee_id` varchar(12) not null comment '收款人id',
 	`payer_id` varchar(12) not null comment '支付人id',
 	`amount` decimal(12, 2) not null comment '金额',
-	`mode` int(1) not null comment '模式，0为贷款， 1为还款',
+	`mode` int not null comment '模式，0为贷款， 1为还款',
 	`time` timestamp not null default current_timestamp comment '交易时间',
 	primary key(`water_bill_id`)
 -- 	foreign key(`payee_id`) references `user`(`user_id`),
@@ -140,11 +140,14 @@ create table `repay_plan` (
 --	foreign key(`purchase_id`) references `purchase`(`purchase_id`)
 ) engine=InnoDB default charset=utf8mb4 comment '还款计划';
 
-drop table if exists `notify`;
-create table `notify` (
+drop table if exists `notice`;
+create table `notice` (
+	`notice_id` int not null auto_increment,
 	`user_id` varchar(12) not null,
 	`content` text not null,
+	`time` timestamp not null comment '通知时间',
 	`status` int not null comment '读取状态，1为已读，0为未读',
+	primary key(`notice_id`),
 	key `index_user_id`(`user_id`)
 --	foreign key (`user_id`) references `user`(`user_id`)
 ) engine=InnoDB default charset=utf8mb4 comment '通知表';
