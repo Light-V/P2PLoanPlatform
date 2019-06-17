@@ -3,19 +3,19 @@ package com.scut.p2ploanplatform.enums;
 import lombok.Getter;
 
 /**
- * 借款申请状态枚举类
+ * 借款状态枚举类
  *
  * @author FatCat
  */
 
 @Getter
-public enum LoanApplicationStatus {
+public enum LoanStatus {
     /**
      * 未审核
      */
     UNREVIEWED(0),
     /**
-     * 审核已通过
+     * 审核已通过(上架)
      */
     REVIEWED_PASSED(1),
     /**
@@ -23,13 +23,17 @@ public enum LoanApplicationStatus {
      */
     REVIEDED_REJECTED(2),
     /**
-     * 已认购
+     * 已认购（合约中）
      */
     SUBSCRIBED(3),
     /**
-     * 已过期
+     * 已过期（未认购)
      */
-    EXPRIED(4)
+    EXPRIED(4),
+    /**
+     * 逾期
+     */
+    OVERDUE(5)
     ;
 
     private Integer status;
@@ -42,7 +46,7 @@ public enum LoanApplicationStatus {
         this.status = status;
     }
 
-    LoanApplicationStatus(Integer status) {
+    LoanStatus(Integer status) {
         this.status = status;
     }
 }
