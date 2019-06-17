@@ -14,41 +14,41 @@ public class User {
     /**
      * 用户Id
      */
-    String userId;
+    private String userId;
 
     /**
      * 用户所在部门代码
      */
-    Integer departmentId;
+    private Integer departmentId;
 
     /**
      * 用户密码
      */
-    String password;
+    private String password;
 
     /**
      * 用户手机号码
      */
-    String phone;
+    private String phone;
 
     /**
      * 用户身份证号码
      */
-    String idCard;
+    private String idCard;
 
     /**
      * 用户第三方账户Id
      */
-    String thirdPartyId;
+    private String thirdPartyId;
 
     /**
      * 用户姓名
      */
-    String name;
+    private String name;
 
     /**
      * 用户地址
      */
-    String address;
+    private String address;
 
 }

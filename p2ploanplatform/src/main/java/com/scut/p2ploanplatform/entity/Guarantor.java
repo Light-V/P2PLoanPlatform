@@ -14,26 +14,26 @@ public class Guarantor {
     /**
      * 担保人Id
      */
-    String guarantorId;
+    private String guarantorId;
 
     /**
      * 担保人密码
      */
-    String password;
+    private String password;
 
     /**
      * 担保人姓名
      */
-    String name;
+    private String name;
 
     /**
      * 担保人第三方担保账户Id
      */
-    String thirdPartyId;
+    private String thirdPartyId;
 
     /**
      * 担保人授权等级，涉及最大担保金额计算
      */
-    Integer authorityId;
+    private Integer authorityId;
 
 }
