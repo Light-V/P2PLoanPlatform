@@ -13,11 +13,11 @@ import java.sql.Date;
  * @author FatCat
  */
 @Data
-public class Product {
+public class LoanApplication {
     /**
      * 产品Id(自增)
      */
-    private int productId;
+    private Integer productId;
     /**
      * 借款人Id
      */
@@ -30,7 +30,7 @@ public class Product {
      * 产品状态
      * 0为未审核，1为审核通过，2为审核失败，3为已被认购，4为过期
      */
-    private int status;
+    private Integer status;
     /**
      * 借款金额
      */
@@ -42,7 +42,7 @@ public class Product {
     /**
      * 借款时长
      */
-    private int loanMonth;
+    private Integer loanMonth;
     /**
      * 认购期限
      */

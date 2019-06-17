@@ -26,8 +26,8 @@ create table `user` (
 	`third_party_id` varchar(12) not null comment '第三方平台账号',
 	`name` varchar(64) not null comment '姓名',
 	`address` varchar(255) not null comment '地址',
+	-- foreign key (`department_id`) references `department`(`department_id`),
 	primary key (`user_id`)
---	foreign key (`department_id`) references `department`(`department_id`)
 ) engine=InnoDB default charset=utf8mb4 comment '用户信息表';
 
 drop table if exists `authority`;
@@ -49,8 +49,8 @@ create table `guarantor` (
 	`name` varchar(64) not null comment '担保人姓名',
 	`third_party_id` varchar(12) not null comment '第三方平台账号',
 	`authority_id` int not null comment '权限id', 
+	-- foreign key (`authority_id`) references `authority`(`authority_id`),
 	primary key (`guarantor_id`)
---	foreign key (`authority_id`) references `authority`(`authority_id`)
 ) engine=InnoDB default charset=utf8mb4 comment '工具人表';
 
 drop table if exists `credit_info`;
@@ -62,8 +62,8 @@ create table `credit_info` (
 	`family_number` int(2) not null comment '家庭成员数',
 	`debt` decimal(12,2) not null comment '债务',
 	`credit_score` int(3) not null comment '信用积分',
+	-- foreign key(`user_id`) references `user`(`user_id`),
 	primary key(`user_id`)
--- 	foreign key(`user_id`) references `user`(`user_id`)
 ) engine=InnoDB default charset=utf8mb4 comment '用户征信表';
 
 drop table if exists `grant_credit`;
@@ -73,13 +73,13 @@ create table `grant_credit` (
 	`quota` decimal(12,2) not null comment '额度',
 	`rate` decimal(3,2) not null comment '额度系数',
 	`expire` timestamp not null comment '过期时间',
+	-- foreign key(`user_id`) references `user`(`user_id`),
 	primary key(`user_id`)
---	foreign key(`user_id`) references `user`(`user_id`)
 ) engine=InnoDB default charset=utf8mb4 comment '用户授信表';
 
-drop table if exists `product`;
-create table `product` (
-	`product_id` int(12) not null auto_increment,
+drop table if exists `loan_application`;
+create table `loan_application` (
+	`application_id` int(12) not null auto_increment,
 	`borrower_id` varchar(12) not null comment '贷款人id',
 	`guarantor_id` varchar(12) not null comment '担保人id',
 	`status` int not null comment '产品状态, 0为未审核，1为审核通过，2为审核失败，3为已被认购，4为过期',
@@ -89,14 +89,15 @@ create table `product` (
 	`purchase_deadline` date not null comment '认购期限',
 	`create_time` timestamp not null default current_timestamp comment '创建时间',
 	`update_time` timestamp not null default current_timestamp on update current_timestamp comment '修改时间',
-	primary key (`product_id`)
---	foreign key (`borrower_id`) references `user`(`user_id`),
---	foreign key (`guarantor_id`) references `guarantor`(`guarantor_id`)
-) engine=InnoDB default charset=utf8mb4 comment '产品信息表';
+	-- foreign key (`borrower_id`) references `user`(`user_id`),
+	-- foreign key (`guarantor_id`) references `guarantor`(`guarantor_id`),
+	primary key (`application_id`)
+) engine=InnoDB default charset=utf8mb4 comment '借款申请信息表';
 
 drop table if exists `purchase`;
 create table `purchase` (
 	`purchase_id` int(12) not null auto_increment,
+	`application_id` int(12) not null comment '借款申请id',
 	`borrower_id` varchar(12) not null comment '贷款人id',
 	`guarantor_id` varchar(12) not null comment '担保人id',
 	`investor_id` varchar(12) not null comment '投资人id',
@@ -107,10 +108,11 @@ create table `purchase` (
 	`status` int not null comment '状态， 0表示合约中，1表示逾期',
 	`create_time` timestamp not null default current_timestamp comment '创建时间',
 	`update_time` timestamp not null default current_timestamp on update current_timestamp comment '修改时间',
+	-- foreign key (`guarantor_id`) references `guarantor`(`guarantor_id`),
+	-- foreign key (`application_id`) references `loan_application`(`application_id`),
+	-- foreign key (`investor_id`) references `user`(`user_id`),
+	-- foreign key (`borrower_id`) references `user`(`user_id`),
 	primary key (`purchase_id`)
---	foreign key (`guarantor_id`) references `guarantor`(`guarantor_id`),
--- 	foreign key (`investor_id`) references `user`(`user_id`),
---	foreign key (`borrower_id`) references `user`(`user_id`)
 ) engine=InnoDB default charset=utf8mb4 comment '认购信息表';
 
 drop table if exists `water_bill`;
@@ -121,9 +123,9 @@ create table `water_bill` (
 	`amount` decimal(12, 2) not null comment '金额',
 	`mode` int not null comment '模式，0为贷款， 1为还款',
 	`time` timestamp not null default current_timestamp comment '交易时间',
+	-- foreign key(`payee_id`) references `user`(`user_id`),
+	-- foreign key(`payer_id`) references `user`(`user_id`),
 	primary key(`water_bill_id`)
--- 	foreign key(`payee_id`) references `user`(`user_id`),
--- 	foreign key(`payer_id`) references `user`(`user_id`)
 ) engine=InnoDB default charset=utf8mb4 comment '流水账';
 
 drop table if exists `repay_plan`;
@@ -134,10 +136,10 @@ create table `repay_plan` (
 	`real_repay_date` date comment '实际还款日期',
 	`amount` decimal(12, 2) not null comment '还款金额',
 	`status` int not null comment '还款状态，0为未还，1为已还, 2为逾期未还',
+	-- foreign key(`purchase_id`) references `purchase`(`purchase_id`),
 	primary key(`plan_id`),
 	key `index_repay_date`(`repay_date`),
     key `index_status`(`status`)
---	foreign key(`purchase_id`) references `purchase`(`purchase_id`)
 ) engine=InnoDB default charset=utf8mb4 comment '还款计划';
 
 drop table if exists `notice`;
@@ -147,9 +149,9 @@ create table `notice` (
 	`content` text not null,
 	`time` timestamp not null comment '通知时间',
 	`status` int not null comment '读取状态，1为已读，0为未读',
+	-- foreign key (`user_id`) references `user`(`user_id`),
 	primary key(`notice_id`),
 	key `index_user_id`(`user_id`)
---	foreign key (`user_id`) references `user`(`user_id`)
 ) engine=InnoDB default charset=utf8mb4 comment '通知表';
 
 
