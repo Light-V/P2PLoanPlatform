@@ -9,7 +9,7 @@ import lombok.Data;
  */
 
 @Data
-public class authority {
+public class Authority {
 
     /**
      * 权限Id
@@ -20,5 +20,5 @@ public class authority {
      * 授权最大金额
      */
     private Double authorityAmount;
-    
+
 }
