@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -28,4 +29,7 @@ public interface WaterBillDao {
 
     @Select("select * from water_bill where mode = #{mode}")
     List<WaterBill> findByMode(Integer mode);
+
+    @Select("select * from water_bill where mode = #{mode} and time between #{start} and #{end}")
+    List<WaterBill> findByModeAndTime(Integer mode, Date start, Date end);
 }
