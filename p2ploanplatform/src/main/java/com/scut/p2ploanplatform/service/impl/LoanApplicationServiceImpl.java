@@ -4,6 +4,7 @@ import com.scut.p2ploanplatform.entity.LoanApplication;
 import com.scut.p2ploanplatform.enums.LoanStatus;
 import com.scut.p2ploanplatform.service.LoanApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -11,9 +12,8 @@ import java.util.List;
 /**
  * @author FatCat
  */
+@Service
 public class LoanApplicationServiceImpl implements LoanApplicationService{
-    @Autowired
-    private LoanApplicationService loanApplicationService;
 
     @Override
     public Boolean addApplication(LoanApplication loanApplication) throws SQLException {

@@ -55,4 +55,20 @@ public class LoanApplication {
      * 修改时间（最后一次状态改变时间）
      */
     private Timestamp updateTime;
+
+    @Override
+    public String toString() {
+        return "{" +
+                "productId=" + productId +
+                ", borrowerId='" + borrowerId + '\'' +
+                ", guarantorId='" + guarantorId + '\'' +
+                ", status=" + status +
+                ", amount=" + amount +
+                ", interestRate=" + interestRate +
+                ", loanMonth=" + loanMonth +
+                ", purchaseDeadline=" + purchaseDeadline +
+                ", createTime=" + createTime +
+                ", updateTime=" + updateTime +
+                '}';
+    }
 }

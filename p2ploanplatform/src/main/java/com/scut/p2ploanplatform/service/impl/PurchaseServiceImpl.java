@@ -3,12 +3,14 @@ package com.scut.p2ploanplatform.service.impl;
 import com.scut.p2ploanplatform.entity.Purchase;
 import com.scut.p2ploanplatform.service.PurchaseService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
-
+/**
+ * @author FatCat
+ */
+@Service
 public class PurchaseServiceImpl implements PurchaseService {
-    @Autowired
-    private PurchaseService purchaseService;
 
     @Override
     public Boolean createPurchaseItem(String investorId, Integer applicationId) {
