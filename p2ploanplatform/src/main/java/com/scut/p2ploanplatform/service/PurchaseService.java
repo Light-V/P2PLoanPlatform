@@ -18,11 +18,11 @@ public interface PurchaseService {
     Boolean createPurchaseItem(String investorId, Integer applicationId);
 
     /**
-     * 修改订单信息状态(逾期时使用）
+     * 订单逾期（修改订单状态）
      * @param purchaseId 订单id
      * @return 操作状态（成功/失败）
      */
-    Boolean changePurchaseItemStatus(Integer purchaseId);
+    Boolean purchaseOverdue(Integer purchaseId);
 
     /**
      * 查询所有订单
@@ -31,16 +31,23 @@ public interface PurchaseService {
     List<Purchase> showAllPurchase();
 
     /**
+     * 根据订单id查询订单
+     * @param purchaseId 订单id
+     * @return 订单列表
+     */
+    Purchase showPurchaseById(Integer purchaseId);
+
+    /**
      * 查询特定投资人的所有订单
      * @param investorID 投资人Id
      * @return 订单列表
      */
-    List<Purchase> showoPurchaseByInvestorId(String investorID);
+    List<Purchase> showPurchaseByInvestorId(String investorID);
 
     /**
      * 完成订单
      * @param purchaseId 订单Id
      * @return 操作状态（成功/失败)
      */
-    Boolean accomplishPushchase(Integer purchaseId);
+    Boolean accomplishPurchase(Integer purchaseId);
 }

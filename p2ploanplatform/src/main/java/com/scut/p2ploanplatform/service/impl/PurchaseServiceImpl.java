@@ -18,7 +18,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
-    public Boolean changePurchaseItemStatus(Integer purchaseId) {
+    public Boolean purchaseOverdue(Integer purchaseId) {
         return null;
     }
 
@@ -28,12 +28,18 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
-    public List<Purchase> showoPurchaseByInvestorId(String investorID) {
+    public Purchase showPurchaseById(Integer purchaseId) {
         return null;
     }
 
     @Override
-    public Boolean accomplishPushchase(Integer purchaseId) {
+    public List<Purchase> showPurchaseByInvestorId(String investorID) {
         return null;
     }
+
+    @Override
+    public Boolean accomplishPurchase(Integer purchaseId) {
+        return null;
+    }
+
 }
