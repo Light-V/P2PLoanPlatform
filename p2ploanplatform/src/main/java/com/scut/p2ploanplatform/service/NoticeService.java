@@ -13,10 +13,11 @@ public interface NoticeService {
     /**
      * 发送通知
      * @param  receiverId 被通知的人的id（用户或担保人）
+     * @param title 通知的标题
      * @param content 通知的内容
      * @return 通知成功后返回Notice
      */
-    Notice sendNotice(String receiverId, String content);
+    Notice sendNotice(String receiverId, String title, String content);
 
     /**
      * 获取某个用户的所有通知

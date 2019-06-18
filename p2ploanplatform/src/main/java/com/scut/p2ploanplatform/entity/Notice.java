@@ -16,6 +16,8 @@ public class Notice {
 
     private String userId;
 
+    private String title;
+
     private String content;
 
     private Date time;
