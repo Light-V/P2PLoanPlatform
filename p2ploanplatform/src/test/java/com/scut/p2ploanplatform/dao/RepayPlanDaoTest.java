@@ -183,4 +183,53 @@ public class RepayPlanDaoTest {
         result = repayPlanDao.deletePlan(sampleRepayPlan.getPlanId());
         assertEquals(1, result);
     }
+
+    @Test
+    @Transactional
+    public void updatePlanStatusTest() {
+
+        // unpaid plans (will be paid today)
+        RepayPlan unpaidPlan = new RepayPlan();
+        unpaidPlan.setPlanId(UUID.randomUUID().toString().replace("-",""));
+        unpaidPlan.setPurchaseId(1234);
+        unpaidPlan.setRepayDate(getDate(new Date()));
+        unpaidPlan.setRealRepayDate(null);
+        unpaidPlan.setAmount(BigDecimal.valueOf(666.66));
+        unpaidPlan.setStatus(RepayPlanStatus.SCHEDULED.getStatus());
+
+        // overdue plans
+        RepayPlan overduePlan = new RepayPlan();
+        overduePlan.setPlanId(UUID.randomUUID().toString().replace("-",""));
+        overduePlan.setPurchaseId(1234);
+        overduePlan.setRepayDate(offsetOneMonth(getDate(new Date()), -1));
+        overduePlan.setRealRepayDate(null);
+        overduePlan.setAmount(BigDecimal.valueOf(123, 2));
+        overduePlan.setStatus(RepayPlanStatus.OVERDUE.getStatus());
+
+        // overdue plans (with wrong status)
+        RepayPlan overduePlan2 = new RepayPlan();
+        overduePlan2.setPlanId(UUID.randomUUID().toString().replace("-",""));
+        overduePlan2.setPurchaseId(1234);
+        overduePlan2.setRepayDate(offsetOneMonth(getDate(new Date()), -1));
+        overduePlan2.setRealRepayDate(null);
+        overduePlan2.setAmount(BigDecimal.valueOf(123, 2));
+        overduePlan2.setStatus(RepayPlanStatus.SCHEDULED.getStatus());
+
+        // normal plans
+        RepayPlan normalPlan = new RepayPlan();
+        normalPlan.setPlanId(UUID.randomUUID().toString().replace("-",""));
+        normalPlan.setPurchaseId(1234);
+        normalPlan.setRepayDate(offsetOneMonth(getDate(new Date()), -2));
+        normalPlan.setRealRepayDate(normalPlan.getRepayDate());
+        normalPlan.setAmount(BigDecimal.valueOf(321, 2));
+        normalPlan.setStatus(RepayPlanStatus.SUCCEEDED.getStatus());
+
+        insertPlan(unpaidPlan);
+        insertPlan(overduePlan);
+        insertPlan(overduePlan2);
+        insertPlan(normalPlan);
+
+        int result = repayPlanDao.updatePlanStatus();
+        assertEquals(1, result);
+    }
 }

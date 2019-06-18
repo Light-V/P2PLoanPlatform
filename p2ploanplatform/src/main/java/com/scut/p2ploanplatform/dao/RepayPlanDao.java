@@ -19,7 +19,7 @@ public interface RepayPlanDao {
     @Select("SELECT * FROM `p2p`.`repay_plan` WHERE `plan_id` = #{value}")
     RepayPlan findPlanByPlanId(String id);
 
-    @Select("(SELECT * FROM `p2p`.`repay_plan` WHERE `repay_date` = CURRENT_DATE) UNION (SELECT * FROM `p2p`.`repay_plan` WHERE `status` = 2)")
+    @Select("(SELECT * FROM `p2p`.`repay_plan` WHERE `repay_date` = CURRENT_DATE AND `status` = 0) UNION (SELECT * FROM `p2p`.`repay_plan` WHERE `status` = 2)")
     List<RepayPlan> findAllUnpaidPlan();
 
     @Update("UPDATE `p2p`.`repay_plan` SET `repay_date` = #{repayDate}, `real_repay_date` = #{realRepayDate}, `status` = #{status} WHERE `plan_id` = #{planId}")
@@ -27,4 +27,7 @@ public interface RepayPlanDao {
 
     @Delete("DELETE FROM `p2p`.`repay_plan` WHERE `plan_id` = #{value}")
     int deletePlan(String id);
+
+    @Update("UPDATE `p2p`.`repay_plan` SET `status` = 2 WHERE `repay_date` < CURRENT_DATE AND `status` = 0")
+    int updatePlanStatus();
 }

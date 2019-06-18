@@ -3,7 +3,7 @@ package com.scut.p2ploanplatform.entity;
 import lombok.Data;
 
 /**
- * @auther: Light
+ * @author: Light
  * @date: 2019/6/17 09:54
  * @description:
  */
@@ -50,5 +50,6 @@ public class User {
      * 用户地址
      */
     private String address;
+
 
 }

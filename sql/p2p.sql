@@ -146,6 +146,7 @@ drop table if exists `notice`;
 create table `notice` (
 	`notice_id` int not null auto_increment,
 	`user_id` varchar(12) not null,
+	`title` varchar(128) not null,
 	`content` text not null,
 	`time` timestamp not null comment '通知时间',
 	`status` int not null comment '读取状态，1为已读，0为未读',

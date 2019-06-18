@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.Date;
 
 /**
- * @auther: Light
+ * @author: Light
  * @date: 2019/6/17 11:04
  * @description:
  */
