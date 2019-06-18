@@ -29,7 +29,8 @@ public class NoticeDaoTest {
     public void insertTest() {
         Notice notice = new Notice();
         notice.setUserId("123456789098");
-        notice.setContent("test");
+        notice.setTitle("test");
+        notice.setContent("This is a test.");
         notice.setTime(new Date());
         notice.setStatus(NoticeStatusEnum.UNREAD.getCode());
         int result = noticeDao.insert(notice);
@@ -42,7 +43,8 @@ public class NoticeDaoTest {
     public void findByUserIdTest() {
         Notice notice = new Notice();
         notice.setUserId("123456789098");
-        notice.setContent("test");
+        notice.setTitle("test");
+        notice.setContent("This is a test.");
         notice.setTime(new Date());
         notice.setStatus(NoticeStatusEnum.UNREAD.getCode());
         noticeDao.insert(notice);
@@ -61,13 +63,15 @@ public class NoticeDaoTest {
     public void findByUserIdAndStatusTest() {
         Notice notice = new Notice();
         notice.setUserId("123456789098");
-        notice.setContent("test");
+        notice.setTitle("test");
+        notice.setContent("This is a test.");
         notice.setTime(new Date());
         notice.setStatus(NoticeStatusEnum.UNREAD.getCode());
         noticeDao.insert(notice);
         notice = new Notice();
         notice.setUserId("123456789098");
-        notice.setContent("test");
+        notice.setTitle("test");
+        notice.setContent("This is a test.");
         notice.setTime(new Date());
         notice.setStatus(NoticeStatusEnum.READ.getCode());
         noticeDao.insert(notice);
@@ -86,7 +90,8 @@ public class NoticeDaoTest {
     public void updateStatus() {
         Notice notice = new Notice();
         notice.setUserId("123456789098");
-        notice.setContent("test");
+        notice.setTitle("test");
+        notice.setContent("This is a test.");
         notice.setTime(new Date());
         notice.setStatus(NoticeStatusEnum.UNREAD.getCode());
         noticeDao.insert(notice);

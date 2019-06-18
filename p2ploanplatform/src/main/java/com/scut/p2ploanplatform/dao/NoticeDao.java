@@ -14,7 +14,7 @@ import java.util.List;
 @Repository
 public interface NoticeDao {
 
-    @Insert("insert into notice(user_id, content, time, status) values (#{userId}, #{content}, #{time}, #{status})")
+    @Insert("insert into notice(user_id, title, content, time, status) values (#{userId}, #{title}, #{content}, #{time}, #{status})")
     @Options(useGeneratedKeys = true, keyProperty = "noticeId", keyColumn = "notice_id")
     int insert(Notice notice);
 

@@ -13,7 +13,7 @@ import java.util.List;
 @Service
 public class NoticeServiceImpl implements NoticeService {
     @Override
-    public Notice sendNotice(String receiverId, String content) {
+    public Notice sendNotice(String receiverId, String title, String content) {
         return null;
     }
 
