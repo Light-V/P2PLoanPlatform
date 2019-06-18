@@ -3,7 +3,7 @@ package com.scut.p2ploanplatform.entity;
 import lombok.Data;
 
 /**
- * @auther: Light
+ * @author: Light
  * @date: 2019/6/17 10:59
  * @description:
  */
@@ -44,5 +44,5 @@ public class CreditInfo {
     /**
      * 信用分数
      */
-    private Integer credictScore;
+    private Integer creditScore;
 }

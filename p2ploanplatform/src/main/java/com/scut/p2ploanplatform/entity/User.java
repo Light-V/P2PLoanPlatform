@@ -3,7 +3,7 @@ package com.scut.p2ploanplatform.entity;
 import lombok.Data;
 
 /**
- * @auther: Light
+ * @author: Light
  * @date: 2019/6/17 09:54
  * @description:
  */
