@@ -45,4 +45,12 @@ public class CreditInfo {
      * 信用分数
      */
     private Integer creditScore;
+
+    /**
+     *
+     * @return true完整;false不完整
+     */
+    public boolean isComplete() {
+        return  (userId != null && income != null && familyIncome != null && assets != null && familyNumber != null && debt != null && creditScore != null);
+    }
 }
