@@ -1,5 +1,6 @@
 package com.scut.p2ploanplatform.service;
 
+import com.github.pagehelper.PageInfo;
 import com.scut.p2ploanplatform.entity.WaterBill;
 import com.scut.p2ploanplatform.enums.PayModeEnum;
 
@@ -27,21 +28,27 @@ public interface WaterBillService {
     /**
      * 查找用户支出记录
      * @param userId 用户id
-     * @return List<WaterBill>
+     * @param pageNum 页码
+     * @param pageSize 每页数目
+     * @return PageInfo<WaterBill>
      */
-    List<WaterBill> findUserPayRecord(String userId);
+    PageInfo<WaterBill> findUserPayRecord(String userId, Integer pageNum, Integer pageSize);
 
     /**
      * 查找用户收款记录
      * @param userId 用户id
-     * @return List<WaterBill>
+     * @param pageNum 页码
+     * @param pageSize 每页数目
+     * @return PageInfo<WaterBill>
      */
-    List<WaterBill> findUserIncomeRecord(String userId);
+    PageInfo<WaterBill> findUserIncomeRecord(String userId, Integer pageNum, Integer pageSize);
 
     /**
-     * 根据交易的模式查找记录，主要用于p2p平台统计贷款和还款记录
+     * 根据交易的模式和时间查找记录，主要用于p2p平台统计贷款和还款记录
      * @param payModeEnum 付款模式，具体见{@link com.scut.p2ploanplatform.enums.PayModeEnum}
-     * @return List<WaterBill>
+     * @param start 起始时间, 格式 yyyy-MM-dd
+     * @param end 结束时间, 格式 yyyy-MM-dd
+     * @return PageInfo<WaterBill>
      */
-    List<WaterBill> findWaterBillByMode(PayModeEnum payModeEnum);
+    List<WaterBill> findWaterBillByModeAndTime(PayModeEnum payModeEnum, String start, String end);
 }
