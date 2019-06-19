@@ -155,8 +155,8 @@ create table `notice` (
 	key `index_user_id`(`user_id`)
 ) engine=InnoDB default charset=utf8mb4 comment '通知表';
 
-DROP TABLE IF EXISTS `bankaccount`;
-CREATE TABLE `bankaccount`  (
+DROP TABLE IF EXISTS `bank_account`;
+CREATE TABLE `bank_account`  (
   `card_id` varchar(12) NOT NULL COMMENT '银行卡ID',
   `user_id` varchar(12) NOT NULL COMMENT '用户ID',
   `name` varchar(64) NOT NULL COMMENT '用户姓名',
@@ -165,8 +165,8 @@ CREATE TABLE `bankaccount`  (
   PRIMARY KEY (`card_id`)
 ) ENGINE = InnoDB default charset=utf8mb4 comment '银行账户';
 
-DROP TABLE IF EXISTS `p2paccount`;
-CREATE TABLE `p2paccount`  (
+DROP TABLE IF EXISTS `p2p_account`;
+CREATE TABLE `p2p_account`  (
   `user_id` varchar(12) NOT NULL COMMENT '用户ID',
   `name` varchar(64) NOT NULL COMMENT '用户姓名',
   `payment_password` varchar(64) NOT NULL COMMENT '支付密码',
