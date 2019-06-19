@@ -2,6 +2,8 @@ package com.scut.p2ploanplatform.entity;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 /**
  * @author: Light
  * @date: 2019/6/17 15:30
@@ -19,6 +21,6 @@ public class Authority {
     /**
      * 授权最大金额
      */
-    private Double authorityAmount;
+    private BigDecimal authorityAmount;
 
 }

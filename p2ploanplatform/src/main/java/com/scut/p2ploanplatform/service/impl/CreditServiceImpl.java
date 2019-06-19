@@ -8,6 +8,7 @@ import com.scut.p2ploanplatform.service.CreditService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Date;
@@ -36,13 +37,13 @@ public class CreditServiceImpl implements CreditService {
      * @throws  IllegalArgumentException 非法参数
      */
     @Override
-    public Double creditReport(String userId) throws SQLException, IllegalArgumentException {
+    public BigDecimal creditReport(String userId) throws SQLException, IllegalArgumentException {
         //检查是否提交了征信信息
         CreditInfo creditInfo = creditInfoDao.selectCreditInfo(userId);
-        if (!creditInfo.isComplete()) return -1.;
+        if (!creditInfo.isComplete()) return new BigDecimal(-1.);
 
         //征信信息填写完整,返回征信系数
-        return creditInfo.getCreditScore()/50.;
+        return new BigDecimal(creditInfo.getCreditScore().toString()).divide(new BigDecimal("50"));
 
     }
 
@@ -73,16 +74,16 @@ public class CreditServiceImpl implements CreditService {
      * @throws  IllegalArgumentException 非法参数
      */
     @Override
-    public Double creditGrant(String userId, Double rate) throws SQLException, IllegalArgumentException {
+    public BigDecimal creditGrant(String userId, BigDecimal rate) throws SQLException, IllegalArgumentException {
         CreditInfo creditInfo = creditInfoDao.selectCreditInfo(userId);
-        if (creditInfo==null) return -1.;
+        if (creditInfo==null) return new BigDecimal(-1.);
         GrantCredit grantCredit = grantCreditDao.selectGrantCredit(userId);
         if (grantCredit == null) {
             //Insert grant credit
             grantCredit = new GrantCredit();
             grantCredit.setUserId(userId);
             grantCredit.setRate(rate);
-            grantCredit.setQuota(creditInfo.getIncome() * rate);
+            grantCredit.setQuota(creditInfo.getIncome().multiply(rate));
             grantCredit.setIncome(creditInfo.getIncome());
             grantCredit.setExpire(offsetOneMonth(new Date()));
             grantCreditDao.insertGrantCredit(grantCredit);
@@ -91,10 +92,10 @@ public class CreditServiceImpl implements CreditService {
             //Update grant credit
             grantCredit.setRate(rate);
             grantCredit.setExpire(offsetOneMonth(new Date()));
-            grantCredit.setQuota(grantCredit.getIncome() * rate);
+            grantCredit.setQuota(grantCredit.getIncome().multiply(rate));
             grantCreditDao.updateGrantCredit(grantCredit);
         }
-        return grantCredit.getRate() * rate;
+        return grantCredit.getRate().multiply(rate);
     }
 
 

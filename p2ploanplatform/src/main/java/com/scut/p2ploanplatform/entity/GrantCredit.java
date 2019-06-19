@@ -2,6 +2,7 @@ package com.scut.p2ploanplatform.entity;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -21,17 +22,17 @@ public class GrantCredit {
     /**
      * 个人收入 （单位:人民币）
      */
-    private Double income;
+    private BigDecimal income;
 
     /**
      * 授信额度 （单位:人民币）
      */
-    private Double quota;
+    private BigDecimal quota;
 
     /**
      *最高利率
      */
-    private Double rate;
+    private BigDecimal rate;
 
     /**
      * 授信有效期限

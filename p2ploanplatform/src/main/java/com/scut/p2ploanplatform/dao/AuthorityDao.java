@@ -1,10 +1,8 @@
 package com.scut.p2ploanplatform.dao;
 
 import com.scut.p2ploanplatform.entity.Authority;
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -13,6 +11,9 @@ import java.util.List;
  * @date: 2019/6/19 10:52
  * @description:
  */
+
+@Repository
+@Mapper
 public interface AuthorityDao {
 
     @Insert("INSERT INTO `p2p`.`authority` (`authority_id`, `authority_amount`) VALUES (#{authorityId}, #{authorityAmount}")

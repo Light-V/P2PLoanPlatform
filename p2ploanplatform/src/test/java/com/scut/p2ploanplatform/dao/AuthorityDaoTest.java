@@ -21,20 +21,24 @@ public class AuthorityDaoTest {
     @Test
     @Transactional
     public void insertAuthority() {
+        //TODO
     }
 
     @Test
     @Transactional
     public void updateAuthority() {
+        //TODO
     }
 
     @Test
     @Transactional
     public void selectAllAuthority() {
+        //TODO
     }
 
     @Test
     @Transactional
     public void deleteAuthority() {
+        //TODO
     }
 }

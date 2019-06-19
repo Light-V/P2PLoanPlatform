@@ -4,6 +4,7 @@ package com.scut.p2ploanplatform.service;
 import com.scut.p2ploanplatform.entity.CreditInfo;
 import com.sun.org.apache.xpath.internal.operations.Bool;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 
 /**
@@ -21,7 +22,7 @@ public interface CreditService {
      * @throws SQLException SQL异常
      * @throws  IllegalArgumentException 非法参数
      */
-    Double creditReport(String userId) throws SQLException, IllegalArgumentException;
+    BigDecimal creditReport(String userId) throws SQLException, IllegalArgumentException;
 
     /**
      * 通过用户Id对用户进行授信
@@ -30,7 +31,7 @@ public interface CreditService {
      * @throws SQLException SQL异常
      * @throws  IllegalArgumentException 非法参数
      */
-    Double creditGrant(String userId, Double rate) throws SQLException, IllegalArgumentException;
+    BigDecimal creditGrant(String userId, BigDecimal rate) throws SQLException, IllegalArgumentException;
 
     /**
      * 通过用户Id查询用户的征信信息

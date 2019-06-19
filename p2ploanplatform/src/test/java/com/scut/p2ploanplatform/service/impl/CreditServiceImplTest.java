@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 import static org.junit.Assert.*;
@@ -34,30 +35,44 @@ public class CreditServiceImplTest {
     public void setUp() {
         creditInfo = new CreditInfo();
         creditInfo.setUserId("1234567890ab");
-        creditInfo.setIncome(10000.);
-        creditInfo.setDebt(0.);
-        creditInfo.setFamilyIncome(50000.);
-        creditInfo.setAssets(1000000.);
+        creditInfo.setIncome(new BigDecimal("10000.00"));
+        creditInfo.setDebt(new BigDecimal("0.00"));
+        creditInfo.setFamilyIncome(new BigDecimal("50000.00"));
+        creditInfo.setAssets(new BigDecimal("1000000.00"));
         creditInfo.setCreditScore(120);
         creditInfo.setFamilyNumber(10);
 
         grantCredit = new GrantCredit();
         grantCredit.setUserId(creditInfo.getUserId());
-        grantCredit.setQuota(100000.);
-        grantCredit.setRate(1.);
+        grantCredit.setQuota(new BigDecimal("100000.00"));
+        grantCredit.setRate(new BigDecimal("1.00"));
         grantCredit.setIncome(creditInfo.getIncome());
         grantCredit.setExpire(new Date());
 
     }
     @Test
-    //@Transactional
+    @Transactional
     public void creditReport() {
-        //TODO
+        creditService.updateCreditInfo(creditInfo);
+        try {
+            assertEquals(new BigDecimal("2.4"), creditService.creditReport(creditInfo.getUserId()));
+        }
+        catch (Exception exception) {
+
+        }
     }
 
     @Test
+    @Transactional
     public void getCreditInfo() {
-        //TODO
+        creditService.updateCreditInfo(creditInfo);
+        try {
+            CreditInfo actual = creditService.getCreditInfo(creditInfo.getUserId());
+            assertEquals(creditInfo, actual);
+        }
+        catch (Exception exception) {
+
+        }
     }
 
     @Test
@@ -65,9 +80,9 @@ public class CreditServiceImplTest {
     public void creditGrant() {
         try {
             creditService.updateCreditInfo(creditInfo);
-            Double result = creditService.creditReport(creditInfo.getUserId());
-            assertEquals(new Double(2.4), result);
-            creditService.creditGrant(creditInfo.getUserId(), 2.0);
+            BigDecimal result = creditService.creditReport(creditInfo.getUserId());
+            assertEquals(new BigDecimal(2.4), result);
+            creditService.creditGrant(creditInfo.getUserId(), new BigDecimal(2.0));
         }
         catch (Exception exception) {
 
