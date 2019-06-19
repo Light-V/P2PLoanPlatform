@@ -157,21 +157,21 @@ create table `notice` (
 
 DROP TABLE IF EXISTS `bankaccount`;
 CREATE TABLE `bankaccount`  (
-  `cardID` varchar(12) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '银行卡ID',
-  `userID` varchar(12) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '用户ID',
-  `name` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '用户姓名',
-  `paymentPassword` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '支付密码',
+  `cardID` varchar(12) NOT NULL COMMENT '银行卡ID',
+  `userID` varchar(12) NOT NULL COMMENT '用户ID',
+  `name` varchar(64) NULL DEFAULT NULL COMMENT '用户姓名',
+  `paymentPassword` NULL DEFAULT NULL COMMENT '支付密码',
   `balance` decimal(12, 2) NULL DEFAULT NULL COMMENT '账户余额',
-  PRIMARY KEY (`cardID`) USING BTREE
+  PRIMARY KEY (`cardID`)
 ) ENGINE = InnoDB default charset=utf8mb4 comment '银行账户';
 
 DROP TABLE IF EXISTS `p2paccount`;
 CREATE TABLE `p2paccount`  (
-  `userID` varchar(12) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '用户ID',
-  `name` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '用户姓名',
-  `paymentPassword` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '支付密码',
+  `userID` varchar(12) NOT NULL COMMENT '用户ID',
+  `name` varchar(64) NULL DEFAULT NULL COMMENT '用户姓名',
+  `paymentPassword` varchar(255) NULL DEFAULT NULL COMMENT '支付密码',
   `balance` decimal(12, 2) NULL DEFAULT NULL COMMENT '账户余额',
   `status` int(1) NULL DEFAULT NULL COMMENT '账户状态，0表示冻结，1表示正常',
   `type` int(1) NULL DEFAULT NULL COMMENT '账户类型，0表示普通用户，1表示风险准备金账户',
-  PRIMARY KEY (`userID`) USING BTREE
+  PRIMARY KEY (`userID`)
 )ENGINE = InnoDB default charset=utf8mb4 comment 'P2P平台账户';
