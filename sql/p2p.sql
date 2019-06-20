@@ -117,19 +117,6 @@ create table `purchase` (
 	primary key (`purchase_id`)
 ) engine=InnoDB default charset=utf8mb4 comment '认购信息表';
 
-drop table if exists `water_bill`;
-create table `water_bill` (
-	`water_bill_id` varchar(32) not null,
-	`payee_id` varchar(12) not null comment '收款人id',
-	`payer_id` varchar(12) not null comment '支付人id',
-	`amount` decimal(12, 2) not null comment '金额',
-	`mode` int not null comment '模式，0为贷款， 1为还款',
-	`time` timestamp not null default current_timestamp comment '交易时间',
-	-- foreign key(`payee_id`) references `user`(`user_id`),
-	-- foreign key(`payer_id`) references `user`(`user_id`),
-	primary key(`water_bill_id`)
-) engine=InnoDB default charset=utf8mb4 comment '流水账';
-
 drop table if exists `repay_plan`;
 create table `repay_plan` (
 	`plan_id` binary(32) not null comment '计划ID',
@@ -143,6 +130,31 @@ create table `repay_plan` (
 	key `index_repay_date`(`repay_date`),
     key `index_status`(`status`)
 ) engine=InnoDB default charset=utf8mb4 comment '还款计划';
+
+drop table if exists `loan_record`;
+create table `loan_record` (
+	`record_id` varchar(32) not null,
+	`purchase_id` int(12) not null,
+	`borrower_id` varchar(12) not null,
+	`investor_id` varchar(12) not null,
+	`time` timestamp not null comment '时间',
+	`amount` decimal(12,2) not null comment '金额',
+	-- foreign key(`purchase_id`) references `purchase`(`purchase_id`),
+	primary key(`record_id`)
+) engine=InnoDB default charset=utf8mb4 comment '贷款流水记录';
+
+drop table if exists `repay_record`;
+create table `repay_record` (
+	`record_id` varchar(32) not null,
+	`plan_id` binary(32) not null,
+	`purchase_id` int(12) not null,
+	`payer_id` varchar(12) not null,
+	`payee_id` varchar(12) not null,
+	`time` timestamp not null comment '还款时间',
+	`amount` timestamp not null comment '还款金额',
+	-- foreign key(`plan_id`) references `repay_plan`(`plan_id`),
+	primary key(`record_id`)
+) engine=InnoDB default charset=utf8mb4 comment '还款流水记录';
 
 drop table if exists `notice`;
 create table `notice` (
