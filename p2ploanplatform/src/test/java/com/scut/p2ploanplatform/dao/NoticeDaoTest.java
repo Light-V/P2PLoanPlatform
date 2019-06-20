@@ -40,6 +40,20 @@ public class NoticeDaoTest {
 
     @Test
     @Transactional
+    public void findByNoticeId() {
+        Notice notice = new Notice();
+        notice.setUserId("123456789098");
+        notice.setTitle("test");
+        notice.setContent("This is a test.");
+        notice.setTime(new Date());
+        notice.setStatus(NoticeStatusEnum.UNREAD.getCode());
+        noticeDao.insert(notice);
+        Notice result = noticeDao.findByNoticeId(notice.getNoticeId());
+        assertNotNull(result);
+    }
+
+    @Test
+    @Transactional
     public void findByUserIdTest() {
         Notice notice = new Notice();
         notice.setUserId("123456789098");
