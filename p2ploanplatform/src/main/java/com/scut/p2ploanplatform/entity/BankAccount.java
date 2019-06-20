@@ -27,4 +27,31 @@ public class BankAccount {
      * 银行卡余额
      */
     private BigDecimal balance;
+
+    /**
+     * 获取银行卡ID
+     * @return 卡号
+     */
+    public String getCardID()
+    {
+        return cardID;
+    }
+
+    /**
+     * 获取用户ID
+     * @return 用户ID
+     */
+    public String getUserID()
+    {
+        return userID;
+    }
+
+    /**
+     * 获取余额
+     * @return 余额
+     */
+    public BigDecimal getBalance()
+    {
+        return balance;
+    }
 }
