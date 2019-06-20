@@ -128,28 +128,9 @@ public class RepayServiceImplTest {
     @SuppressWarnings("deprecation")
     public void updateRepayPlanTest() {
         Date targetDate = new Date(new Date().getTime() + 86400000);
-        Date targetDate2 = new Date(new Date().getTime() - 86400000);
 
         try {
-            // check: status auto complement
-            RepayPlan plan = repayService.insertPlan(23333, targetDate, BigDecimal.valueOf(123.45));
-            repayService.updateRepayPlan(plan.getPlanId(), null, null);
-            plan = repayService.findPlanById(plan.getPlanId());
-            assertEquals(RepayPlanStatus.SCHEDULED.getStatus().intValue(), plan.getStatus());
-
-            plan = repayService.insertPlan(23333, targetDate2, BigDecimal.valueOf(543.21));
-            assertEquals(RepayPlanStatus.OVERDUE.getStatus().intValue(), plan.getStatus());
-            repayService.updateRepayPlan(plan.getPlanId(), null, null);
-            plan = repayService.findPlanById(plan.getPlanId());
-            assertEquals(RepayPlanStatus.OVERDUE.getStatus().intValue(), plan.getStatus());
-
-            plan = repayService.insertPlan(23333, targetDate2, BigDecimal.valueOf(233.33));
-            assertEquals(RepayPlanStatus.OVERDUE.getStatus().intValue(), plan.getStatus());
-            repayService.updateRepayPlan(plan.getPlanId(), null, new Date());
-            plan = repayService.findPlanById(plan.getPlanId());
-            assertEquals(RepayPlanStatus.SUCCEEDED.getStatus().intValue(), plan.getStatus());
-
-            plan = repayService.insertPlan(233333, targetDate, BigDecimal.valueOf(123.45));
+            RepayPlan plan = repayService.insertPlan(233333, targetDate, BigDecimal.valueOf(123.45));
             try {
                 repayService.updateRepayPlan(plan.getPlanId(), RepayPlanStatus.SCHEDULED, new Date());
                 fail();
@@ -157,6 +138,10 @@ public class RepayServiceImplTest {
             catch (IllegalArgumentException ignore) {}
 
             repayService.updateRepayPlan(plan.getPlanId(), RepayPlanStatus.SUCCEEDED, new Date());
+            repayService.updateRepayPlan(plan.getPlanId(), RepayPlanStatus.OVERDUE_SUCCEEDED, new Date());
+            RepayPlan actualPlan = repayService.findPlanById(plan.getPlanId());
+
+            assertEquals(RepayPlanStatus.OVERDUE_SUCCEEDED.getStatus().intValue(), actualPlan.getStatus());
         }
         catch (Exception e) {
             e.printStackTrace();
