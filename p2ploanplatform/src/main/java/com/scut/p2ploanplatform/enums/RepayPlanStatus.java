@@ -13,9 +13,18 @@ public enum RepayPlanStatus {
      */
     SUCCEEDED(1),
     /**
-     * 已逾期
+     * 已逾期未还
      */
-    OVERDUE(2);
+    OVERDUE(2),
+    /**
+     * 担保人预垫付
+     */
+    GUARANTOR_PAID_ADVANCE(3),
+    /**
+     * 逾期完成还款
+     */
+    OVERDUE_SUCCEEDED(4),
+    ;
 
 
     private Integer status;
