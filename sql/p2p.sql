@@ -81,7 +81,8 @@ drop table if exists `loan_application`;
 create table `loan_application` (
 	`application_id` int(12) not null auto_increment,
 	`borrower_id` varchar(12) not null comment '贷款人id',
-	`guarantor_id` varchar(12) not null comment '担保人id',
+	`guarantor_id` varchar(12) comment '担保人id',
+	`title` varchar(255) not null default '借款申请' comment '标题',
 	`status` int not null comment '产品状态, 0为未审核，1为审核通过，2为审核失败，3为已被认购，4为过期',
 	`amount` decimal(12, 2) not null comment '贷款金额',
 	`interest_rate` decimal(5, 4) not null comment '利率',
@@ -101,6 +102,7 @@ create table `purchase` (
 	`borrower_id` varchar(12) not null comment '贷款人id',
 	`guarantor_id` varchar(12) not null comment '担保人id',
 	`investor_id` varchar(12) not null comment '投资人id',
+	`title` varchar(255) not null default '借款申请' comment '标题' ,
 	`purchase_time` date not null comment '认购时间',
 	`interest_rate` decimal(5, 4) not null comment '利率',
 	`loan_month` int not null comment '借款月数',
@@ -155,5 +157,28 @@ create table `notice` (
 	key `index_user_id`(`user_id`)
 ) engine=InnoDB default charset=utf8mb4 comment '通知表';
 
+drop table if exists `loan_month`;
+create table `loan_month`(
+	`month` int not null
+) engine=InnoDB default charset=utf8mb4 comment '借款月数字典';
+insert into `loan_month`(`month`) values(1);
+insert into `loan_month`(`month`) values(2);
+insert into `loan_month`(`month`) values(3);
+insert into `loan_month`(`month`) values(6);
+insert into `loan_month`(`month`) values(9);
+insert into `loan_month`(`month`) values(12);
+
+drop table if exists `loan_interest_rate`;
+create table `loan_interest_rate`(
+	`rate` decimal(5,4) not null
+) engine=InnoDB default charset=utf8mb4 comment '借款利率字典';
+insert into `loan_interest_rate`(`rate`) values(0.0404);
+insert into `loan_interest_rate`(`rate`) values(0.0433);
+insert into `loan_interest_rate`(`rate`) values(0.0464);
+insert into `loan_interest_rate`(`rate`) values(0.0498);
+insert into `loan_interest_rate`(`rate`) values(0.0557);
+insert into `loan_interest_rate`(`rate`) values(0.0585);
+insert into `loan_interest_rate`(`rate`) values(0.0618);
+insert into `loan_interest_rate`(`rate`) values(0.0666);
 
 
