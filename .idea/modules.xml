@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="ProjectModuleManager">
-    <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/P2PLoanPlatform.iml" filepath="$PROJECT_DIR$/.idea/P2PLoanPlatform.iml" />
-      <module fileurl="file://$PROJECT_DIR$/p2ploanplatform/p2ploanplatform.iml" filepath="$PROJECT_DIR$/p2ploanplatform/p2ploanplatform.iml" />
-    </modules>
-  </component>
-</project>
