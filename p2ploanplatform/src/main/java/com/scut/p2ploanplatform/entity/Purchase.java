@@ -3,8 +3,7 @@ package com.scut.p2ploanplatform.entity;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
-import java.sql.Date;
+import java.util.Date;
 
 /**
  * 订单类
@@ -17,7 +16,7 @@ public class Purchase {
     /**
      * 订单Id(自增)
      */
-    private Integer productId;
+    private Integer purchaseId;
     /**
      * 借款申请Id（自增）
      */
@@ -34,6 +33,10 @@ public class Purchase {
      * 投资人Id
      */
     private String investorId;
+    /**
+     * 借款申请标题
+     */
+    private String title;
     /**
      * 购买时间
      */
@@ -58,9 +61,9 @@ public class Purchase {
     /**
      * 创建时间（申请提交时间）
      */
-    private Timestamp createTime;
+    private Date createTime;
     /**
      * 修改时间（最后一次状态改变时间）
      */
-    private Timestamp updateTime;
+    private Date updateTime;
 }

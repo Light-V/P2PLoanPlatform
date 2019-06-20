@@ -1,40 +1,60 @@
 package com.scut.p2ploanplatform.dao;
 
-import java.util.List;
+import com.scut.p2ploanplatform.entity.Purchase;
+import javafx.application.Application;
+import org.apache.ibatis.annotations.*;
+import org.springframework.stereotype.Repository;
 
-public interface Purchase {
+import java.util.List;
+@Repository
+@Mapper
+public interface PurchaseDao {
     /**
      * 新建订单信息（产品撮合成功）
-     * @param investorId 投资人Id
-     * @param applicationId 投资人投资的借款申请Id
+     * @param purchase 订单
      * @return 操作状态（成功/失败)
      */
-    Boolean createPurchaseItem(String investorId, Integer applicationId);
+    @Insert("INSERT INTO `purchase` (`application_id`, `borrower_id`, `guarantor_id`,`investor_id`, `title`, `purchase_time`, `status`,  `amount`, `interest_rate`, `loan_month`)\n" +
+            "VALUES (#{applicationId}, #{borrowerId}, #{guarantorId}, #{investorId}, #{title}, #{purchaseTime}, #{status}, #{amount}, #{interestRate},#{loanMonth})")
+    @Options(useGeneratedKeys = true, keyProperty = "purchaseId", keyColumn = "purchase_id")
+    Boolean createPurchaseItem(Purchase purchase);
 
     /**
-     * 修改订单信息状态(逾期时使用）
-     * @param purchaseId 订单id
+     * 修改订单状态
+     * @param purchase 订单
      * @return 操作状态（成功/失败）
      */
-    Boolean changePurchaseItemStatus(Integer purchaseId);
+    @Update("UPDATE `purchase` SET `status`= #{status} WHERE `purchase_id` = #{purchaseId}")
+    Boolean updatePurchase(Purchase purchase);
 
     /**
      * 查询所有订单
      * @return 订单列表
      */
-    List<com.scut.p2ploanplatform.entity.Purchase> showAllPurchase();
+    @Select("SELECT * FROM `purchase`")
+    List<Purchase> showAllPurchase();
+
+    /**
+     * 根据订单ID查询订单
+     * @param purchaseId 订单Id
+     * @return 订单列表
+     */
+    @Select("SELECT * FROM `purchase` WHERE `purchase_id` = #{purchaseId}")
+    Purchase showPurchaseByPurchaseId(Integer purchaseId);
 
     /**
      * 查询特定投资人的所有订单
-     * @param investorID 投资人Id
+     * @param investorId 投资人Id
      * @return 订单列表
      */
-    List<com.scut.p2ploanplatform.entity.Purchase> showoPurchaseByInvestorId(String investorID);
+    @Select("SELECT * FROM `purchase` WHERE `investor_id` #{investorId}")
+    List<Purchase> showPurchaseByInvestorId(String investorId);
 
     /**
-     * 完成订单
-     * @param purchaseId 订单Id
-     * @return 操作状态（成功/失败)
+     * 查询特定投资人的所有订单
+     * @param borrowerId 投资人Id
+     * @return 订单列表
      */
-    Boolean accomplishPushchase(Integer purchaseId);
+    @Select("SELECT * FROM `purchase` WHERE `borrower_id` #{borrowerId}")
+    List<Purchase> showPurchaseByBorrowerId(String borrowerId);
 }
