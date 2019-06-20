@@ -10,6 +10,8 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+
 import static org.junit.Assert.*;
 
 /**
@@ -31,11 +33,11 @@ public class CreditInfoDaoTest {
     public void setUp() {
         creditInfo = new CreditInfo();
         creditInfo.setUserId("2ck9f9d8rju3");
-        creditInfo.setIncome(10000.00);
+        creditInfo.setIncome(new BigDecimal("10000.00"));
         creditInfo.setFamilyNumber(10);
-        creditInfo.setAssets(1000000.00);
-        creditInfo.setFamilyIncome(50000.00);
-        creditInfo.setDebt(0.00);
+        creditInfo.setAssets(new BigDecimal("1000000.00"));
+        creditInfo.setFamilyIncome(new BigDecimal("50000.00"));
+        creditInfo.setDebt(new BigDecimal("0.00"));
         creditInfo.setCreditScore(100);
     }
 
@@ -51,7 +53,7 @@ public class CreditInfoDaoTest {
     public void updateCreditInfo()
     {
         creditInfoDao.insertCreditInfo(creditInfo);
-        creditInfo.setIncome(500.0);
+        creditInfo.setIncome(new BigDecimal("500.00"));
         assertEquals(1, creditInfoDao.updateCreditInfo(creditInfo));
     }
 
@@ -61,7 +63,7 @@ public class CreditInfoDaoTest {
     {
         creditInfoDao.insertCreditInfo(creditInfo);
         CreditInfo actual = creditInfoDao.selectCreditInfo(creditInfo.getUserId());
-        assertEquals(creditInfo, actual);
+        isCreditInfoEqual(creditInfo, actual);
     }
 
     @Test
@@ -73,7 +75,6 @@ public class CreditInfoDaoTest {
     }
 
     public void isCreditInfoEqual(CreditInfo expect, CreditInfo actual) throws AssertionError {
-
         assertEquals(expect.getAssets(), actual.getAssets());
         assertEquals(expect.getCreditScore(), actual.getCreditScore());
         assertEquals(expect.getDebt(), actual.getDebt());
