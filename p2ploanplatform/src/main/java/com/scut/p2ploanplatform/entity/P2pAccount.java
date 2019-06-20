@@ -12,7 +12,7 @@ public class P2pAccount {
     /**
      * 用户ID
      */
-    private String userID;
+    private String userId;
     /**
      * 用户姓名
      */
@@ -36,21 +36,26 @@ public class P2pAccount {
      */
     private Integer type;
 
-    /**
-     * 获取用户ID
-     * @return 用户ID
-     */
-    public String getUserID()
+
+    public String getUserId()
     {
-        return userID;
+        return userId;
     }
 
-    /**
-     * 获取余额
-     * @return 余额
-     */
     public BigDecimal getBalance()
     {
         return balance;
     }
+
+    public void setUserId(String userId) { this.userId=userId; }
+
+    public void setName(String name) {this.name=name;}
+
+    public void setPaymentPassword(String paymentPassword) {this.paymentPassword=paymentPassword;}
+
+    public void setBalance(BigDecimal balance) {this.balance=balance;}
+
+    public void setStatus(Integer status) {this.status=status;}
+
+    public void setType(Integer type) {this.type=type;}
 }

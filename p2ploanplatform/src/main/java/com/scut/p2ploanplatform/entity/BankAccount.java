@@ -28,30 +28,40 @@ public class BankAccount {
      */
     private BigDecimal balance;
 
-    /**
-     * 获取银行卡ID
-     * @return 卡号
-     */
     public String getCardID()
     {
         return cardID;
     }
 
-    /**
-     * 获取用户ID
-     * @return 用户ID
-     */
     public String getUserID()
     {
         return userID;
     }
 
-    /**
-     * 获取余额
-     * @return 余额
-     */
     public BigDecimal getBalance()
     {
         return balance;
+    }
+
+    public String getPaymentPassword() { return paymentPassword; }
+
+    public void setBalance(BigDecimal balance) {
+        this.balance = balance;
+    }
+
+    public void setCardID(String cardID) {
+        this.cardID = cardID;
+    }
+
+    public void setUserID(String userID) {
+        this.userID = userID;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setPaymentPassword(String paymentPassword) {
+        this.paymentPassword = paymentPassword;
     }
 }
