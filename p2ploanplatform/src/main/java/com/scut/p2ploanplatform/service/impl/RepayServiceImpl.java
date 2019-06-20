@@ -124,7 +124,7 @@ public class RepayServiceImpl implements RepayService {
             throw new IllegalArgumentException("invalid planId, should be non null and has length of 32");
         if (status == null)
             throw new IllegalArgumentException("status could not be null");
-        if (realRepayDate != null && status != RepayPlanStatus.SUCCEEDED)
+        if (realRepayDate != null && (status != RepayPlanStatus.SUCCEEDED && status != RepayPlanStatus.OVERDUE_SUCCEEDED))
             throw new IllegalArgumentException("invalid argument: realRepayDate and status, status must be SUCCEEDED if realRepayDate is set");
         try {
             RepayPlan plan = repayPlanDao.findPlanByPlanId(id);
