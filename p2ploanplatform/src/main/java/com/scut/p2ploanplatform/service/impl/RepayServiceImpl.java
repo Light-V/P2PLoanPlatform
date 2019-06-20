@@ -6,6 +6,7 @@ import com.scut.p2ploanplatform.entity.RepayPlan;
 import com.scut.p2ploanplatform.entity.User;
 import com.scut.p2ploanplatform.enums.RepayPlanStatus;
 import com.scut.p2ploanplatform.service.*;
+import com.scut.p2ploanplatform.utils.AutoTrigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,11 +54,12 @@ public class RepayServiceImpl implements RepayService {
     }
 
     public RepayServiceImpl() throws Exception {
-        RepayAutoTrigger trigger = new RepayAutoTrigger(this, getClass().getDeclaredMethod("doRepay"));
-        Thread thread = new Thread(trigger);
-        thread.setDaemon(true);
-        thread.setName("RepayThread");
-        thread.start();
+//        RepayAutoTrigger trigger = new RepayAutoTrigger(this, getClass().getDeclaredMethod("doRepay"));
+//        Thread thread = new Thread(trigger);
+//        thread.setDaemon(true);
+//        thread.setName("RepayThread");
+//        thread.start();
+        new AutoTrigger(getClass().getDeclaredMethod("doRepay"), this, 8, 0, 0, true);
     }
 
 
@@ -238,64 +240,6 @@ public class RepayServiceImpl implements RepayService {
                 logger.error("Exception caught while executing repay routine in plan id: " + plan.getPlanId(), e);
             }
 
-        }
-    }
-}
-
-
-@SuppressWarnings("WeakerAccess")
-class RepayAutoTrigger implements Runnable {
-    private Logger logger = LoggerFactory.getLogger(RepayAutoTrigger.class);
-    // 这里定义了每天触发还款任务的时间
-    // todo: modify this hard-coded schedule time to global config in Iteration 2
-    public static final int REPAY_HOUR = 8;
-    public static final int REPAY_MINUTE = 0;
-    public static final int REPAY_SECOND = 0;
-
-    private Method callbackMethod;
-    private Object invokeObject;
-
-    RepayAutoTrigger(Object invokeObject, Method callbackMethod) {
-        this.invokeObject = invokeObject;
-        this.callbackMethod = callbackMethod;
-    }
-
-    @Override
-    public void run() {
-        try {
-            logger.info("Started repay trigger thread");
-            long repayTimeOfDay = (REPAY_SECOND + (60 * (60 * REPAY_HOUR + REPAY_MINUTE))) * 1000;
-            long nextDateTime = (new Date().getTime() + 86399999) / 86400000;
-            long nextRepayTimestamp = nextDateTime * 86400000 + repayTimeOfDay;
-
-            //noinspection InfiniteLoopStatement
-            while (true) {
-                callbackMethod.invoke(invokeObject);
-
-                nextRepayTimestamp += 86400000;
-                long sleepTimeForNextDay = (nextRepayTimestamp - new Date().getTime());
-                if (sleepTimeForNextDay > 0)
-                    Thread.sleep(sleepTimeForNextDay);
-            }
-        }catch (Exception e) {
-            logger.error(e.toString());
-
-            // retry
-            Thread thread = new Thread(() -> {
-                try {
-                    logger.warn("Unhandled exception caught in auto trigger thread, restarting in 1 hours");
-                    Thread.sleep(3600000);
-                    Thread restartThread = new Thread(new RepayAutoTrigger(this.invokeObject, this.callbackMethod));
-                    restartThread.setDaemon(true);
-                    restartThread.setName("RepayThread");
-                    restartThread.start();
-                }
-                catch (InterruptedException ignore) {}
-            });
-
-            thread.setDaemon(true);
-            thread.setName("RepayThread");
-            thread.start();
         }
     }
 }
