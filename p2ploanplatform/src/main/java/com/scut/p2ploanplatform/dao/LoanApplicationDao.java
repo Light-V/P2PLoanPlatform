@@ -18,24 +18,15 @@ public interface LoanApplicationDao {
     @Insert("INSERT INTO `loan_application` (`borrower_id`, `guarantor_id`, `title`, `status`, `amount`, `interest_rate`, `loan_month`, `purchase_deadline`)\n" +
             "VALUES (#{borrowerId}, #{guarantorId},#{title}, #{status}, #{amount}, #{interestRate},#{loanMonth}, #{purchaseDeadline})")
     @Options(useGeneratedKeys = true, keyProperty = "applicationId", keyColumn = "application_id")
-    Integer addApplication(LoanApplication loanApplication);
+    Boolean addApplication(LoanApplication loanApplication);
 
     /**
      * 根据借款申请id修改借款申请状态
-     * @param id     借款申请id
-     * @param loanStatus 借款申请状态
+     * @param loanApplication     更新的借款申请信息
      * @return 操作状态（成功/失败)
      */
-    @Update("UPDATE `loan_application` SET `status`= #{loanStatus} WHERE `application_Id`=#{id} ")
-    Integer changeStatusById(Integer id, Integer loanStatus);
-
-    /**
-     * 根据借款申请id修改借款申请信息
-     * @param loanApplication     借款申请id
-     * @return 操作状态（成功/失败)
-     */
-//    @Update("UPDATE `loan_application` SET `application_Id ")
-    Integer modifyApplication(LoanApplication loanApplication);
+    @Update("UPDATE `loan_application` SET `status`= #{status} WHERE `application_Id`=#{applicationId} ")
+    Boolean updateApplication(LoanApplication loanApplication);
 
     /**
      * 删除借款申请
@@ -43,7 +34,7 @@ public interface LoanApplicationDao {
      * @param id 借款申请Id
      */
     @Delete("DELETE FROM `loan_application` WHERE `application_id` = #{id}")
-    Integer deleteApplicationById(Integer id);
+    Boolean deleteApplicationById(Integer id);
 
     /**
      * 根据借款申请ID查询借款申请
@@ -51,7 +42,7 @@ public interface LoanApplicationDao {
      * @return 借款申请
      */
     @Select("SELECT * FROM `loan_application` WHERE `application_id`= #{ApplicationId}")
-    LoanApplication showApplicationByApplicationId(Integer ApplicationId);
+    LoanApplication showApplicationById(Integer ApplicationId);
 
     /**
      * 查询特定借款人的所有借款申请

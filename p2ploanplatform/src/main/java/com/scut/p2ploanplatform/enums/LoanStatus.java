@@ -21,19 +21,23 @@ public enum LoanStatus {
     /**
      * 审核未通过
      */
-    REVIEDED_REJECTED(2),
+    REVIEWED_REJECTED(2),
     /**
-     * 已认购（合约中）
+     * 已认购(合约中）
      */
     SUBSCRIBED(3),
     /**
      * 已过期（未认购)
      */
-    EXPRIED(4),
+    EXPIRED(4),
     /**
      * 逾期
      */
-    OVERDUE(5)
+    OVERDUE(5),
+    /**
+     * 合约结束
+     */
+    FINISHED(6)
     ;
 
     private Integer status;

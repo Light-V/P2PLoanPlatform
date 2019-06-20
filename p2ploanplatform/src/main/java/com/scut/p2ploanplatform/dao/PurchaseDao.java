@@ -47,7 +47,7 @@ public interface PurchaseDao {
      * @param investorId 投资人Id
      * @return 订单列表
      */
-    @Select("SELECT * FROM `purchase` WHERE `investor_id` #{investorId}")
+    @Select("SELECT * FROM `purchase` WHERE `investor_id` = #{investorId}")
     List<Purchase> showPurchaseByInvestorId(String investorId);
 
     /**
@@ -55,6 +55,6 @@ public interface PurchaseDao {
      * @param borrowerId 投资人Id
      * @return 订单列表
      */
-    @Select("SELECT * FROM `purchase` WHERE `borrower_id` #{borrowerId}")
+    @Select("SELECT * FROM `purchase` WHERE `borrower_id` = #{borrowerId}")
     List<Purchase> showPurchaseByBorrowerId(String borrowerId);
 }

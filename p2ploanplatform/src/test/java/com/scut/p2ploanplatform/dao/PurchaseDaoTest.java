@@ -78,10 +78,20 @@ public class PurchaseDaoTest {
     @Test
     @Transactional
     public void showPurchaseByInvestorId() {
+        for(int i = 0; i<5; i++){
+            purchaseDao.createPurchaseItem(purchase);
+        }
+        List<Purchase> purchases = purchaseDao.showPurchaseByInvestorId("206613679426");
+        Assert.assertEquals(5,purchases.size());
     }
 
     @Test
     @Transactional
     public void showPurchaseByBorrowerId() {
+        for(int i = 0; i<5; i++){
+            purchaseDao.createPurchaseItem(purchase);
+        }
+        List<Purchase> purchases = purchaseDao.showPurchaseByBorrowerId("206613679426");
+        Assert.assertEquals(0,purchases.size());
     }
 }

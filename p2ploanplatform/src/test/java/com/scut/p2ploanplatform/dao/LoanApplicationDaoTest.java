@@ -12,13 +12,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.sql.Date;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
 import static java.lang.Thread.sleep;
-import static org.junit.Assert.*;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class LoanApplicationDaoTest {
@@ -44,17 +42,17 @@ public class LoanApplicationDaoTest {
     @Test
     @Transactional
     public void addApplication() {
-        Integer applicationId = loanApplicationDao.addApplication(loanApplication);
-        Assert.assertEquals(new Integer(1), applicationId);
+        Boolean result = loanApplicationDao.addApplication(loanApplication);
+        Assert.assertTrue( result);
     }
 
     @Test
     @Transactional
-    public void changeStatusById() {
-        Integer temp = loanApplicationDao.addApplication(loanApplication);
-        Integer applicationId = loanApplication.getApplicationId();
-        Integer result = loanApplicationDao.changeStatusById(applicationId, LoanStatus.REVIEWED_PASSED.getStatus());
-        Assert.assertEquals(new Integer(1), result);
+    public void updateApplication() {
+        loanApplicationDao.addApplication(loanApplication);
+        loanApplication.setStatus(LoanStatus.REVIEWED_PASSED.getStatus());
+        Boolean result = loanApplicationDao.updateApplication(loanApplication);
+        Assert.assertTrue( result);
     }
 
     @Test
@@ -64,18 +62,18 @@ public class LoanApplicationDaoTest {
     @Test
     @Transactional
     public void deleteApplicationById() {
-        Integer temp = loanApplicationDao.addApplication(loanApplication);
+        loanApplicationDao.addApplication(loanApplication);
         Integer applicationId = loanApplication.getApplicationId();
-        Integer result = loanApplicationDao.deleteApplicationById(applicationId);
-        Assert.assertEquals(new Integer(1), result);
+        Boolean result = loanApplicationDao.deleteApplicationById(applicationId);
+        Assert.assertTrue( result);
     }
 
     @Test
     @Transactional
     public void showApplicationByApplicationId() {
-        Integer temp = loanApplicationDao.addApplication(loanApplication);
+        loanApplicationDao.addApplication(loanApplication);
         Integer applicationId = loanApplication.getApplicationId();
-        LoanApplication application = loanApplicationDao.showApplicationByApplicationId(applicationId);
+        LoanApplication application = loanApplicationDao.showApplicationById(applicationId);
         Assert.assertEquals(loanApplication.getTitle(), application.getTitle());
     }
 
