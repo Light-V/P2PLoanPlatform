@@ -35,4 +35,22 @@ public class P2pAccount {
      * 0表示普通账户，1表示风险准备金账户
      */
     private int type;
+
+    /**
+     * 获取用户ID
+     * @return 用户ID
+     */
+    public String getUserID()
+    {
+        return userID;
+    }
+
+    /**
+     * 获取余额
+     * @return 余额
+     */
+    public BigDecimal getBalance()
+    {
+        return balance;
+    }
 }
