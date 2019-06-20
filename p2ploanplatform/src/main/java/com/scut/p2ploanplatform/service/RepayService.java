@@ -41,7 +41,7 @@ public interface RepayService {
     /**
      * 更新还款计划信息（不推荐外部调用）
      * @param id 计划ID
-     * @param status 还款计划状态（该字段可为null，为null时根据realRepayDate更新状态，否则要求该状态与realRepayDate统一）
+     * @param status 还款计划状态
      * @param realRepayDate 实际还款日期（为null则为未还）
      * @throws SQLException SQL错误
      * @throws IllegalArgumentException 参数错误

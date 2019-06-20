@@ -135,13 +135,23 @@ public class RepayPlanDaoTest {
         normalPlan.setAmount(BigDecimal.valueOf(321, 2));
         normalPlan.setStatus(RepayPlanStatus.SUCCEEDED.getStatus());
 
+        // normal plans
+        RepayPlan advancedPaidPlan = new RepayPlan();
+        advancedPaidPlan.setPlanId(UUID.randomUUID().toString().replace("-",""));
+        advancedPaidPlan.setPurchaseId(1234);
+        advancedPaidPlan.setRepayDate(offsetOneMonth(getDate(new Date()), -2));
+        advancedPaidPlan.setRealRepayDate(advancedPaidPlan.getRepayDate());
+        advancedPaidPlan.setAmount(BigDecimal.valueOf(321, 2));
+        advancedPaidPlan.setStatus(RepayPlanStatus.GUARANTOR_PAID_ADVANCE.getStatus());
+
         insertPlan(unpaidPlan);
         insertPlan(overduePlan);
         insertPlan(normalPlan);
+        insertPlan(advancedPaidPlan);
 
         List<RepayPlan> plans = repayPlanDao.findAllUnpaidPlan();
 
-        assertEquals(2, plans.size());
+        assertEquals(3, plans.size());
 
         if (plans.get(0).getPlanId().equals(unpaidPlan.getPlanId())) {
             assertRepayPlanEquals(unpaidPlan, plans.get(0));
@@ -166,6 +176,7 @@ public class RepayPlanDaoTest {
         actualPlan.setStatus(RepayPlanStatus.SUCCEEDED.getStatus());
         actualPlan.setRepayDate(offsetOneMonth(actualPlan.getRepayDate(), 1));
         actualPlan.setRealRepayDate(actualPlan.getRepayDate());
+        actualPlan.setAmount(BigDecimal.valueOf(2333.45));
 
         result = repayPlanDao.updatePlan(actualPlan);
         assertEquals(1, result);
