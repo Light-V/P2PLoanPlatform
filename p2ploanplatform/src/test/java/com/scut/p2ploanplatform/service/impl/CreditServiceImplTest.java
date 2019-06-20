@@ -81,8 +81,8 @@ public class CreditServiceImplTest {
         try {
             creditService.updateCreditInfo(creditInfo);
             BigDecimal result = creditService.creditReport(creditInfo.getUserId());
-            assertEquals(new BigDecimal(2.4), result);
-            creditService.creditGrant(creditInfo.getUserId(), new BigDecimal(2.0));
+            assertEquals(new BigDecimal("2.4"), result);
+            creditService.creditGrant(creditInfo.getUserId(), new BigDecimal("2.0"));
         }
         catch (Exception exception) {
 

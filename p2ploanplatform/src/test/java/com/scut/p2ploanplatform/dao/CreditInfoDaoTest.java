@@ -57,6 +57,7 @@ public class CreditInfoDaoTest {
         assertEquals(1, creditInfoDao.updateCreditInfo(creditInfo));
     }
 
+
     @Test
     @Transactional
     public void selectCreditInfo()
