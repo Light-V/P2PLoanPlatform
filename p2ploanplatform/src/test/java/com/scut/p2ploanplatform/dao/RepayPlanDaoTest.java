@@ -176,6 +176,7 @@ public class RepayPlanDaoTest {
         actualPlan.setStatus(RepayPlanStatus.SUCCEEDED.getStatus());
         actualPlan.setRepayDate(offsetOneMonth(actualPlan.getRepayDate(), 1));
         actualPlan.setRealRepayDate(actualPlan.getRepayDate());
+        actualPlan.setAmount(BigDecimal.valueOf(2333.45));
 
         result = repayPlanDao.updatePlan(actualPlan);
         assertEquals(1, result);
