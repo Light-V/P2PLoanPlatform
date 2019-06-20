@@ -1,4 +1,5 @@
-package com.scut.p2ploanplatform.dao;
+package com.scut.p2ploanplatform.service;
+
 
 import com.scut.p2ploanplatform.entity.User;
 import org.junit.Before;
@@ -9,15 +10,20 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.SQLException;
+
 import static org.junit.Assert.*;
 
-
+/**
+ * @author: zrh
+ * @date: 2019/6/19
+ * @description:测试UserService
+ */
 @SpringBootTest
 @RunWith(SpringRunner.class)
-public class SignUpDaoTest {
-
+public class UserServiceTest {
     @Autowired
-    private SignUpDao signUpDao;
+    private UserService userService;
 
     private User sampleUser;
 
@@ -36,22 +42,15 @@ public class SignUpDaoTest {
 
     @Test
     @Transactional
-    public void insertUserTest() {
-        int result = insertUser(sampleUser);
+    public void insertUserTest() throws SQLException, IllegalArgumentException{
+        int result = userService.insertUser(sampleUser.getUserId(),sampleUser.getDepartmentId(),sampleUser.getPassword(), sampleUser.getPhone(),sampleUser.getIdCard(),sampleUser.getThirdPartyId(),sampleUser.getName(),sampleUser.getAddress());
         assertEquals(1, result);
-    }
-
-    private int insertUser(User newUser) {
-        return signUpDao.insertUser(newUser);
     }
 
     @Test
     @Transactional
-    public void findUserIdTest() {
-
-        // check: non-empty result
-        insertUser(sampleUser);
-        User it = signUpDao.findUser(sampleUser.getUserId());
-        assertEquals(sampleUser, it);
+    public void findUserTest() throws SQLException, IllegalArgumentException{
+        int result = userService.insertUser(sampleUser.getUserId(),sampleUser.getDepartmentId(),sampleUser.getPassword(), sampleUser.getPhone(),sampleUser.getIdCard(),sampleUser.getThirdPartyId(),sampleUser.getName(),sampleUser.getAddress());
+        assertEquals(sampleUser,userService.findUser(sampleUser.getUserId()));
     }
 }
