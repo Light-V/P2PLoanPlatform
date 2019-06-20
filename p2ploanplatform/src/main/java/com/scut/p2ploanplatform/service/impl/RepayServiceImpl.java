@@ -179,24 +179,25 @@ public class RepayServiceImpl implements RepayService {
                 User guarantor = userService.findUser(purchase.getGuarantorId());
 
                 // 转账
-                boolean transactionSuccess = p2pAccountService.pay(borrower.getThirdPartyId(), plan.getAmount());
+                boolean transactionSuccess;
+                // 已由担保人代付，还款默认转到担保人账号，其余情况都转到投资者账号
+                if (plan.getStatus() == RepayPlanStatus.GUARANTOR_PAID_ADVANCE.getStatus())
+                    transactionSuccess = p2pAccountService.transfer(borrower.getThirdPartyId(), guarantor.getThirdPartyId(), plan.getAmount());
+                else
+                    transactionSuccess = p2pAccountService.transfer(borrower.getThirdPartyId(), investor.getThirdPartyId(), plan.getAmount());
+
                 if (transactionSuccess) {
                     plan.setRealRepayDate(new Date());
                     //todo: modify this hard-coded message to configuration file
                     noticeService.sendNotice(borrower.getUserId(), NOTICE_TITLE,
                             String.format("尊敬的 %s 用户，您本月贷款还款成功，已成功还款 %s 元", borrower.getName(), plan.getAmount().toString()));
                     if (plan.getStatus() == RepayPlanStatus.GUARANTOR_PAID_ADVANCE.getStatus()) {
-                        // 已由担保人代付，还款默认转到担保人账号
-                        p2pAccountService.income(guarantor.getThirdPartyId(), plan.getAmount());
 
                         plan.setStatus(RepayPlanStatus.OVERDUE_SUCCEEDED.getStatus());
 
                     noticeService.sendNotice(guarantor.getUserId(), NOTICE_TITLE,
                             String.format("尊敬的 %s 用户，您担保的贷款人 %s 本月已完成还款，还款金额已经转入您的第三方账号中", guarantor.getName(), borrower.getName()));
                     } else {
-                        // 其余情况都转到投资者账号
-                        p2pAccountService.income(investor.getThirdPartyId(), plan.getAmount());
-
                         if (plan.getStatus() == RepayPlanStatus.SCHEDULED.getStatus())
                             plan.setStatus(RepayPlanStatus.SUCCEEDED.getStatus());
                         else
@@ -210,13 +211,11 @@ public class RepayServiceImpl implements RepayService {
                 } else {
                     // transaction failed: borrower -> investor
 
-                    transactionSuccess = p2pAccountService.pay(guarantor.getThirdPartyId(), plan.getAmount());
+                    transactionSuccess = p2pAccountService.transfer(guarantor.getThirdPartyId(), investor.getThirdPartyId(), plan.getAmount());
                     noticeService.sendNotice(borrower.getUserId(), NOTICE_TITLE,
                             String.format("尊敬的 %s 用户，您的贷款本月还款失败，请检查第三方账号中金额，确保在系统重试还款前，拥有足够金额进行划扣", borrower.getName()));
 
                     if (transactionSuccess) {
-                        p2pAccountService.income(investor.getThirdPartyId(), plan.getAmount());
-
                         // 担保人代付成功
                         plan.setStatus(RepayPlanStatus.GUARANTOR_PAID_ADVANCE.getStatus());
 
@@ -225,7 +224,6 @@ public class RepayServiceImpl implements RepayService {
                         // todo: add water bill: guarantor -> investor
                     } else {
                         // 支付失败，投资方money全部木大
-
                         // 只对首次失败通知投资方
                         if (plan.getStatus() != RepayPlanStatus.OVERDUE.getStatus()) {
                             noticeService.sendNotice(investor.getUserId(), NOTICE_TITLE,
