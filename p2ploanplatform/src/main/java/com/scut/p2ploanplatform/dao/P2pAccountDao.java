@@ -7,8 +7,8 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.List;
-@Mapper
 @Repository
+@Mapper
 public interface P2pAccountDao {
     @Insert("insert into p2p_account(user_id, name, payment_password, balance, status, type) values (#{userId}, #{name}, #{paymentPassword}, #{balance}, #{status}, #{type})")
     int insertP2pAccount(P2pAccount p2pAccount);

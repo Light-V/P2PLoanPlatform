@@ -29,12 +29,12 @@ public class P2pAccount {
      * 账户状态
      * 0表示冻结，1表示正常
      */
-    private int status;
+    private Integer status;
     /**
      * 账户类型
      * 0表示普通账户，1表示风险准备金账户
      */
-    private int type;
+    private Integer type;
 
     /**
      * 获取用户ID

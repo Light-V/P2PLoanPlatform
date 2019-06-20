@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.sql.SQLException;
 
 public interface P2pAccountService {
+
     /**
      * 查询账户余额
      * @param userId 用户ID

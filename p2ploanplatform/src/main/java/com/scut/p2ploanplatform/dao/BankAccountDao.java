@@ -1,7 +1,6 @@
 package com.scut.p2ploanplatform.dao;
 
 import com.scut.p2ploanplatform.entity.BankAccount;
-import com.scut.p2ploanplatform.entity.P2pAccount;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
