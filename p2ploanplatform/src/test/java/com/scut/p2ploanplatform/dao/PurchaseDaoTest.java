@@ -15,7 +15,6 @@ import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.List;
 
-import static org.junit.Assert.*;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class PurchaseDaoTest {
@@ -50,8 +49,7 @@ public class PurchaseDaoTest {
     @Transactional
     public void purchaseUpdate() {
         purchaseDao.createPurchaseItem(purchase);
-        purchase.setStatus(LoanStatus.OVERDUE.getStatus());
-        Boolean result = purchaseDao.updatePurchase(purchase);
+        Boolean result = purchaseDao.updatePurchaseStatus(purchase.getPurchaseId(),LoanStatus.OVERDUE.getStatus());
         Assert.assertTrue(result);
         Assert.assertEquals(new Integer(5), purchase.getStatus());
     }
@@ -72,7 +70,7 @@ public class PurchaseDaoTest {
         for(int i = 0; i<5; i++){
             purchaseDao.createPurchaseItem(purchase);
         }
-        Purchase purchaseitem = purchaseDao.showPurchaseByPurchaseId(10);
+        Purchase purchaseitem = purchaseDao.getPurchaseByPurchaseId(10);
     }
 
     @Test
@@ -81,7 +79,7 @@ public class PurchaseDaoTest {
         for(int i = 0; i<5; i++){
             purchaseDao.createPurchaseItem(purchase);
         }
-        List<Purchase> purchases = purchaseDao.showPurchaseByInvestorId("206613679426");
+        List<Purchase> purchases = purchaseDao.getPurchaseByInvestorId("206613679426");
         Assert.assertEquals(5,purchases.size());
     }
 
@@ -91,7 +89,7 @@ public class PurchaseDaoTest {
         for(int i = 0; i<5; i++){
             purchaseDao.createPurchaseItem(purchase);
         }
-        List<Purchase> purchases = purchaseDao.showPurchaseByBorrowerId("206613679426");
+        List<Purchase> purchases = purchaseDao.getPurchaseByBorrowerId("206613679426");
         Assert.assertEquals(0,purchases.size());
     }
 }

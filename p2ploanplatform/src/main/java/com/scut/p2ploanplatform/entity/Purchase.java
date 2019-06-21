@@ -1,8 +1,10 @@
 package com.scut.p2ploanplatform.entity;
 
+import com.scut.p2ploanplatform.enums.LoanStatus;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -66,4 +68,20 @@ public class Purchase {
      * 修改时间（最后一次状态改变时间）
      */
     private Date updateTime;
+
+    public Purchase(LoanApplication application) {
+        this.applicationId = application.getApplicationId();
+        this.borrowerId = application.getBorrowerId();
+        this.guarantorId = application.getGuarantorId();
+        this.title = application.getTitle();
+        this.purchaseTime = Calendar.getInstance().getTime();
+        this.status = LoanStatus.SUBSCRIBED.getStatus();
+        this.amount = application.getAmount();
+        this.interestRate = application.getInterestRate();
+        this.loanMonth = application.getLoanMonth();
+    }
+
+    public Purchase(){
+
+    }
 }
