@@ -3,9 +3,9 @@ package com.scut.p2ploanplatform.enums;
 import lombok.Getter;
 
 @Getter
-public enum P2pAccountStatusEnum {
-    FROZEN(0,"冻结"),
-    ACTIVE(1,"激活")
+public enum AccountTypeEnum {
+    NORMAL(0,"普通账户"),
+    RISKRESERVE(1,"风险准备金账户")
     ;
     private Integer code;
 
@@ -20,7 +20,7 @@ public enum P2pAccountStatusEnum {
     {
         return msg;
     }
-    P2pAccountStatusEnum(Integer code, String msg) {
+    AccountTypeEnum(Integer code, String msg) {
         this.code = code;
         this.msg = msg;
     }

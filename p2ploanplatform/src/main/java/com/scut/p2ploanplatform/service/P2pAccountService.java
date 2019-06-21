@@ -1,8 +1,5 @@
 package com.scut.p2ploanplatform.service;
 
-import com.scut.p2ploanplatform.entity.P2pAccount;
-import com.sun.org.apache.xpath.internal.operations.Bool;
-
 import java.math.BigDecimal;
 import java.sql.SQLException;
 

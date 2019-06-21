@@ -1,20 +1,22 @@
 package com.scut.p2ploanplatform.entity;
 
+import lombok.Data;
+
 import java.math.BigDecimal;
 
 /**
  * 银行账户
  */
-
+@Data
 public class BankAccount {
     /**
      * 银行卡ID
      */
-    private String cardID;
+    private String cardId;
     /**
      * 用户ID
      */
-    private String userID;
+    private String userId;
     /**
      * 用户姓名
      */
@@ -30,12 +32,12 @@ public class BankAccount {
 
     public String getCardID()
     {
-        return cardID;
+        return cardId;
     }
 
     public String getUserID()
     {
-        return userID;
+        return userId;
     }
 
     public BigDecimal getBalance()
@@ -45,16 +47,18 @@ public class BankAccount {
 
     public String getPaymentPassword() { return paymentPassword; }
 
+    public String getName() { return name; }
+
     public void setBalance(BigDecimal balance) {
         this.balance = balance;
     }
 
     public void setCardID(String cardID) {
-        this.cardID = cardID;
+        this.cardId = cardID;
     }
 
     public void setUserID(String userID) {
-        this.userID = userID;
+        this.userId = userID;
     }
 
     public void setName(String name) {

@@ -47,6 +47,14 @@ public class P2pAccount {
         return balance;
     }
 
+    public String getName() { return name; }
+
+    public Integer getStatus() { return status; }
+
+    public Integer getType() { return type; }
+
+    public String getPaymentPassword() { return paymentPassword; }
+
     public void setUserId(String userId) { this.userId=userId; }
 
     public void setName(String name) {this.name=name;}

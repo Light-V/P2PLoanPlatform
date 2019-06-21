@@ -1,7 +1,7 @@
 package com.scut.p2ploanplatform.dao;
 
 import com.scut.p2ploanplatform.entity.Purchase;
-import javafx.application.Application;
+//import javafx.application.Application;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
