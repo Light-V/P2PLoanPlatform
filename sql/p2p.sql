@@ -151,7 +151,7 @@ create table `repay_record` (
 	`payer_id` varchar(12) not null,
 	`payee_id` varchar(12) not null,
 	`time` timestamp not null comment '还款时间',
-	`amount` timestamp not null comment '还款金额',
+	`amount` decimal(12,2) not null comment '还款金额',
 	-- foreign key(`plan_id`) references `repay_plan`(`plan_id`),
 	primary key(`record_id`)
 ) engine=InnoDB default charset=utf8mb4 comment '还款流水记录';
