@@ -94,7 +94,7 @@ public class CreditServiceImpl implements CreditService {
             //Update grant credit
             grantCredit.setRate(rate);
             grantCredit.setExpire(offsetOneMonth(new Date()));
-            grantCredit.setQuota(grantCredit.getIncome().multiply(rate));
+            grantCredit.setIncome(creditInfo.getIncome());
             grantCreditDao.updateGrantCredit(grantCredit);
         }
         return grantCredit.getIncome().multiply(rate);

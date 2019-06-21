@@ -19,6 +19,8 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author: Light
@@ -73,11 +75,11 @@ public class CreditController {
             }
         }
         catch (SQLException exception){
-
         }
 
-
-        return ResultVoUtil.success(result);
+        Map<String, Object> map = new HashMap<>();
+        map.put("quota", result);
+        return ResultVoUtil.success(map);
     }
 
 
