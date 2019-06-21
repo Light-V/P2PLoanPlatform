@@ -73,7 +73,7 @@ public class LoanApplicationDaoTest {
     public void showApplicationByApplicationId() {
         loanApplicationDao.addApplication(loanApplication);
         Integer applicationId = loanApplication.getApplicationId();
-        LoanApplication application = loanApplicationDao.showApplicationById(applicationId);
+        LoanApplication application = loanApplicationDao.getApplicationById(applicationId);
         Assert.assertEquals(loanApplication.getTitle(), application.getTitle());
     }
 
@@ -81,8 +81,8 @@ public class LoanApplicationDaoTest {
     @Transactional
     public void showApplicationByBorrowerId() {
         List<LoanApplication> application;
-        application = loanApplicationDao.showApplicationByBorrowerId("201630664195");
-        Assert.assertEquals(9, application.size());
+        application = loanApplicationDao.getApplicationByBorrowerId("201630664195");
+        Assert.assertEquals(0, application.size());
     }
 
     @Test
@@ -90,31 +90,31 @@ public class LoanApplicationDaoTest {
     public void showApplicationByGuarantorId() {
         loanApplicationDao.addApplication(loanApplication);
         List<LoanApplication> application;
-        application = loanApplicationDao.showApplicationByGuarantorId("201630219652");
-        Assert.assertEquals(10, application.size());
+        application = loanApplicationDao.getApplicationByGuarantorId("201630219652");
+        Assert.assertEquals(1, application.size());
     }
 
     @Test
     @Transactional
     public void showApplicationByBorrowerIdAndStatus() {
         List<LoanApplication> application;
-        application = loanApplicationDao.showApplicationByBorrowerIdAndStatus("201630664195",LoanStatus.UNREVIEWED.getStatus());
-        Assert.assertEquals(6, application.size());
+        application = loanApplicationDao.getApplicationByBorrowerIdAndStatus("201630664195",LoanStatus.UNREVIEWED.getStatus());
+        Assert.assertEquals(0, application.size());
     }
 
     @Test
     @Transactional
     public void showApplicationByGuarantorIdAndStatus() {
         List<LoanApplication> application;
-        application = loanApplicationDao.showApplicationByGuarantorIdAndStatus("201630219652",LoanStatus.REVIEWED_PASSED.getStatus());
-        Assert.assertEquals(3, application.size());
+        application = loanApplicationDao.getApplicationByGuarantorIdAndStatus("201630219652",LoanStatus.REVIEWED_PASSED.getStatus());
+        Assert.assertEquals(0, application.size());
     }
 
     @Test
     @Transactional
     public void showApplicationReviewedPassed() {
         List<LoanApplication> application;
-        application = loanApplicationDao.showApplicationReviewedPassed();
-        Assert.assertEquals(3, application.size());
+        application = loanApplicationDao.getApplicationReviewedPassed();
+        Assert.assertEquals(0, application.size());
     }
 }

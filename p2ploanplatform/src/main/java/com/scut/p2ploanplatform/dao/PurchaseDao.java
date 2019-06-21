@@ -21,11 +21,12 @@ public interface PurchaseDao {
 
     /**
      * 修改订单状态
-     * @param purchase 订单
+     * @param purchaseID 订单Id
+     * @param status 订单状态
      * @return 操作状态（成功/失败）
      */
     @Update("UPDATE `purchase` SET `status`= #{status} WHERE `purchase_id` = #{purchaseId}")
-    Boolean updatePurchase(Purchase purchase);
+    Boolean updatePurchaseStatus(Integer purchaseID,Integer status);
 
     /**
      * 查询所有订单
@@ -40,7 +41,7 @@ public interface PurchaseDao {
      * @return 订单列表
      */
     @Select("SELECT * FROM `purchase` WHERE `purchase_id` = #{purchaseId}")
-    Purchase showPurchaseByPurchaseId(Integer purchaseId);
+    Purchase getPurchaseByPurchaseId(Integer purchaseId);
 
     /**
      * 查询特定投资人的所有订单
@@ -48,7 +49,7 @@ public interface PurchaseDao {
      * @return 订单列表
      */
     @Select("SELECT * FROM `purchase` WHERE `investor_id` = #{investorId}")
-    List<Purchase> showPurchaseByInvestorId(String investorId);
+    List<Purchase> getPurchaseByInvestorId(String investorId);
 
     /**
      * 查询特定投资人的所有订单
@@ -56,5 +57,5 @@ public interface PurchaseDao {
      * @return 订单列表
      */
     @Select("SELECT * FROM `purchase` WHERE `borrower_id` = #{borrowerId}")
-    List<Purchase> showPurchaseByBorrowerId(String borrowerId);
+    List<Purchase> getPurchaseByBorrowerId(String borrowerId);
 }

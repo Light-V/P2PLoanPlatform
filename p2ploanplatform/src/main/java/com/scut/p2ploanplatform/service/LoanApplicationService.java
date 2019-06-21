@@ -74,11 +74,11 @@ public interface LoanApplicationService {
     /**
      * 根据Id借款申请
      * @param id 借款申请Id
-     * @return 借款申请列表
+     * @return 借款申请
      * @throws SQLException sql错误
      * @throws IllegalArgumentException 非法参数错误
      */
-    LoanApplication showApplicationById(Integer id) throws  SQLException,IllegalArgumentException;
+    LoanApplication getApplicationById(Integer id) throws  SQLException,IllegalArgumentException;
 
     /**
      * 查询特定借款人的所有借款申请
@@ -87,7 +87,7 @@ public interface LoanApplicationService {
      * @throws SQLException sql错误
      * @throws IllegalArgumentException 非法参数错误
      */
-    List<LoanApplication> showApplicationByBorrowerId(String borrowerId) throws  SQLException,IllegalArgumentException;
+    List<LoanApplication> getApplicationByBorrowerId(String borrowerId) throws  SQLException,IllegalArgumentException;
 
     /**
      * 查询特定担保人担保的所有借款申请
@@ -96,7 +96,7 @@ public interface LoanApplicationService {
      * @throws SQLException sql错误
      * @throws IllegalArgumentException 非法参数错误
      */
-    List<LoanApplication> showApplicationByGuarantorId(String guarantorId) throws SQLException,IllegalArgumentException;
+    List<LoanApplication> getApplicationByGuarantorId(String guarantorId) throws SQLException,IllegalArgumentException;
 
     /**
      * 查询特定借款人特定状态的所有借款申请
@@ -106,7 +106,7 @@ public interface LoanApplicationService {
      * @throws SQLException sql错误
      * @throws IllegalArgumentException 非法参数错误
      */
-    List<LoanApplication> showApplicationByBorrowerId(String borrowerId, Integer status) throws  SQLException,IllegalArgumentException;
+    List<LoanApplication> getApplicationByBorrowerId(String borrowerId, Integer status) throws  SQLException,IllegalArgumentException;
 
     /**
      * 查询特定担保人担保的特定状态的借款申请
@@ -116,7 +116,7 @@ public interface LoanApplicationService {
      * @throws SQLException sql错误
      * @throws IllegalArgumentException 非法参数错误
      */
-    List<LoanApplication> showApplicationByGuarantorId(String guarantorId, Integer status) throws SQLException,IllegalArgumentException;
+    List<LoanApplication> getApplicationByGuarantorId(String guarantorId, Integer status) throws SQLException,IllegalArgumentException;
 
     /**
      * 查询所有审核已通过的借款申请
@@ -125,5 +125,5 @@ public interface LoanApplicationService {
      * @throws SQLException sql错误
      * @throws IllegalArgumentException 非法参数错误
      */
-    List<LoanApplication> showApplicationReviewedPassed() throws SQLException;
+    List<LoanApplication> getApplicationReviewedPassed() throws SQLException;
 }

@@ -42,7 +42,7 @@ public interface LoanApplicationDao {
      * @return 借款申请
      */
     @Select("SELECT * FROM `loan_application` WHERE `application_id`= #{ApplicationId}")
-    LoanApplication showApplicationById(Integer ApplicationId);
+    LoanApplication getApplicationById(Integer ApplicationId);
 
     /**
      * 查询特定借款人的所有借款申请
@@ -50,7 +50,7 @@ public interface LoanApplicationDao {
      * @return 借款申请列表
      */
     @Select("SELECT * FROM `loan_application` WHERE `borrower_id`= #{borrowerId}")
-    List<LoanApplication> showApplicationByBorrowerId(String borrowerId);
+    List<LoanApplication> getApplicationByBorrowerId(String borrowerId);
 
     /**
      * 查询特定担保人担保的所有借款申请
@@ -58,7 +58,7 @@ public interface LoanApplicationDao {
      * @return 借款申请列表
      */
     @Select("SELECT * FROM `loan_application` WHERE `guarantor_id`= #{guarantorId}")
-    List<LoanApplication> showApplicationByGuarantorId(String guarantorId);
+    List<LoanApplication> getApplicationByGuarantorId(String guarantorId);
 
     /**
      * 查询特定借款人特定状态的所有借款申请
@@ -67,7 +67,7 @@ public interface LoanApplicationDao {
      * @return 借款申请列表
      */
     @Select("SELECT * FROM `loan_application` WHERE `borrower_id`= #{borrowerId} AND `status` = #{loanStatus}")
-    List<LoanApplication> showApplicationByBorrowerIdAndStatus(String borrowerId, Integer loanStatus);
+    List<LoanApplication> getApplicationByBorrowerIdAndStatus(String borrowerId, Integer loanStatus);
 
     /**
      * 查询特定担保人担保的特定状态的借款申请
@@ -76,7 +76,7 @@ public interface LoanApplicationDao {
      * @return 借款申请列表
      */
     @Select("SELECT * FROM `loan_application` WHERE `guarantor_id`= #{guarantorId} AND `status` = #{loanStatus}")
-    List<LoanApplication> showApplicationByGuarantorIdAndStatus(String guarantorId, Integer loanStatus);
+    List<LoanApplication> getApplicationByGuarantorIdAndStatus(String guarantorId, Integer loanStatus);
 
     /**
      * 查询所有审核已通过的借款申请
@@ -84,5 +84,5 @@ public interface LoanApplicationDao {
      * @return 借款申请列表
      */
     @Select("SELECT * FROM `loan_application` WHERE `status` = 1")
-    List<LoanApplication> showApplicationReviewedPassed();
+    List<LoanApplication> getApplicationReviewedPassed();
 }
