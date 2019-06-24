@@ -1,6 +1,6 @@
 package com.scut.p2ploanplatform.utils;
 
-import lombok.Data;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,7 +11,7 @@ import java.util.Date;
  * 自动触发器，按照每日指定时间定时触发（独立线程）
  * 触发机制：调用构造函数后立刻触发
  */
-@Data
+@Getter
 public class AutoTrigger implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(AutoTrigger.class);
 
@@ -27,8 +27,8 @@ public class AutoTrigger implements Runnable {
 
     /**
      * 默认构造函数
-     * @param invokeMethod 回调函数的方法，如调用foo()，则为getClass().getDeclaredMethod("foo")
-     * @param invokeObject 调用函数的实例化对象，如this，则相当于this.foo()
+     * @param invokeMethod 回调方法，如调用foo()，则为getClass().getDeclaredMethod("foo")
+     * @param invokeObject 调用该方法的实例化对象，如this，则相当于this.foo()
      * @param triggerHour 每日触发的小时（0~23）
      * @param triggerMinute 每日触发的分钟（0~59）
      * @param triggerSecond 每日触发的秒数（0~59）
