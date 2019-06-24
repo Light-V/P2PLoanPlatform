@@ -9,6 +9,17 @@ import java.util.List;
 
 public interface BankAccountService {
     /**
+     * 添加银行卡账户
+     * @param cardId 卡号
+     * @param userId 用户ID
+     * @param name 姓名
+     * @param paymentPassword 支付密码
+     * @param balance 余额
+     * @return 成功返回1，失败返回0
+     */
+    int addBankAccount(String cardId, String userId, String name, String paymentPassword, BigDecimal balance) throws SQLException,IllegalArgumentException;
+
+    /**
      * 根据卡号查询余额
      * @param cardId 卡号
      * @return 余额

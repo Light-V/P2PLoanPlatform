@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.Date;
@@ -29,7 +28,7 @@ public class RepayServiceImpl implements RepayService {
     private RepayPlanDao repayPlanDao;
     private PurchaseService purchaseService;
     private NoticeService noticeService;
-//    private WaterBillService waterBillService;
+    private WaterBillService waterBillService;
     private UserService userService;
     private P2pAccountService p2pAccountService;
 
@@ -53,12 +52,21 @@ public class RepayServiceImpl implements RepayService {
         this.userService = userService;
     }
 
+//    @Autowired
+//    public void setWaterBillService(WaterBillService waterBillService) {
+//        this.waterBillService = waterBillService;
+//    }
+
+    @Autowired
+    public void setP2pAccountService(P2pAccountService p2pAccountService) {
+        this.p2pAccountService = p2pAccountService;
+    }
+
+    private Object[] getAutowiredMembers() {
+        return new Object[] {repayPlanDao, purchaseService, noticeService, waterBillService, userService, p2pAccountService};
+    }
+
     public RepayServiceImpl() throws Exception {
-//        RepayAutoTrigger trigger = new RepayAutoTrigger(this, getClass().getDeclaredMethod("doRepay"));
-//        Thread thread = new Thread(trigger);
-//        thread.setDaemon(true);
-//        thread.setName("RepayThread");
-//        thread.start();
         new AutoTrigger(getClass().getDeclaredMethod("doRepay"), this, 8, 0, 0, true);
     }
 
@@ -146,8 +154,18 @@ public class RepayServiceImpl implements RepayService {
 
     @Override
     public synchronized void doRepay() {
-        // waiting autowired value set
-        while (repayPlanDao == null || purchaseService == null) {
+        logger.info("Repay thread ready, waiting beans set");
+        while (true) {
+            Object[] autowiredValues = getAutowiredMembers();
+            boolean hasNullValue = false;
+            for(Object i : autowiredValues) {
+                if (i == null) {
+                    hasNullValue = true;
+                    break;
+                }
+            }
+            if (!hasNullValue)
+                break;
             try {
                 Thread.sleep(10);
             }
@@ -181,58 +199,51 @@ public class RepayServiceImpl implements RepayService {
                 // 转账
                 boolean transactionSuccess;
                 // 已由担保人代付，还款默认转到担保人账号，其余情况都转到投资者账号
-                if (plan.getStatus() == RepayPlanStatus.GUARANTOR_PAID_ADVANCE.getStatus())
-                    transactionSuccess = p2pAccountService.transfer(borrower.getThirdPartyId(), guarantor.getThirdPartyId(), plan.getAmount());
-                else
-                    transactionSuccess = p2pAccountService.transfer(borrower.getThirdPartyId(), investor.getThirdPartyId(), plan.getAmount());
+                User payee = (plan.getStatus() == RepayPlanStatus.GUARANTOR_PAID_ADVANCE.getStatus()) ? guarantor : investor;
+                User payer = borrower;
+                String borrowerMessage, guarantorMessage = null, investorMessage = null;
+
+                transactionSuccess = p2pAccountService.transfer(payer.getThirdPartyId(), payee.getThirdPartyId(), plan.getAmount());
 
                 if (transactionSuccess) {
+                    // 贷款人还款成功：贷款人 -> 投资者/担保人
                     plan.setRealRepayDate(new Date());
-                    //todo: modify this hard-coded message to configuration file
-                    noticeService.sendNotice(borrower.getUserId(), NOTICE_TITLE,
-                            String.format("尊敬的 %s 用户，您本月贷款还款成功，已成功还款 %s 元", borrower.getName(), plan.getAmount().toString()));
-                    if (plan.getStatus() == RepayPlanStatus.GUARANTOR_PAID_ADVANCE.getStatus()) {
-
+                    borrowerMessage = String.format("尊敬的 %s 用户，您本月贷款还款成功，已成功还款 %s 元", borrower.getName(), plan.getAmount().toString());
+                    if (payee == guarantor) { // WARN: weak reference equal, todo: implement equals()
                         plan.setStatus(RepayPlanStatus.OVERDUE_SUCCEEDED.getStatus());
-
-                    noticeService.sendNotice(guarantor.getUserId(), NOTICE_TITLE,
-                            String.format("尊敬的 %s 用户，您担保的贷款人 %s 本月已完成还款，还款金额已经转入您的第三方账号中", guarantor.getName(), borrower.getName()));
+                        guarantorMessage = String.format("尊敬的 %s 用户，您担保的贷款人 %s 本月已完成还款，还款金额已经转入您的第三方账号中", guarantor.getName(), borrower.getName());
                     } else {
-                        if (plan.getStatus() == RepayPlanStatus.SCHEDULED.getStatus())
-                            plan.setStatus(RepayPlanStatus.SUCCEEDED.getStatus());
-                        else
-                            plan.setStatus(RepayPlanStatus.OVERDUE_SUCCEEDED.getStatus());
-                        //todo: add water bill: borrower -> investor
-
-                        noticeService.sendNotice(investor.getUserId(), NOTICE_TITLE,
-                                String.format("尊敬的 %s 用户，您本月投资的贷款已完成还款，已成功收款 %s 元", investor.getName(), plan.getAmount().toString()));
-
+                        plan.setStatus((plan.getStatus() == RepayPlanStatus.SCHEDULED.getStatus()) ? RepayPlanStatus.SUCCEEDED.getStatus() : RepayPlanStatus.OVERDUE_SUCCEEDED.getStatus());
+                        investorMessage = String.format("尊敬的 %s 用户，您本月投资的贷款已完成还款，已成功收款 %s 元", investor.getName(), plan.getAmount().toString());
                     }
                 } else {
-                    // transaction failed: borrower -> investor
-
-                    transactionSuccess = p2pAccountService.transfer(guarantor.getThirdPartyId(), investor.getThirdPartyId(), plan.getAmount());
-                    noticeService.sendNotice(borrower.getUserId(), NOTICE_TITLE,
-                            String.format("尊敬的 %s 用户，您的贷款本月还款失败，请检查第三方账号中金额，确保在系统重试还款前，拥有足够金额进行划扣", borrower.getName()));
+                    // 贷款人还款失败，执行垫付：担保人 -> 投资者
+                    payer = guarantor;
+                    transactionSuccess = p2pAccountService.transfer(payer.getThirdPartyId(), payee.getThirdPartyId(), plan.getAmount());
+                    borrowerMessage = String.format("尊敬的 %s 用户，您的贷款本月还款失败，请检查第三方账号中金额，确保在系统重试还款前，拥有足够金额进行划扣", borrower.getName());
 
                     if (transactionSuccess) {
                         // 担保人代付成功
                         plan.setStatus(RepayPlanStatus.GUARANTOR_PAID_ADVANCE.getStatus());
-
-                        noticeService.sendNotice(investor.getUserId(), NOTICE_TITLE,
-                                String.format("尊敬的 %s 用户，您投资的贷款已完成本月还款，已成功收款 %s 元", borrower.getName(), plan.getAmount().toString()));
-                        // todo: add water bill: guarantor -> investor
+                        investorMessage = String.format("尊敬的 %s 用户，您投资的贷款已完成本月还款，已成功收款 %s 元", borrower.getName(), plan.getAmount().toString());
                     } else {
                         // 支付失败，投资方money全部木大
                         // 只对首次失败通知投资方
                         if (plan.getStatus() != RepayPlanStatus.OVERDUE.getStatus()) {
-                            noticeService.sendNotice(investor.getUserId(), NOTICE_TITLE,
-                                    String.format("尊敬的 %s 用户，您投资贷款本月未及时还款，系统已经为您执行逾期流程", investor.getName()));
+                            investorMessage = String.format("尊敬的 %s 用户，您投资贷款本月未及时还款，系统已经为您执行逾期流程", investor.getName());
                             plan.setStatus(RepayPlanStatus.OVERDUE.getStatus());
                         }
                     }
                 }
                 repayPlanDao.updatePlan(plan);
+                waterBillService.addRepayRecord(plan.getPlanId(), plan.getPurchaseId(), payer.getUserId(), payee.getUserId(), plan.getRepayDate(), plan.getAmount());
+
+                if (borrowerMessage != null)
+                    noticeService.sendNotice(borrower.getUserId(), NOTICE_TITLE, borrowerMessage);
+                if (guarantorMessage != null)
+                    noticeService.sendNotice(guarantor.getUserId(), NOTICE_TITLE, guarantorMessage);
+                if (investorMessage != null)
+                    noticeService.sendNotice(investor.getUserId(), NOTICE_TITLE, investorMessage);
             }
             catch (Exception e) {
                 logger.error("Exception caught while executing repay routine in plan id: " + plan.getPlanId(), e);

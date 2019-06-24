@@ -44,4 +44,27 @@ public class UserServiceImpl implements UserService {
         User user = userDao.findUser(userId);
         return user;
     }
+
+    @Override
+    public int updataPassword(String userId, String password) throws SQLException, IllegalArgumentException {
+        User user = userDao.findUser(userId);
+        if(user != null){
+            user.setPassword(password);
+            return userDao.updatePassword(user);
+        } else {
+            return 0;
+        }
+    }
+
+    @Override
+    public int updataUser(String userId, String phone, String address) throws SQLException, IllegalArgumentException {
+        User user = userDao.findUser(userId);
+        if(user != null){
+            user.setPhone(phone);
+            user.setAddress(address);
+            return userDao.updateUser(user);
+        } else {
+            return 0;
+        }
+    }
 }

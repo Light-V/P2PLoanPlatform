@@ -15,6 +15,9 @@ public interface BankAccountDao {
     @Insert("insert into `p2p`.`bank_account`(`card_id`, `user_id`, `name`, `payment_password`, `balance`) values (#{cardId}, #{userId}, #{name}, #{paymentPassword}, #{balance})")
     int insertBankAccount(BankAccount bankAccount);
 
+    @Select("select * from `p2p`.`bank_account` where `card_id` = #{cardId}")
+    BankAccount findCardByCardId(String cardId);
+
     @Select("select `balance` from `p2p`.`bank_account` where `card_id` = #{cardId}")
     BigDecimal findBalanceByCardId(String cardId);
 
