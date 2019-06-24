@@ -3,7 +3,7 @@ package com.scut.p2ploanplatform.service;
 
 import com.scut.p2ploanplatform.entity.CreditInfo;
 import com.scut.p2ploanplatform.form.CreditInfoForm;
-import com.sun.org.apache.xpath.internal.operations.Bool;
+//import com.sun.org.apache.xpath.internal.operations.Bool;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
