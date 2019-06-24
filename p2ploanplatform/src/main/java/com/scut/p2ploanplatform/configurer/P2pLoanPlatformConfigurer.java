@@ -1,12 +1,14 @@
 package com.scut.p2ploanplatform.configurer;
 
 import com.scut.p2ploanplatform.interceptor.LoginInterceptor;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.scut.p2ploanplatform.utils.Underline2CamelArgumentResolver;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.List;
 
 /**
  * @author: Light
@@ -25,4 +27,8 @@ public class P2pLoanPlatformConfigurer implements WebMvcConfigurer {
 
     }
 
+    @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+        resolvers.add(new Underline2CamelArgumentResolver());
+    }
 }

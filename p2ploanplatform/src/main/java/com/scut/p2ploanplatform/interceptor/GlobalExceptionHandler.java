@@ -5,8 +5,13 @@ import com.scut.p2ploanplatform.exception.CustomException;
 import com.scut.p2ploanplatform.utils.ResultVoUtil;
 import com.scut.p2ploanplatform.vo.ResultVo;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindException;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -53,7 +58,18 @@ public class GlobalExceptionHandler {
         for (ConstraintViolation<?> violation : violations) {
             msg.append(violation.getInvalidValue()).append(violation.getMessage()).append(",");
         }
-        return ResultVoUtil.error(ResultEnum.PARAM_IS_INVALID.getCode(), msg.toString().substring(0, msg.lastIndexOf(",")));
+        return ResultVoUtil.error(ResultEnum.PARAM_IS_INVALID.getCode(), msg.substring(0, msg.lastIndexOf(",")));
+    }
+
+    @ExceptionHandler(BindException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResultVo bindExceptionHandler(BindException e) {
+        StringBuilder msg = new StringBuilder();
+        BindingResult bindingResult = e.getBindingResult();
+        for (FieldError fieldError : bindingResult.getFieldErrors()) {
+            msg.append(fieldError.getDefaultMessage()).append(", ");
+        }
+        return ResultVoUtil.error(ResultEnum.PARAM_IS_INVALID.getCode(), msg.substring(0, msg.lastIndexOf(",")));
     }
 
     @ExceptionHandler(CustomException.class)
