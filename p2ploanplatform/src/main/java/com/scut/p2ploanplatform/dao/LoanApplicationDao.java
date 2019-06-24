@@ -15,8 +15,8 @@ public interface LoanApplicationDao {
      * @param loanApplication 借款申请
      * @return 操作状态（成功/失败)
      */
-    @Insert("INSERT INTO `loan_application` (`borrower_id`, `guarantor_id`, `title`, `status`, `amount`, `interest_rate`, `loan_month`, `purchase_deadline`)\n" +
-            "VALUES (#{borrowerId}, #{guarantorId},#{title}, #{status}, #{amount}, #{interestRate},#{loanMonth}, #{purchaseDeadline})")
+    @Insert("INSERT INTO `loan_application` (`borrower_id`, `title`, `status`, `amount`, `interest_rate`, `loan_month`, `purchase_deadline`)\n" +
+            "VALUES (#{borrowerId}, #{title}, #{status}, #{amount}, #{interestRate},#{loanMonth}, #{purchaseDeadline})")
     @Options(useGeneratedKeys = true, keyProperty = "applicationId", keyColumn = "application_id")
     Boolean addApplication(LoanApplication loanApplication);
 
