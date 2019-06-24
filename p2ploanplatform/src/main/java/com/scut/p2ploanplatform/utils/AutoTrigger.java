@@ -3,13 +3,18 @@ package com.scut.p2ploanplatform.utils;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Date;
 
 /**
  * 自动触发器，按照每日指定时间定时触发（独立线程）
- * 触发机制：调用构造函数后立刻触发
+ * 若存在@Autowired字段，则会等待所有@Autowired注入之后才完成
+ * （PS：通过Setter方式注入的请在字段上加上@com.scut.p2ploanplatform.utils.AutowireField，实例可以参考com.scut.p2ploanplatform.service.impl.RepayServiceImpl）
  */
 @Getter
 public class AutoTrigger implements Runnable {
@@ -56,6 +61,34 @@ public class AutoTrigger implements Runnable {
         thread.start();
     }
 
+    private void waitFieldInitialization() throws Exception {
+        if (invokeObject == null)
+            return;
+        Class c = invokeObject.getClass();
+        while (true) {
+            boolean isAllFieldSet = true;
+            Field[] fields = c.getDeclaredFields();
+            for (Field field: fields) {
+                if (field.isAnnotationPresent(Autowired.class) || field.isAnnotationPresent(AutowireField.class)) {
+                    field.setAccessible(true);
+                    Object fieldValue = field.get(invokeObject);
+                    if (fieldValue == null) {
+                        isAllFieldSet = false;
+                        break;
+                    }
+                }
+            }
+            if (isAllFieldSet)
+                break;
+            Thread.sleep(100);
+        }
+    }
+
+    private void doInvoke() throws Exception {
+        waitFieldInitialization();
+        invokeMethod.invoke(invokeObject, invokeArgs);
+    }
+
     @Override
     public void run() {
         try {
@@ -68,7 +101,7 @@ public class AutoTrigger implements Runnable {
 
             if (triggerAfterInstantiation) {
                 logger.info("Started trigger invocation: " + invokeMethod.toString());
-                invokeMethod.invoke(invokeObject, invokeArgs);
+                doInvoke();
             }
 
             //noinspection InfiniteLoopStatement
@@ -78,12 +111,15 @@ public class AutoTrigger implements Runnable {
                     Thread.sleep(sleepTimeForNextDay);
 
                 logger.info("Started trigger invocation: " + invokeMethod.toString());
-                invokeMethod.invoke(invokeObject, invokeArgs);
+                doInvoke();
 
                 nextTriggerTimestamp += 86400000;
             }
         }catch (Exception e) {
-            logger.error(e.toString());
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            String exceptionDetails = sw.toString();
+            logger.error(exceptionDetails);
 
             // 重试
             Thread thread = new Thread(() -> {

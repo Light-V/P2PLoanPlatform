@@ -7,6 +7,7 @@ import com.scut.p2ploanplatform.entity.User;
 import com.scut.p2ploanplatform.enums.RepayPlanStatus;
 import com.scut.p2ploanplatform.service.*;
 import com.scut.p2ploanplatform.utils.AutoTrigger;
+import com.scut.p2ploanplatform.utils.AutowireField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,11 +26,17 @@ public class RepayServiceImpl implements RepayService {
     private Logger logger = LoggerFactory.getLogger(RepayServiceImpl.class);
     private boolean isColdStart = true;
 
+    @AutowireField
     private RepayPlanDao repayPlanDao;
+    @AutowireField
     private PurchaseService purchaseService;
+    @AutowireField
     private NoticeService noticeService;
+    @AutowireField
     private WaterBillService waterBillService;
+    @AutowireField
     private UserService userService;
+    @AutowireField
     private P2pAccountService p2pAccountService;
 
     @Autowired
@@ -52,18 +59,14 @@ public class RepayServiceImpl implements RepayService {
         this.userService = userService;
     }
 
-//    @Autowired
-//    public void setWaterBillService(WaterBillService waterBillService) {
-//        this.waterBillService = waterBillService;
-//    }
+    @Autowired
+    public void setWaterBillService(WaterBillService waterBillService) {
+        this.waterBillService = waterBillService;
+    }
 
     @Autowired
     public void setP2pAccountService(P2pAccountService p2pAccountService) {
         this.p2pAccountService = p2pAccountService;
-    }
-
-    private Object[] getAutowiredMembers() {
-        return new Object[] {repayPlanDao, purchaseService, noticeService, waterBillService, userService, p2pAccountService};
     }
 
     public RepayServiceImpl() throws Exception {
@@ -154,25 +157,6 @@ public class RepayServiceImpl implements RepayService {
 
     @Override
     public synchronized void doRepay() {
-        logger.info("Repay thread ready, waiting beans set");
-        while (true) {
-            Object[] autowiredValues = getAutowiredMembers();
-            boolean hasNullValue = false;
-            for(Object i : autowiredValues) {
-                if (i == null) {
-                    hasNullValue = true;
-                    break;
-                }
-            }
-            if (!hasNullValue)
-                break;
-            try {
-                Thread.sleep(10);
-            }
-            catch (InterruptedException ignore) {
-                return;
-            }
-        }
         logger.info("Starting daily repay process");
 
         if (isColdStart) {
