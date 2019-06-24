@@ -81,7 +81,8 @@ drop table if exists `loan_application`;
 create table `loan_application` (
 	`application_id` int(12) not null auto_increment,
 	`borrower_id` varchar(12) not null comment '贷款人id',
-	`guarantor_id` varchar(12) not null comment '担保人id',
+	`guarantor_id` varchar(12) comment '担保人id',
+	`title` varchar(255) not null default '借款申请' comment '标题',
 	`status` int not null comment '产品状态, 0为未审核，1为审核通过，2为审核失败，3为已被认购，4为过期',
 	`amount` decimal(12, 2) not null comment '贷款金额',
 	`interest_rate` decimal(5, 4) not null comment '利率',
@@ -101,6 +102,7 @@ create table `purchase` (
 	`borrower_id` varchar(12) not null comment '贷款人id',
 	`guarantor_id` varchar(12) not null comment '担保人id',
 	`investor_id` varchar(12) not null comment '投资人id',
+	`title` varchar(255) not null default '借款申请' comment '标题' ,
 	`purchase_time` date not null comment '认购时间',
 	`interest_rate` decimal(5, 4) not null comment '利率',
 	`loan_month` int not null comment '借款月数',
@@ -114,19 +116,6 @@ create table `purchase` (
 	-- foreign key (`borrower_id`) references `user`(`user_id`),
 	primary key (`purchase_id`)
 ) engine=InnoDB default charset=utf8mb4 comment '认购信息表';
-
-drop table if exists `water_bill`;
-create table `water_bill` (
-	`water_bill_id` varchar(32) not null,
-	`payee_id` varchar(12) not null comment '收款人id',
-	`payer_id` varchar(12) not null comment '支付人id',
-	`amount` decimal(12, 2) not null comment '金额',
-	`mode` int not null comment '模式，0为贷款， 1为还款',
-	`time` timestamp not null default current_timestamp comment '交易时间',
-	-- foreign key(`payee_id`) references `user`(`user_id`),
-	-- foreign key(`payer_id`) references `user`(`user_id`),
-	primary key(`water_bill_id`)
-) engine=InnoDB default charset=utf8mb4 comment '流水账';
 
 drop table if exists `repay_plan`;
 create table `repay_plan` (
@@ -142,6 +131,31 @@ create table `repay_plan` (
     key `index_status`(`status`)
 ) engine=InnoDB default charset=utf8mb4 comment '还款计划';
 
+drop table if exists `loan_record`;
+create table `loan_record` (
+	`record_id` varchar(32) not null,
+	`purchase_id` int(12) not null,
+	`borrower_id` varchar(12) not null,
+	`investor_id` varchar(12) not null,
+	`time` timestamp not null comment '时间',
+	`amount` decimal(12,2) not null comment '金额',
+	-- foreign key(`purchase_id`) references `purchase`(`purchase_id`),
+	primary key(`record_id`)
+) engine=InnoDB default charset=utf8mb4 comment '贷款流水记录';
+
+drop table if exists `repay_record`;
+create table `repay_record` (
+	`record_id` varchar(32) not null,
+	`plan_id` binary(32) not null,
+	`purchase_id` int(12) not null,
+	`payer_id` varchar(12) not null,
+	`payee_id` varchar(12) not null,
+	`time` timestamp not null comment '还款时间',
+	`amount` decimal(12,2) not null comment '还款金额',
+	-- foreign key(`plan_id`) references `repay_plan`(`plan_id`),
+	primary key(`record_id`)
+) engine=InnoDB default charset=utf8mb4 comment '还款流水记录';
+
 drop table if exists `notice`;
 create table `notice` (
 	`notice_id` int not null auto_increment,
@@ -154,6 +168,30 @@ create table `notice` (
 	primary key(`notice_id`),
 	key `index_user_id`(`user_id`)
 ) engine=InnoDB default charset=utf8mb4 comment '通知表';
+
+drop table if exists `loan_month`;
+create table `loan_month`(
+	`month` int not null
+) engine=InnoDB default charset=utf8mb4 comment '借款月数字典';
+insert into `loan_month`(`month`) values(1);
+insert into `loan_month`(`month`) values(2);
+insert into `loan_month`(`month`) values(3);
+insert into `loan_month`(`month`) values(6);
+insert into `loan_month`(`month`) values(9);
+insert into `loan_month`(`month`) values(12);
+
+drop table if exists `loan_interest_rate`;
+create table `loan_interest_rate`(
+	`rate` decimal(5,4) not null
+) engine=InnoDB default charset=utf8mb4 comment '借款利率字典';
+insert into `loan_interest_rate`(`rate`) values(0.0404);
+insert into `loan_interest_rate`(`rate`) values(0.0433);
+insert into `loan_interest_rate`(`rate`) values(0.0464);
+insert into `loan_interest_rate`(`rate`) values(0.0498);
+insert into `loan_interest_rate`(`rate`) values(0.0557);
+insert into `loan_interest_rate`(`rate`) values(0.0585);
+insert into `loan_interest_rate`(`rate`) values(0.0618);
+insert into `loan_interest_rate`(`rate`) values(0.0666);
 
 DROP TABLE IF EXISTS `bank_account`;
 CREATE TABLE `bank_account`  (

@@ -18,6 +18,9 @@ public interface NoticeDao {
     @Options(useGeneratedKeys = true, keyProperty = "noticeId", keyColumn = "notice_id")
     int insert(Notice notice);
 
+    @Select("select * from notice where notice_id = #{noticeId}")
+    Notice findByNoticeId(Integer noticeId);
+
     @Select("select * from notice where user_id = #{userId}")
     List<Notice> findByUserId(String userId);
 

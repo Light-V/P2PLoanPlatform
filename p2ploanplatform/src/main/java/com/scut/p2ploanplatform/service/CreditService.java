@@ -2,7 +2,7 @@ package com.scut.p2ploanplatform.service;
 
 
 import com.scut.p2ploanplatform.entity.CreditInfo;
-import com.sun.org.apache.xpath.internal.operations.Bool;
+import com.scut.p2ploanplatform.form.CreditInfoForm;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
@@ -44,10 +44,20 @@ public interface CreditService {
 
     /**
      * 更新用户征信信息
-     * @param creditInfo 更新的征信信息
+     * @param userId 更新的Id
+     * @param creditInfoForm 表单提交的征信信息
      * @return true(信息被修改)/false(信息未修改)
      * @throws SQLException SQL异常
      * @throws  IllegalArgumentException 非法参数
      */
-    boolean updateCreditInfo(CreditInfo creditInfo) throws SQLException, IllegalArgumentException;
+    boolean updateCreditInfo(String userId, CreditInfoForm creditInfoForm) throws SQLException, IllegalArgumentException;
+
+    /**
+     * 获取已经授信的信用额度
+     * @param userId 需要获取的Id
+     * @return 授信额度
+     * @throws SQLException SQL异常
+     */
+    BigDecimal getGrantInfo(String userId) throws SQLException;
+
 }

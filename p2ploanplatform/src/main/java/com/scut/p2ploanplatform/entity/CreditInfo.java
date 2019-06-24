@@ -1,5 +1,6 @@
 package com.scut.p2ploanplatform.entity;
 
+import com.scut.p2ploanplatform.form.CreditInfoForm;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -48,11 +49,15 @@ public class CreditInfo {
      */
     private Integer creditScore;
 
-    /**
-     *
-     * @return true完整;false不完整
-     */
-    public boolean isComplete() {
-        return  (userId != null && income != null && familyIncome != null && assets != null && familyNumber != null && debt != null && creditScore != null);
+    public CreditInfo(){}
+
+    public CreditInfo(String userId, CreditInfoForm creditInfoForm){
+        this.setUserId(userId);
+        this.setFamilyIncome(creditInfoForm.getFamilyIncome());
+        this.setCreditScore(100);
+        this.setIncome(creditInfoForm.getIncome());
+        this.setFamilyNumber(creditInfoForm.getFamilyNumber());
+        this.setAssets(creditInfoForm.getAssets());
+        this.setDebt(creditInfoForm.getDebt());
     }
 }

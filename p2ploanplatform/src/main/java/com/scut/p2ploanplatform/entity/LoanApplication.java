@@ -3,8 +3,7 @@ package com.scut.p2ploanplatform.entity;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
-import java.sql.Date;
+import java.util.Date;
 
 /**
  * 借款申请类
@@ -17,7 +16,7 @@ public class LoanApplication {
     /**
      * 产品Id(自增)
      */
-    private Integer productId;
+    private Integer applicationId;
     /**
      * 借款人Id
      */
@@ -27,9 +26,14 @@ public class LoanApplication {
      */
     private String guarantorId;
     /**
-     * 产品状态
-     * 0为未审核，1为审核通过，2为审核失败，3为已被认购，4为过期
+     * 借款申请标题
      */
+    private String title;
+    /**
+     * 产品状态
+     * 详情见LoanStatus枚举类
+     */
+
     private Integer status;
     /**
      * 借款金额
@@ -50,16 +54,16 @@ public class LoanApplication {
     /**
      * 创建时间（申请提交时间）
      */
-    private Timestamp createTime;
+    private Date createTime;
     /**
      * 修改时间（最后一次状态改变时间）
      */
-    private Timestamp updateTime;
+    private Date updateTime;
 
     @Override
     public String toString() {
         return "{" +
-                "productId=" + productId +
+                "  applicationId=" + applicationId +
                 ", borrowerId='" + borrowerId + '\'' +
                 ", guarantorId='" + guarantorId + '\'' +
                 ", status=" + status +
