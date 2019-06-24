@@ -60,4 +60,29 @@ public class UserDaoTest {
         User it = userDao.findUser(sampleUser.getUserId());
         assertEquals(sampleUser, it);
     }
+
+    @Test
+    @Transactional
+    public void updataPasswordTest() {
+        insertUser(sampleUser);
+        sampleUser.setPassword("123");
+        int ret = userDao.updatePassword(sampleUser);
+        assertEquals(1, ret);
+        User it = userDao.findUser(sampleUser.getUserId());
+        assertEquals("123", it.getPassword());
+    }
+
+    @Test
+    @Transactional
+    public void updataUserTest() {
+        insertUser(sampleUser);
+        sampleUser.setPhone("15544332211");
+        sampleUser.setAddress("华南理工幼儿园附属大学");
+        int ret = userDao.updateUser(sampleUser);
+        assertEquals(1, ret);
+        User it = userDao.findUser(sampleUser.getUserId());
+        assertEquals("15544332211", it.getPhone());
+        assertEquals("华南理工幼儿园附属大学", it.getAddress());
+    }
+
 }

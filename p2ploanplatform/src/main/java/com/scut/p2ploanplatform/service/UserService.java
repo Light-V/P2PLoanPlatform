@@ -35,4 +35,25 @@ public interface UserService {
      * @return 返回对应的User
      */
     User findUser(String userId) throws SQLException, IllegalArgumentException;
+
+    /**
+     * 用户修改密码
+     * @param userId 用户ID
+     * @param password 用户密码
+     * @throws SQLException SQL错误
+     * @throws IllegalArgumentException 参数错误
+     * @return 修改成功后返回1,失败返回0
+     */
+    int updataPassword(String userId, String password) throws SQLException, IllegalArgumentException;
+
+    /**
+     * 修改用户资料，包括手机号和地址
+     * @param userId 用户ID
+     * @param phone 用户手机号码
+     * @param address 用户地址
+     * @throws SQLException SQL错误
+     * @throws IllegalArgumentException 参数错误
+     * @return 修改成功后返回1,失败返回0
+     */
+    int updataUser(String userId, String phone, String address) throws SQLException, IllegalArgumentException;
 }

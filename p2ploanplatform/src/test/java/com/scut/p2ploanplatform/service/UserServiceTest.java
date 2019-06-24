@@ -35,7 +35,7 @@ public class UserServiceTest {
         sampleUser.setPassword("123456");
         sampleUser.setPhone("15511223344");
         sampleUser.setThirdPartyId("123");
-        sampleUser.setIdCard("456");
+        sampleUser.setIdCard("445281199709195332");
         sampleUser.setAddress("双鸭山大学");
         sampleUser.setName("zhou");
     }
@@ -51,6 +51,25 @@ public class UserServiceTest {
     @Transactional
     public void findUserTest() throws SQLException, IllegalArgumentException{
         int result = userService.insertUser(sampleUser.getUserId(),sampleUser.getDepartmentId(),sampleUser.getPassword(), sampleUser.getPhone(),sampleUser.getIdCard(),sampleUser.getThirdPartyId(),sampleUser.getName(),sampleUser.getAddress());
+        assertEquals(sampleUser,userService.findUser(sampleUser.getUserId()));
+    }
+
+    @Test
+    @Transactional
+    public void updataPasswordTest() throws SQLException, IllegalArgumentException{
+        userService.insertUser(sampleUser.getUserId(),sampleUser.getDepartmentId(),sampleUser.getPassword(), sampleUser.getPhone(),sampleUser.getIdCard(),sampleUser.getThirdPartyId(),sampleUser.getName(),sampleUser.getAddress());
+        sampleUser.setPassword("147");
+        userService.updataPassword(sampleUser.getUserId(),sampleUser.getPassword());
+        assertEquals(sampleUser,userService.findUser(sampleUser.getUserId()));
+    }
+
+    @Test
+    @Transactional
+    public void updataUserTest() throws SQLException, IllegalArgumentException{
+        userService.insertUser(sampleUser.getUserId(),sampleUser.getDepartmentId(),sampleUser.getPassword(), sampleUser.getPhone(),sampleUser.getIdCard(),sampleUser.getThirdPartyId(),sampleUser.getName(),sampleUser.getAddress());
+        sampleUser.setPhone("15544332211");
+        sampleUser.setAddress("华南理工幼儿园附属大学");
+        userService.updataUser(sampleUser.getUserId(),sampleUser.getPhone(),sampleUser.getAddress());
         assertEquals(sampleUser,userService.findUser(sampleUser.getUserId()));
     }
 }

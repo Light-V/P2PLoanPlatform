@@ -21,4 +21,10 @@ public interface UserDao {
     @Select("SELECT * FROM `p2p`.`User` WHERE `user_id` = #{value}")
     User findUser(String id);
 
+    @Update("UPDATE `p2p`.`User` SET `password` = #{password} WHERE `user_id` = #{userId}")
+    int updatePassword(User user);
+
+    @Update("UPDATE `p2p`.`User` SET `phone` = #{phone}, `address` = #{address} WHERE `user_id` = #{userId}")
+    int updateUser(User user);
+
 }
