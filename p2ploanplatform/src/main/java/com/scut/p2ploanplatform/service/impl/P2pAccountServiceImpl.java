@@ -19,26 +19,28 @@ public class P2pAccountServiceImpl implements P2pAccountService {
     BankAccountDao bankAccountDao;
 
     @Override
-    public int insertP2pAccount(String userId, String name, String paymentPassword, BigDecimal balance, Integer status, Integer type) throws SQLException,IllegalArgumentException
+    public int addP2pAccount(String thirdPartyId, String paymentPassword, BigDecimal balance, Integer status, Integer type) throws SQLException,IllegalArgumentException
     {
-        if (p2pAccountDao.findByUserId(userId)!=null)
+        if (p2pAccountDao.findByThirdPartyId(thirdPartyId)!=null)
             return 0;
         else
         {
             P2pAccount p2pAccount=new P2pAccount();
-            p2pAccount.setUserId(userId);
-            p2pAccount.setName(name);
+            p2pAccount.setThirdPartyId(thirdPartyId);
             p2pAccount.setPaymentPassword(paymentPassword);
             p2pAccount.setBalance(balance);
             p2pAccount.setStatus(status);
             p2pAccount.setType(type);
-            p2pAccountDao.insertP2pAccount(p2pAccount);
+            p2pAccountDao.addP2pAccount(p2pAccount);
             return 1;
         }
     }
 
     @Override
-    public BigDecimal showBalance(String userId) throws SQLException,IllegalArgumentException {return p2pAccountDao.findBalanceByUserId(userId);}
+    public BigDecimal findBalance(String thirdPartyId) throws SQLException,IllegalArgumentException
+    {
+        return p2pAccountDao.findBalanceByThirdPartyId(thirdPartyId);
+    }
 
     @Override
     public Boolean verifyTrade(String payerId, BigDecimal amount) throws SQLException,IllegalArgumentException
@@ -46,8 +48,17 @@ public class P2pAccountServiceImpl implements P2pAccountService {
         BigDecimal zero=new BigDecimal(0);
         if (amount.compareTo(zero)==-1)
             return false;
-        BigDecimal balance=showBalance(payerId);
+        BigDecimal balance=findBalance(payerId);
         if (balance.compareTo(amount)==0 || balance.compareTo(amount)==1)
+            return true;
+        else
+            return false;
+    }
+
+    @Override
+    public Boolean verifyPassword(String thirdPartyId, String password) throws SQLException,IllegalArgumentException
+    {
+        if (password==p2pAccountDao.findPasswordByThirdPartyId(thirdPartyId))
             return true;
         else
             return false;
@@ -58,8 +69,8 @@ public class P2pAccountServiceImpl implements P2pAccountService {
     {
         if (verifyTrade(payerId, amount))
         {
-            BigDecimal payerBalance=showBalance(payerId);
-            BigDecimal payeeBalance=showBalance(payeeId);
+            BigDecimal payerBalance=findBalance(payerId);
+            BigDecimal payeeBalance=findBalance(payeeId);
             BigDecimal newPayerBalance=payerBalance.subtract(amount);
             BigDecimal newPayeeBalance=payeeBalance.add(amount);
             p2pAccountDao.updateBalance(payerId, newPayerBalance);
@@ -71,15 +82,28 @@ public class P2pAccountServiceImpl implements P2pAccountService {
     }
 
     @Override
-    public Boolean recharge(String userId, String cardId, BigDecimal amount) throws SQLException,IllegalArgumentException
+    public Boolean verifyPasswordIsSet(String thirdPartyId) throws SQLException,IllegalArgumentException
     {
-        if (verifyTrade(userId,amount))
+        String password=p2pAccountDao.findPasswordByThirdPartyId(thirdPartyId);
+        if (password==null||password.equals(""))
+            return false;
+        else
+            return true;
+    }
+
+    @Override
+    public Boolean recharge(String thirdPartyId, String cardId, BigDecimal amount) throws SQLException,IllegalArgumentException
+    {
+        BigDecimal zero=new BigDecimal(0);
+        if (amount.compareTo(zero)==-1)
+            return false;
+        BigDecimal cardBalance=bankAccountDao.findBalanceByCardId(cardId);
+        if (cardBalance.compareTo(amount)==0 || cardBalance.compareTo(amount)==1)
         {
-            BigDecimal p2pBalance=showBalance(userId);
-            BigDecimal cardBalance=bankAccountDao.findBalanceByCardId(cardId);
-            BigDecimal newP2pBalance=p2pBalance.subtract(amount);
-            BigDecimal newCardBalance=cardBalance.add(amount);
-            p2pAccountDao.updateBalance(userId, newP2pBalance);
+            BigDecimal p2pBalance=findBalance(thirdPartyId);
+            BigDecimal newCardBalance=cardBalance.subtract(amount);
+            BigDecimal newP2pBalance=p2pBalance.add(amount);
+            p2pAccountDao.updateBalance(thirdPartyId, newP2pBalance);
             bankAccountDao.updateBalance(cardId, newCardBalance);
             return true;
         }
@@ -88,18 +112,18 @@ public class P2pAccountServiceImpl implements P2pAccountService {
     }
 
     @Override
-    public Boolean withdraw(String userId, String cardId, BigDecimal amount) throws SQLException,IllegalArgumentException
+    public Boolean withdraw(String thirdPartyId, String cardId, BigDecimal amount) throws SQLException,IllegalArgumentException
     {
         BigDecimal zero=new BigDecimal(0);
         if (amount.compareTo(zero)==-1)
             return false;
-        BigDecimal cardBalance=bankAccountDao.findBalanceByCardId(cardId);
-        if (cardBalance.compareTo(amount)==0 || cardBalance.compareTo(amount)==1)
+        BigDecimal p2pBalance=findBalance(thirdPartyId);
+        if (p2pBalance.compareTo(amount)==0 || p2pBalance.compareTo(amount)==1)
         {
-            BigDecimal p2pBalance=showBalance(userId);
-            BigDecimal newP2pBalance=p2pBalance.add(amount);
-            BigDecimal newCardBalance=cardBalance.subtract(amount);
-            p2pAccountDao.updateBalance(userId,newP2pBalance);
+            BigDecimal cardBalance=bankAccountDao.findBalanceByCardId(cardId);
+            BigDecimal newP2pBalance=p2pBalance.subtract(amount);
+            BigDecimal newCardBalance=cardBalance.add(amount);
+            p2pAccountDao.updateBalance(thirdPartyId,newP2pBalance);
             bankAccountDao.updateBalance(cardId,newCardBalance);
             return true;
         }

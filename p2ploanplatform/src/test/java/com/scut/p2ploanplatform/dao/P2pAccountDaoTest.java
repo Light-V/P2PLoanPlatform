@@ -32,8 +32,7 @@ public class P2pAccountDaoTest {
     @Before
     public void setUp() throws Exception
     {
-        sampleP2pAccount.setUserId("201636824347");
-        sampleP2pAccount.setName("Oliver");
+        sampleP2pAccount.setThirdPartyId("201636824347");
         sampleP2pAccount.setPaymentPassword("123456");
         sampleP2pAccount.setBalance(balance);
         sampleP2pAccount.setStatus(P2pAccountStatusEnum.ACTIVE.getCode());
@@ -44,26 +43,25 @@ public class P2pAccountDaoTest {
 //    @Transactional
     public void insertP2pAccountTest()
     {
-        int result=p2pAccountDao.insertP2pAccount(sampleP2pAccount);
+        int result=p2pAccountDao.addP2pAccount(sampleP2pAccount);
         assertEquals(1,result);
     }
 
     @Test
     @Transactional
-    public void findBalanceByUserIdTest()
+    public void findBalanceByThirdPartyIdTest()
     {
-        BigDecimal testBalance=p2pAccountDao.findBalanceByUserId(sampleP2pAccount.getUserId());
+        BigDecimal testBalance=p2pAccountDao.findBalanceByThirdPartyId(sampleP2pAccount.getThirdPartyId());
         assertEquals(0,balance.compareTo(testBalance));
     }
 
     @Test
     @Transactional
-    public void findByUserIdTest()
+    public void findByThirdPartyIdTest()
     {
-        P2pAccount p2pAccountTest=p2pAccountDao.findByUserId(sampleP2pAccount.getUserId());
-        assertNotNull(p2pAccountTest.getUserId());
+        P2pAccount p2pAccountTest=p2pAccountDao.findByThirdPartyId(sampleP2pAccount.getThirdPartyId());
+        assertNotNull(p2pAccountTest.getThirdPartyId());
         assertNotNull(p2pAccountTest.getBalance());
-        assertNotNull(p2pAccountTest.getName());
         assertNotNull(p2pAccountTest.getStatus());
         assertNotNull(p2pAccountTest.getType());
         assertNotNull(p2pAccountTest.getPaymentPassword());
@@ -71,21 +69,27 @@ public class P2pAccountDaoTest {
 
     @Test
     @Transactional
+    public void findPaymentPasswordByThirdPartyIdTest()
+    {
+        String password=p2pAccountDao.findPasswordByThirdPartyId(sampleP2pAccount.getThirdPartyId());
+        assertEquals(password,sampleP2pAccount.getPaymentPassword());
+    }
+
+    @Test
+    @Transactional
     public void findByStatusTest()
     {
         P2pAccount newP2pAccount=new P2pAccount();
-        newP2pAccount.setUserId("201736824347");
-        newP2pAccount.setName("Oliver");
+        newP2pAccount.setThirdPartyId("201736824347");
         newP2pAccount.setPaymentPassword("123456");
         newP2pAccount.setBalance(balance);
         newP2pAccount.setStatus(P2pAccountStatusEnum.ACTIVE.getCode());
         newP2pAccount.setType(AccountTypeEnum.NORMAL.getCode());
-        p2pAccountDao.insertP2pAccount(newP2pAccount);
+        p2pAccountDao.addP2pAccount(newP2pAccount);
         List<P2pAccount> p2pAccountList=p2pAccountDao.findByStatus(P2pAccountStatusEnum.ACTIVE.getCode());
         for (P2pAccount account: p2pAccountList)
         {
-            assertNotNull(account.getUserId());
-            assertNotNull(account.getName());
+            assertNotNull(account.getThirdPartyId());
             assertNotNull(account.getPaymentPassword());
             assertNotNull(account.getBalance());
             assertNotNull(account.getType());
@@ -98,9 +102,9 @@ public class P2pAccountDaoTest {
     public void updateBalanceTest()
     {
         BigDecimal newBalance=new BigDecimal(200);
-        int result=p2pAccountDao.updateBalance(sampleP2pAccount.getUserId(),newBalance);
+        int result=p2pAccountDao.updateBalance(sampleP2pAccount.getThirdPartyId(),newBalance);
         assertEquals(1,result);
-        assertEquals(0,newBalance.compareTo(p2pAccountDao.findBalanceByUserId(sampleP2pAccount.getUserId())));
+        assertEquals(0,newBalance.compareTo(p2pAccountDao.findBalanceByThirdPartyId(sampleP2pAccount.getThirdPartyId())));
     }
 
     @Test
@@ -108,16 +112,7 @@ public class P2pAccountDaoTest {
     public void updateStatusTest()
     {
         Integer newStatus=P2pAccountStatusEnum.FROZEN.getCode();
-        int result=p2pAccountDao.updateStatus(sampleP2pAccount.getUserId(), newStatus);
-        assertEquals(1,result);
-    }
-
-    @Test
-    @Transactional
-    public void updateNameTest()
-    {
-        String newName="Olivia";
-        int result=p2pAccountDao.updateName(sampleP2pAccount.getUserId(),newName);
+        int result=p2pAccountDao.updateStatus(sampleP2pAccount.getThirdPartyId(), newStatus);
         assertEquals(1,result);
     }
 
@@ -126,7 +121,8 @@ public class P2pAccountDaoTest {
     public void updatePaymentPasswordTest()
     {
         String newPaymentPassword="654321";
-        int result=p2pAccountDao.updatePaymentPassword(sampleP2pAccount.getUserId(),newPaymentPassword);
+        int result=p2pAccountDao.updatePaymentPassword(sampleP2pAccount.getThirdPartyId(),newPaymentPassword);
         assertEquals(1,result);
     }
+
 }

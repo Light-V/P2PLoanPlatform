@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,13 +34,17 @@ public class UserController {
     public ResultVo login(HttpServletRequest request, HttpSession session)
     throws SQLException  {
         ResultVo vo = new ResultVo();
-        String userId = request.getParameter("userId");
+        String userId = request.getParameter("user_id");
         String password = request.getParameter("password");
+        String userType = request.getParameter("user_type");
         User user = userService.findUser(userId);
         if (user != null ) {
             if( user.getPassword().equals(password) ){
                 session.setAttribute("user", userId);
-                vo.setData(userId);
+                Map<String,Object> data=new HashMap<String,Object>();
+                data.put("user_id",user.getUserId());
+                data.put("third_party_id",user.getThirdPartyId());
+                vo.setData(data);
                 vo.setCode(0);
                 vo.setMsg("登录成功");
             } else {
@@ -56,13 +62,13 @@ public class UserController {
     public ResultVo signup(HttpServletRequest request )throws SQLException {
         ResultVo vo = new ResultVo();
 
-        String userId = request.getParameter("userId");
+        String userId = request.getParameter("user_id");
         String password = request.getParameter("password");
-        String passwordRepeat = request.getParameter("passwordRepeat");
-        String departmentId = request.getParameter("departmentId");
+        String passwordRepeat = request.getParameter("password_repeat");
+        String departmentId = request.getParameter("department_id");
         String phone = request.getParameter("phone");
-        String idCard = request.getParameter("idCard");
-        String thirdPartyId = request.getParameter("thirdPartyId");
+        String idCard = request.getParameter("id_card");
+        String thirdPartyId = request.getParameter("third_party_id");
         String name = request.getParameter("name");
         String address = request.getParameter("address");
         int departmentIdInt = Integer.parseInt(departmentId);
@@ -85,7 +91,6 @@ public class UserController {
             vo.setMsg("错误！密码与重复输入不符。");
             return vo;
         }
-
         if( departmentId == null||departmentId.equals("")){
             vo.setCode(1);
             vo.setMsg("错误！部门编号为空。");
@@ -100,7 +105,6 @@ public class UserController {
             vo.setMsg("手机号码不符合规范");
             return vo;
         }
-
         if(idCard == null||idCard.equals("")){
             vo.setCode(1);
             vo.setMsg("错误！身份证号码为空。");
@@ -110,7 +114,6 @@ public class UserController {
             vo.setMsg("身份证号码不符合规范");
             return vo;
         }
-
         if(thirdPartyId == null||thirdPartyId.equals("")){
             vo.setCode(1);
             vo.setMsg("错误！第三方账号为空。");
@@ -139,11 +142,11 @@ public class UserController {
     }
 
     @RequestMapping("/updatapassword")
-    public ResultVo updataPassword(HttpServletRequest request )throws SQLException {
+    public ResultVo updataPassword(HttpServletRequest request, HttpSession session)throws SQLException {
         ResultVo vo = new ResultVo();
-        String userId = request.getParameter("userId");
+        String userId = (String) session.getAttribute("user");
         String password = request.getParameter("password");
-        String passwordRepeat = request.getParameter("passwordRepeat");
+        String passwordRepeat = request.getParameter("password_repeat");
 
         if(  password == null || password.equals("")){
             vo.setCode(1);
@@ -167,10 +170,10 @@ public class UserController {
     }
 
         @RequestMapping("/updata")
-    public ResultVo updataUser(HttpServletRequest request )throws SQLException {
+    public ResultVo updataUser(HttpServletRequest request, HttpSession session)throws SQLException {
         ResultVo vo = new ResultVo();
 
-        String userId = request.getParameter("userId");
+        String userId = (String) session.getAttribute("user");
         String phone = request.getParameter("phone");
         String address = request.getParameter("address");
         if( phone == null||phone.equals("")){
