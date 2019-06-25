@@ -21,7 +21,7 @@ public interface NoticeDao {
     @Select("select * from notice where notice_id = #{noticeId}")
     Notice findByNoticeId(Integer noticeId);
 
-    @Select("select * from notice where user_id = #{userId}")
+    @Select("select * from notice where user_id = #{userId} and status <> 2")
     List<Notice> findByUserId(String userId);
 
     @Select("select * from notice where user_id = #{userId} and status = #{status}")

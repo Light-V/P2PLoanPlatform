@@ -1,5 +1,6 @@
 package com.scut.p2ploanplatform.service;
 
+import com.github.pagehelper.PageInfo;
 import com.scut.p2ploanplatform.entity.Notice;
 
 import java.util.List;
@@ -22,20 +23,32 @@ public interface NoticeService {
     /**
      * 获取某个用户的所有通知
      * @param userId 用户或担保人id
-     * @return List<Notice>
+     * @param pageNum 页码
+     * @param pageSize 每页记录数
+     * @return PageInfo<Notice>
      */
-    List<Notice> getNotices(String userId);
+    PageInfo<Notice> getNotices(String userId, Integer pageNum, Integer pageSize);
 
     /**
      * 获取某个用户的未读通知
      * @param userId 用户或担保人id
-     * @return List<Notice>
+     * @param pageNum 页码
+     * @param pageSize 每页记录数
+     * @return PageInfo<Notice>
      */
-    List<Notice> getUnreadNotices(String userId);
+    PageInfo<Notice> getUnreadNotices(String userId, Integer pageNum, Integer pageSize);
 
     /**
      * 读通知，将通知状态改成已读
+     * @param userId 用户id
      * @param noticeId 通知的id
      */
-    void readNotice(Integer noticeId);
+    void readNotice(String userId, Integer noticeId);
+
+    /**
+     * 删除通知
+     * @param userId 用户id
+     * @param noticeId 通知的id
+     */
+    void deleteNotice(String userId, Integer noticeId);
 }

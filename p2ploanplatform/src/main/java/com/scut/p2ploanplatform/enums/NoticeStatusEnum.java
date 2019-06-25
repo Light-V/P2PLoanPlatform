@@ -10,6 +10,7 @@ import lombok.Getter;
 public enum NoticeStatusEnum {
     UNREAD(0, "未读"),
     READ(1, "已读"),
+    DELETE(2, "已删除")
     ;
     private Integer code;
 

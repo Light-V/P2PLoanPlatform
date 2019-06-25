@@ -1,5 +1,6 @@
 package com.scut.p2ploanplatform.service.impl;
 
+import com.github.pagehelper.PageInfo;
 import com.scut.p2ploanplatform.dao.NoticeDao;
 import com.scut.p2ploanplatform.entity.Notice;
 import com.scut.p2ploanplatform.enums.NoticeStatusEnum;
@@ -43,8 +44,10 @@ public class NoticeServiceImplTest {
         for (int i = 0; i < 5; ++i) {
             noticeService.sendNotice("123456789098", "Test", "This is a test");
         }
-        List<Notice> noticeList = noticeService.getNotices("123456789098");
-        assertNotNull(noticeList);
+        PageInfo<Notice> noticePageInfo = noticeService.getNotices("123456789098", 1, 9);
+        assertNotNull(noticePageInfo);
+        assertEquals(1, noticePageInfo.getPageNum());
+        assertEquals(9, noticePageInfo.getPageSize());
     }
 
     @Test
@@ -53,16 +56,27 @@ public class NoticeServiceImplTest {
         for (int i = 0; i < 5; ++i) {
             noticeService.sendNotice("123456789098", "Test", "This is a test");
         }
-        List<Notice> noticeList = noticeService.getUnreadNotices("123456789098");
-        assertNotNull(noticeList);
+        PageInfo<Notice> noticePageInfo = noticeService.getUnreadNotices("123456789098", 1, 9);
+        assertNotNull(noticePageInfo);
+        assertEquals(1, noticePageInfo.getPageNum());
+        assertEquals(9, noticePageInfo.getPageSize());
     }
 
     @Test
     @Transactional
     public void readNotice() {
         Notice notice = noticeService.sendNotice("123456789098", "Test", "This is a test");
-        noticeService.readNotice(notice.getNoticeId());
+        noticeService.readNotice(notice.getUserId(), notice.getNoticeId());
         Notice result = noticeDao.findByNoticeId(notice.getNoticeId());
         assertEquals(NoticeStatusEnum.READ.getCode(), result.getStatus());
+    }
+
+    @Test
+    @Transactional
+    public void deleteNotice() {
+        Notice notice = noticeService.sendNotice("123456789098", "Test", "This is a test");
+        noticeService.deleteNotice(notice.getUserId(), notice.getNoticeId());
+        Notice result = noticeDao.findByNoticeId(notice.getNoticeId());
+        assertEquals(NoticeStatusEnum.DELETE.getCode(), result.getStatus());
     }
 }

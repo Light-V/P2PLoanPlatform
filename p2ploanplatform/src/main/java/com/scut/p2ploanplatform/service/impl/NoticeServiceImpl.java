@@ -1,5 +1,7 @@
 package com.scut.p2ploanplatform.service.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.scut.p2ploanplatform.dao.NoticeDao;
 import com.scut.p2ploanplatform.entity.Notice;
 import com.scut.p2ploanplatform.enums.NoticeStatusEnum;
@@ -35,19 +37,36 @@ public class NoticeServiceImpl implements NoticeService {
     }
 
     @Override
-    public List<Notice> getNotices(String userId) {
-        return noticeDao.findByUserId(userId);
+    public PageInfo<Notice> getNotices(String userId, Integer pageNum, Integer pageSize) {
+        PageHelper.startPage(pageNum, pageSize);
+        List<Notice> noticeList = noticeDao.findByUserId(userId);
+        return new PageInfo<>(noticeList);
     }
 
     @Override
-    public List<Notice> getUnreadNotices(String userId) {
-        return noticeDao.findByUserIdAndStatus(userId, NoticeStatusEnum.UNREAD.getCode());
+    public PageInfo<Notice> getUnreadNotices(String userId, Integer pageNum, Integer pageSize) {
+        PageHelper.startPage(pageNum, pageSize);
+        List<Notice> noticeList = noticeDao.findByUserIdAndStatus(userId, NoticeStatusEnum.UNREAD.getCode());
+        return new PageInfo<>(noticeList);
     }
 
     @Override
-    public void readNotice(Integer noticeId) {
+    public void deleteNotice(String userId, Integer noticeId) {
         Notice notice = noticeDao.findByNoticeId(noticeId);
-        if (notice == null) {
+        if (notice == null || !notice.getUserId().equals(userId)) {
+            throw new CustomException(ResultEnum.NOTICE_NOT_EXIST);
+        }
+        if (notice.getStatus().equals(NoticeStatusEnum.DELETE.getCode())) {
+            return;
+        }
+        notice.setStatus(NoticeStatusEnum.DELETE.getCode());
+        noticeDao.updateStatus(notice);
+    }
+
+    @Override
+    public void readNotice(String userId, Integer noticeId) {
+        Notice notice = noticeDao.findByNoticeId(noticeId);
+        if (notice == null || !notice.getUserId().equals(userId)) {
             throw new CustomException(ResultEnum.NOTICE_NOT_EXIST);
         }
         if (notice.getStatus().equals(NoticeStatusEnum.READ.getCode())) {
