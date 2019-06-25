@@ -40,6 +40,7 @@ public class PurchaseServiceImpl implements PurchaseService {
             Purchase purchase = new Purchase(application);
             purchase.setInvestorId(investorId);
             if(purchaseDao.createPurchaseItem(purchase)){
+                applicationService.subscribe(applicationId);
                 return purchase;
             }else{
                 throw new SQLException("数据库操作失败");

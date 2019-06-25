@@ -1,5 +1,6 @@
 package com.scut.p2ploanplatform.service;
 
+import com.github.pagehelper.PageInfo;
 import com.scut.p2ploanplatform.enums.LoanStatus;
 import com.scut.p2ploanplatform.entity.LoanApplication;
 
@@ -25,7 +26,7 @@ public interface LoanApplicationService {
      * @throws SQLException sql错误
      * @throws IllegalArgumentException 非法参数错误
      */
-    Boolean reviewPass(Integer id) throws SQLException,IllegalArgumentException;
+    Boolean reviewPass(Integer id, String guarantorId) throws SQLException,IllegalArgumentException;
 
     /**
      * 审核不通过拒绝担保
@@ -34,7 +35,7 @@ public interface LoanApplicationService {
      * @throws SQLException sql错误
      * @throws IllegalArgumentException 非法参数错误
      */
-    Boolean reviewReject(Integer id) throws SQLException,IllegalArgumentException;
+    Boolean reviewReject(Integer id, String guarantorId) throws SQLException,IllegalArgumentException;
 
     /**
      * 撮合成功(购买)
@@ -82,48 +83,69 @@ public interface LoanApplicationService {
 
     /**
      * 查询特定借款人的所有借款申请
-     * @param borrowerId 借款人Id
+     * @param pageNum 请求页码
+     * @param pageSize 每页包含的字段数
      * @return 借款申请列表
      * @throws SQLException sql错误
      * @throws IllegalArgumentException 非法参数错误
      */
-    List<LoanApplication> getApplicationByBorrowerId(String borrowerId) throws  SQLException,IllegalArgumentException;
+    PageInfo<LoanApplication> getAllApplication(Integer pageNum, Integer pageSize) throws SQLException, IllegalArgumentException;
+
+
+    /**
+     * 查询特定借款人的所有借款申请
+     * @param borrowerId 借款人Id
+     * @param pageNum 请求页码
+     * @param pageSize 每页包含的字段数
+     * @return 借款申请列表
+     * @throws SQLException sql错误
+     * @throws IllegalArgumentException 非法参数错误
+     */
+    PageInfo<LoanApplication> getApplicationByBorrowerId(String borrowerId, Integer pageNum, Integer pageSize) throws SQLException, IllegalArgumentException;
 
     /**
      * 查询特定担保人担保的所有借款申请
      * @param guarantorId 担保人Id
+     * @param pageNum 请求页码
+     * @param pageSize 每页包含的字段数
      * @return 借款申请列表
      * @throws SQLException sql错误
      * @throws IllegalArgumentException 非法参数错误
      */
-    List<LoanApplication> getApplicationByGuarantorId(String guarantorId) throws SQLException,IllegalArgumentException;
+    PageInfo<LoanApplication> getApplicationByGuarantorId(String guarantorId, Integer pageNum, Integer pageSize) throws SQLException,IllegalArgumentException;
 
     /**
      * 查询特定借款人特定状态的所有借款申请
      * @param borrowerId 借款人Id
      * @param status 借款申请状态
+     * @param pageNum 请求页码
+     * @param pageSize 每页包含的字段数
      * @return 借款申请列表
      * @throws SQLException sql错误
      * @throws IllegalArgumentException 非法参数错误
      */
-    List<LoanApplication> getApplicationByBorrowerId(String borrowerId, Integer status) throws  SQLException,IllegalArgumentException;
+    PageInfo<LoanApplication> getApplicationByBorrowerId(String borrowerId, Integer status, Integer pageNum, Integer pageSize) throws  SQLException,IllegalArgumentException;
 
     /**
      * 查询特定担保人担保的特定状态的借款申请
      * @param guarantorId 担保人Id
      * @param status 借款申请状态
+     * @param pageNum 请求页码
+     * @param pageSize 每页包含的字段数
      * @return 借款申请列表
      * @throws SQLException sql错误
      * @throws IllegalArgumentException 非法参数错误
      */
-    List<LoanApplication> getApplicationByGuarantorId(String guarantorId, Integer status) throws SQLException,IllegalArgumentException;
+    PageInfo<LoanApplication> getApplicationByGuarantorId(String guarantorId, Integer status, Integer pageNum, Integer pageSize) throws SQLException,IllegalArgumentException;
 
     /**
      * 查询所有审核已通过的借款申请
      * 产品交易平台展示内容
+     * @param pageNum 请求页码
+     * @param pageSize 每页包含的字段数
      * @return 借款申请列表
      * @throws SQLException sql错误
      * @throws IllegalArgumentException 非法参数错误
      */
-    List<LoanApplication> getApplicationReviewedPassed() throws SQLException;
+    PageInfo<LoanApplication> getApplicationReviewedPassed(Integer pageNum, Integer pageSize) throws SQLException;
 }

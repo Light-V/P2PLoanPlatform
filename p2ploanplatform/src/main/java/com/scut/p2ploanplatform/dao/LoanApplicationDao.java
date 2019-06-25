@@ -25,7 +25,7 @@ public interface LoanApplicationDao {
      * @param loanApplication     更新的借款申请信息
      * @return 操作状态（成功/失败)
      */
-    @Update("UPDATE `loan_application` SET `status`= #{status} WHERE `application_Id`=#{applicationId} ")
+    @Update("UPDATE `loan_application` SET `guarantor_id`=#{guarantorId},`status`=#{status} WHERE `application_id`=#{applicationId} ")
     Boolean updateApplication(LoanApplication loanApplication);
 
     /**
@@ -38,11 +38,18 @@ public interface LoanApplicationDao {
 
     /**
      * 根据借款申请ID查询借款申请
-     * @param ApplicationId 借款申请Id
+     * @param applicationId 借款申请Id
      * @return 借款申请
      */
-    @Select("SELECT * FROM `loan_application` WHERE `application_id`= #{ApplicationId}")
-    LoanApplication getApplicationById(Integer ApplicationId);
+    @Select("SELECT * FROM `loan_application` WHERE `application_id`= #{applicationId}")
+    LoanApplication getApplicationById(Integer applicationId);
+
+    /**
+     * 查询所有借款申请
+     * @return 借款申请列表
+     */
+    @Select("SELECT * FROM `loan_application`")
+    List<LoanApplication> getAllApplication();
 
     /**
      * 查询特定借款人的所有借款申请
