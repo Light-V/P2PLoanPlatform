@@ -31,17 +31,16 @@ public class BankAccountDaoTest {
     public void setUp() throws Exception
     {
         sampleBankAccount.setCardID("012345678901");
-        sampleBankAccount.setUserID("201636824347");
-        sampleBankAccount.setName("Oliver");
+        sampleBankAccount.setThirdPartyId("201636824347");
         sampleBankAccount.setPaymentPassword("123456");
         sampleBankAccount.setBalance(balance);
     }
 
     @Test
 //    @Transactional
-    public void insertBankAccountTest()
+    public void addBankAccountTest()
     {
-        int result=bankAccountDao.insertBankAccount(sampleBankAccount);
+        int result=bankAccountDao.addBankAccount(sampleBankAccount);
         assertEquals(1,result);
     }
 
@@ -55,24 +54,19 @@ public class BankAccountDaoTest {
 
     @Test
     @Transactional
-    public void findCardsByUserIdTest()
+    public void findCardByThirdPartyIdTest()
     {
         BankAccount newBankAccount=new BankAccount();
         newBankAccount.setCardID("111111111111");
-        newBankAccount.setUserID("201636824347");
-        newBankAccount.setName("Oliver");
+        newBankAccount.setThirdPartyId("201636824347");
         newBankAccount.setPaymentPassword("123456");
         newBankAccount.setBalance(balance);
-        bankAccountDao.insertBankAccount(newBankAccount);
-        List<BankAccount> bankAccountList=bankAccountDao.findCardsByUserId(sampleBankAccount.getUserID());
-        for (BankAccount bankAccount:bankAccountList)
-        {
-            assertNotNull(bankAccount.getCardID());
-            assertNotNull(bankAccount.getUserID());
-            assertNotNull(bankAccount.getBalance());
-            assertNotNull(bankAccount.getPaymentPassword());
-            assertNotNull(bankAccount.getName());
-        }
+        bankAccountDao.addBankAccount(newBankAccount);
+        BankAccount bankAccount=bankAccountDao.findCardByThirdPartyId(sampleBankAccount.getThirdPartyId());
+        assertNotNull(bankAccount.getCardID());
+        assertNotNull(bankAccount.getThirdPartyId());
+        assertNotNull(bankAccount.getBalance());
+        assertNotNull(bankAccount.getPaymentPassword());
     }
 
     @Test
@@ -82,5 +76,24 @@ public class BankAccountDaoTest {
         BigDecimal newBalance=new BigDecimal(300);
         int result=bankAccountDao.updateBalance(sampleBankAccount.getCardID(),newBalance);
         assertEquals(1,result);
+    }
+
+    @Test
+    @Transactional
+    public void findCardByCardIdTest()
+    {
+        BankAccount bankAccount=bankAccountDao.findCardByCardId(sampleBankAccount.getCardID());
+        assertNotNull(bankAccount.getCardID());
+        assertNotNull(bankAccount.getThirdPartyId());
+        assertNotNull(bankAccount.getBalance());
+        assertNotNull(bankAccount.getPaymentPassword());
+    }
+
+    @Test
+    @Transactional
+    public void findPaymentPasswordByCardIdTest()
+    {
+        String password=bankAccountDao.findPaymentPasswordByCardId(sampleBankAccount.getCardID());
+        assertEquals(password, sampleBankAccount.getPaymentPassword());
     }
 }

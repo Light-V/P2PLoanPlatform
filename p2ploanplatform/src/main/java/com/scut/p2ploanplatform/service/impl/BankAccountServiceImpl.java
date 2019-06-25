@@ -43,4 +43,14 @@ public class BankAccountServiceImpl implements BankAccountService {
     {
         return bankAccountDao.findCardByThirdPartyId(thirdPartyId);
     }
+
+    @Override
+    public Boolean verifyPassword(String cardId,String paymentPassword) throws SQLException,IllegalArgumentException
+    {
+        String truePassword=bankAccountDao.findPaymentPasswordByCardId(cardId);
+        if (truePassword==paymentPassword)
+            return true;
+        else
+            return false;
+    }
 }

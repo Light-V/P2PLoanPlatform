@@ -82,6 +82,16 @@ public class P2pAccountServiceImpl implements P2pAccountService {
     }
 
     @Override
+    public Boolean verifyPasswordIsSet(String thirdPartyId) throws SQLException,IllegalArgumentException
+    {
+        String password=p2pAccountDao.findPasswordByThirdPartyId(thirdPartyId);
+        if (password==null||password.equals(""))
+            return false;
+        else
+            return true;
+    }
+
+    @Override
     public Boolean recharge(String thirdPartyId, String cardId, BigDecimal amount) throws SQLException,IllegalArgumentException
     {
         BigDecimal zero=new BigDecimal(0);

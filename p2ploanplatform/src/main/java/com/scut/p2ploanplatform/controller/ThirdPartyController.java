@@ -1,5 +1,6 @@
 package com.scut.p2ploanplatform.controller;
 
+import com.scut.p2ploanplatform.service.BankAccountService;
 import com.scut.p2ploanplatform.service.P2pAccountService;
 import com.scut.p2ploanplatform.vo.ResultVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,9 @@ public class ThirdPartyController {
     @Autowired
     private P2pAccountService p2pAccountService;
 
+    @Autowired
+    private BankAccountService bankAccountService;
+
     @PutMapping("/purchase")
     public ResultVo transfer(HttpSession session) throws SQLException,IllegalArgumentException
     {
@@ -31,7 +35,7 @@ public class ThirdPartyController {
             Boolean result=p2pAccountService.transfer(payerId,payeeId,amount);
             if (result)
             {
-                resultVo.setMsg("success!");
+                resultVo.setMsg("Success!");
                 resultVo.setCode(1);
             }
             else
@@ -53,7 +57,58 @@ public class ThirdPartyController {
     {
         ResultVo resultVo=new ResultVo();
         String thirdPartyId=(String) session.getAttribute("thirdPartyId");
+        String cardId=(String) session.getAttribute("cardId");
+        BigDecimal amount=(BigDecimal) session.getAttribute("amount");
+        String password=(String) session.getAttribute("paymentPassword");
+        if (bankAccountService.verifyPassword(cardId,password))
+        {
+            Boolean result=p2pAccountService.recharge(thirdPartyId,cardId,amount);
+            if (result)
+            {
+                resultVo.setCode(1);
+                resultVo.setMsg("Success!");
+            }
+            else
+            {
+                resultVo.setCode(0);
+                resultVo.setMsg("The balance is not enough to recharge!");
+            }
+        }
+        else
+        {
+            resultVo.setMsg("The password is wrong!");
+            resultVo.setCode(0);
+        }
         return resultVo;
     }
 
+    @PutMapping("/withdraw")
+    public ResultVo withdraw(HttpSession session) throws SQLException,IllegalArgumentException
+    {
+        ResultVo resultVo=new ResultVo();
+        String thirdPartyId=(String) session.getAttribute("thirdPartyId");
+        String cardId=(String) session.getAttribute("cardId");
+        BigDecimal amount=(BigDecimal) session.getAttribute("amount");
+        String password=(String) session.getAttribute("paymentPassword");
+        if (bankAccountService.verifyPassword(cardId,password))
+        {
+            Boolean result=p2pAccountService.withdraw(thirdPartyId,cardId,amount);
+            if (result)
+            {
+                resultVo.setCode(1);
+                resultVo.setMsg("Success!");
+            }
+            else
+            {
+                resultVo.setCode(0);
+                resultVo.setMsg("The balance is not enough to withdraw!");
+            }
+        }
+        else
+        {
+            resultVo.setCode(0);
+            resultVo.setMsg("The password is wrong!");
+        }
+        return resultVo;
+    }
 }

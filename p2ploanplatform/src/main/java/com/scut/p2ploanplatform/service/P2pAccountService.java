@@ -37,6 +37,15 @@ public interface P2pAccountService {
     Boolean verifyTrade(String payerId, BigDecimal amount) throws SQLException,IllegalArgumentException;
 
     /**
+     * 检验用户是否已设置支付密码
+     * @param thirdPartyId 第三方ID
+     * @return 是否已设置
+     * @throws SQLException
+     * @throws IllegalArgumentException
+     */
+    Boolean verifyPasswordIsSet(String thirdPartyId) throws SQLException,IllegalArgumentException;
+
+    /**
      * 验证支付密码是否正确
      * @param thirdPartyId 第三方ID
      * @param password 支付密码
