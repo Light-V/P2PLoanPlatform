@@ -14,13 +14,9 @@ public class BankAccount {
      */
     private String cardId;
     /**
-     * 用户ID
+     * 第三方ID
      */
-    private String userId;
-    /**
-     * 用户姓名
-     */
-    private String name;
+    private String thirdPartyId;
     /**
      * 支付密码
      */
@@ -35,10 +31,7 @@ public class BankAccount {
         return cardId;
     }
 
-    public String getUserID()
-    {
-        return userId;
-    }
+    public String getThirdPartyId() { return thirdPartyId; }
 
     public BigDecimal getBalance()
     {
@@ -47,7 +40,7 @@ public class BankAccount {
 
     public String getPaymentPassword() { return paymentPassword; }
 
-    public String getName() { return name; }
+    public void setThirdPartyId(String thirdPartyId) { this.thirdPartyId = thirdPartyId; }
 
     public void setBalance(BigDecimal balance) {
         this.balance = balance;
@@ -55,14 +48,6 @@ public class BankAccount {
 
     public void setCardID(String cardID) {
         this.cardId = cardID;
-    }
-
-    public void setUserID(String userID) {
-        this.userId = userID;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public void setPaymentPassword(String paymentPassword) {
