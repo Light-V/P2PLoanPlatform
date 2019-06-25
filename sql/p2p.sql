@@ -205,7 +205,6 @@ CREATE TABLE `bank_account`  (
 DROP TABLE IF EXISTS `p2p_account`;
 CREATE TABLE `p2p_account`  (
   `third_party_id` varchar(12) NOT NULL COMMENT '第三方ID',
-  `user_id` varchar(12) NOT NULL COMMENT '用户ID',
   `payment_password` varchar(64) NOT NULL COMMENT '支付密码',
   `balance` decimal(12, 2) NOT NULL COMMENT '账户余额',
   `status` int(1) NOT NULL COMMENT '账户状态，0表示冻结，1表示正常',
