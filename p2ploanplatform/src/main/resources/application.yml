@@ -7,6 +7,8 @@ spring:
   jackson:
     property-naming-strategy: SNAKE_CASE
     default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: true
   mvc:
     throw-exception-if-no-handler-found: true
   resources:
