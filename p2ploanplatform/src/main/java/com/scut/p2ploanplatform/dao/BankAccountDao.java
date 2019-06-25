@@ -21,7 +21,7 @@ public interface BankAccountDao {
     @Select("select `balance` from `p2p`.`bank_account` where `card_id` = #{cardId}")
     BigDecimal findBalanceByCardId(String cardId);
 
-    @Select("select `payment_password` from `p2p`.`bank_account` where `cardId` = #{cardId}")
+    @Select("select `payment_password` from `p2p`.`bank_account` where `card_id` = #{cardId}")
     String findPaymentPasswordByCardId(String cardId);
 
     @Select("select * from `p2p`.`bank_account` where `third_party_id`=#{thirdPartyId}")

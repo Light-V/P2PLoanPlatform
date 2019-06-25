@@ -4,10 +4,8 @@ import com.scut.p2ploanplatform.entity.P2pAccount;
 import com.scut.p2ploanplatform.enums.AccountTypeEnum;
 import com.scut.p2ploanplatform.enums.P2pAccountStatusEnum;
 import org.junit.Before;
-import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -20,7 +18,6 @@ import static org.junit.Assert.assertNotNull;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
-@FixMethodOrder(MethodSorters.JVM)
 public class P2pAccountDaoTest {
     @Autowired
     private P2pAccountDao p2pAccountDao;
@@ -40,8 +37,8 @@ public class P2pAccountDaoTest {
     }
 
     @Test
-//    @Transactional
-    public void insertP2pAccountTest()
+    @Transactional
+    public void addP2pAccountTest()
     {
         int result=p2pAccountDao.addP2pAccount(sampleP2pAccount);
         assertEquals(1,result);
@@ -51,6 +48,7 @@ public class P2pAccountDaoTest {
     @Transactional
     public void findBalanceByThirdPartyIdTest()
     {
+        p2pAccountDao.addP2pAccount(sampleP2pAccount);
         BigDecimal testBalance=p2pAccountDao.findBalanceByThirdPartyId(sampleP2pAccount.getThirdPartyId());
         assertEquals(0,balance.compareTo(testBalance));
     }
@@ -59,6 +57,7 @@ public class P2pAccountDaoTest {
     @Transactional
     public void findByThirdPartyIdTest()
     {
+        p2pAccountDao.addP2pAccount(sampleP2pAccount);
         P2pAccount p2pAccountTest=p2pAccountDao.findByThirdPartyId(sampleP2pAccount.getThirdPartyId());
         assertNotNull(p2pAccountTest.getThirdPartyId());
         assertNotNull(p2pAccountTest.getBalance());
@@ -69,8 +68,9 @@ public class P2pAccountDaoTest {
 
     @Test
     @Transactional
-    public void findPaymentPasswordByThirdPartyIdTest()
+    public void findPasswordByThirdPartyIdTest()
     {
+        p2pAccountDao.addP2pAccount(sampleP2pAccount);
         String password=p2pAccountDao.findPasswordByThirdPartyId(sampleP2pAccount.getThirdPartyId());
         assertEquals(password,sampleP2pAccount.getPaymentPassword());
     }
@@ -79,6 +79,7 @@ public class P2pAccountDaoTest {
     @Transactional
     public void findByStatusTest()
     {
+        p2pAccountDao.addP2pAccount(sampleP2pAccount);
         P2pAccount newP2pAccount=new P2pAccount();
         newP2pAccount.setThirdPartyId("201736824347");
         newP2pAccount.setPaymentPassword("123456");
@@ -101,6 +102,7 @@ public class P2pAccountDaoTest {
     @Transactional
     public void updateBalanceTest()
     {
+        p2pAccountDao.addP2pAccount(sampleP2pAccount);
         BigDecimal newBalance=new BigDecimal(200);
         int result=p2pAccountDao.updateBalance(sampleP2pAccount.getThirdPartyId(),newBalance);
         assertEquals(1,result);
@@ -111,6 +113,7 @@ public class P2pAccountDaoTest {
     @Transactional
     public void updateStatusTest()
     {
+        p2pAccountDao.addP2pAccount(sampleP2pAccount);
         Integer newStatus=P2pAccountStatusEnum.FROZEN.getCode();
         int result=p2pAccountDao.updateStatus(sampleP2pAccount.getThirdPartyId(), newStatus);
         assertEquals(1,result);
@@ -120,6 +123,7 @@ public class P2pAccountDaoTest {
     @Transactional
     public void updatePaymentPasswordTest()
     {
+        p2pAccountDao.addP2pAccount(sampleP2pAccount);
         String newPaymentPassword="654321";
         int result=p2pAccountDao.updatePaymentPassword(sampleP2pAccount.getThirdPartyId(),newPaymentPassword);
         assertEquals(1,result);

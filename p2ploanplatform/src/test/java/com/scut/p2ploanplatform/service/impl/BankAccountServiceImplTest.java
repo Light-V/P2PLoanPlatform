@@ -29,10 +29,10 @@ public class BankAccountServiceImplTest {
     private P2pAccountDao p2pAccountDao;
 
     @Test
-//    @Transactional
+    @Transactional
     public void addBankAccountTest() throws SQLException,IllegalArgumentException
     {
-        int result=bankAccountService.addBankAccount("123456789012","201636824347","Oliver","123456",new BigDecimal(1000));
+        int result=bankAccountService.addBankAccount("123456789012","201636824347","123456",new BigDecimal(1000));
         assertEquals(1,result);
     }
 
@@ -40,22 +40,10 @@ public class BankAccountServiceImplTest {
     @Transactional
     public void showBalanceByCardIdTest() throws SQLException,IllegalArgumentException
     {
-        BigDecimal testBalance=bankAccountService.showBalanceByCardId("012345678901");
+        BigDecimal testBalance=bankAccountService.findBalanceByCardId("012345678901");
         assertEquals(0,new BigDecimal(500).compareTo(testBalance));
     }
 
-    @Test
-    @Transactional
-    public void showCardsByUserIdTest() throws SQLException,IllegalArgumentException
-    {
-        List<BankAccount> bankAccountList=bankAccountService.showCardsByUserId("201636824347");
-        for (BankAccount bankAccount:bankAccountList)
-        {
-            assertNotNull(bankAccount.getCardID());
-            assertNotNull(bankAccount.getUserID());
-            assertNotNull(bankAccount.getName());
-            assertNotNull(bankAccount.getPaymentPassword());
-            assertNotNull(bankAccount.getBalance());
-        }
-    }
+
+
 }
