@@ -34,8 +34,9 @@ public class UserController {
     public ResultVo login(HttpServletRequest request, HttpSession session)
     throws SQLException  {
         ResultVo vo = new ResultVo();
-        String userId = request.getParameter("userId");
+        String userId = request.getParameter("user_id");
         String password = request.getParameter("password");
+        String userType = request.getParameter("user_type");
         User user = userService.findUser(userId);
         if (user != null ) {
             if( user.getPassword().equals(password) ){
@@ -64,10 +65,10 @@ public class UserController {
         String userId = request.getParameter("user_id");
         String password = request.getParameter("password");
         String passwordRepeat = request.getParameter("password_repeat");
-        String departmentId = request.getParameter("departmentId");
+        String departmentId = request.getParameter("department_id");
         String phone = request.getParameter("phone");
         String idCard = request.getParameter("id_card");
-        String thirdPartyId = request.getParameter("third_partyId");
+        String thirdPartyId = request.getParameter("third_party_id");
         String name = request.getParameter("name");
         String address = request.getParameter("address");
         int departmentIdInt = Integer.parseInt(departmentId);
