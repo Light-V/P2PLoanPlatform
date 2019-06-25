@@ -195,9 +195,8 @@ insert into `loan_interest_rate`(`rate`) values(0.0666);
 
 DROP TABLE IF EXISTS `bank_account`;
 CREATE TABLE `bank_account`  (
-  `card_id` varchar(12) NOT NULL COMMENT '银行卡ID',
-  `user_id` varchar(12) NOT NULL COMMENT '用户ID',
-  `name` varchar(64) NOT NULL COMMENT '用户姓名',
+  `card_id` varchar(19) NOT NULL COMMENT '银行卡ID',
+  `third_party_id` varchar(12) NOT NULL COMMENT '第三方ID',
   `payment_password` varchar(64) NOT NULL COMMENT '支付密码',
   `balance` decimal(12, 2) NOT NULL COMMENT '账户余额',
   PRIMARY KEY (`card_id`)
@@ -205,11 +204,11 @@ CREATE TABLE `bank_account`  (
 
 DROP TABLE IF EXISTS `p2p_account`;
 CREATE TABLE `p2p_account`  (
+  `third_party_id` varchar(12) NOT NULL COMMENT '第三方ID',
   `user_id` varchar(12) NOT NULL COMMENT '用户ID',
-  `name` varchar(64) NOT NULL COMMENT '用户姓名',
   `payment_password` varchar(64) NOT NULL COMMENT '支付密码',
   `balance` decimal(12, 2) NOT NULL COMMENT '账户余额',
   `status` int(1) NOT NULL COMMENT '账户状态，0表示冻结，1表示正常',
   `type` int(1) NOT NULL COMMENT '账户类型，0表示普通用户，1表示风险准备金账户',
-  PRIMARY KEY (`user_id`)
+  PRIMARY KEY (`third_party_id`)
 )ENGINE = InnoDB default charset=utf8mb4 comment 'P2P平台账户';
