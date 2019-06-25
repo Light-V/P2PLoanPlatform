@@ -1,5 +1,7 @@
 package com.scut.p2ploanplatform.service.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.scut.p2ploanplatform.dao.LoanApplicationDao;
 import com.scut.p2ploanplatform.entity.LoanApplication;
 import com.scut.p2ploanplatform.enums.LoanStatus;
@@ -14,8 +16,9 @@ import java.util.List;
 /**
  * @author FatCat
  */
-@Service
+
 //todo: notice
+@Service
 public class LoanApplicationServiceImpl implements LoanApplicationService{
 
     @Autowired
@@ -32,15 +35,15 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
     }
 
     @Override
-    public Boolean reviewPass(Integer id) throws SQLException, IllegalArgumentException {
+    public Boolean reviewPass(Integer id, String guarantorId) throws SQLException, IllegalArgumentException {
         LoanStatus loanStatus = LoanStatus.REVIEWED_PASSED;
-        return changeStatusById(id,loanStatus);
+        return changeStatusById(id,guarantorId, loanStatus);
     }
 
     @Override
-    public Boolean reviewReject(Integer id) throws SQLException, IllegalArgumentException {
+    public Boolean reviewReject(Integer id, String guarantorId) throws SQLException, IllegalArgumentException {
         LoanStatus loanStatus = LoanStatus.REVIEWED_REJECTED;
-        return changeStatusById(id,loanStatus);
+        return changeStatusById(id, guarantorId, loanStatus);
     }
 
     @Override
@@ -63,6 +66,22 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
                 throw new IllegalArgumentException("invalid applicationId, non loan application found with this applicationId");
             }
             loanApplication.setStatus(status.getStatus());
+            return loanApplicationDao.updateApplication(loanApplication);
+        }
+        catch (Exception e) {
+            throw new SQLException(e);
+        }
+    }
+
+    @Transactional
+    public Boolean changeStatusById(Integer id,String guarantorId, LoanStatus status) throws SQLException, IllegalArgumentException {
+        try {
+            LoanApplication loanApplication = loanApplicationDao.getApplicationById(id);
+            if(loanApplication == null){
+                throw new IllegalArgumentException("invalid applicationId, non loan application found with this applicationId");
+            }
+            loanApplication.setStatus(status.getStatus());
+            loanApplication.setGuarantorId(guarantorId);
             return loanApplicationDao.updateApplication(loanApplication);
         }
         catch (Exception e) {
@@ -102,33 +121,50 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
     }
 
     @Override
-    public List<LoanApplication> getApplicationByBorrowerId(String borrowerId) throws SQLException, IllegalArgumentException {
+    public PageInfo<LoanApplication> getAllApplication(Integer pageNum, Integer pageSize) throws SQLException, IllegalArgumentException {
+        PageHelper.startPage(pageNum, pageSize);
+        List<LoanApplication> applicationList;
+        try {
+            applicationList = loanApplicationDao.getAllApplication();
+        }
+        catch (Exception e) {
+            throw new SQLException(e);
+        }
+        return new PageInfo<>(applicationList);
+    }
+
+    @Override
+    public PageInfo<LoanApplication> getApplicationByBorrowerId(String borrowerId, Integer pageNum, Integer pageSize) throws SQLException, IllegalArgumentException {
         if (borrowerId == null || borrowerId.length() != 12)
             throw new IllegalArgumentException("invalid guarantorId, should be non null and has length of 12");
-
+        PageHelper.startPage(pageNum, pageSize);
+        List<LoanApplication> applicationList;
         try {
-            return loanApplicationDao.getApplicationByBorrowerId(borrowerId);
+            applicationList = loanApplicationDao.getApplicationByBorrowerId(borrowerId);
         }
         catch (Exception e) {
             throw new SQLException(e);
         }
+        return new PageInfo<>(applicationList);
     }
 
     @Override
-    public List<LoanApplication> getApplicationByGuarantorId(String guarantorId) throws SQLException, IllegalArgumentException {
+    public PageInfo<LoanApplication> getApplicationByGuarantorId(String guarantorId, Integer pageNum, Integer pageSize) throws SQLException, IllegalArgumentException {
         if (guarantorId == null || guarantorId.length() != 12)
             throw new IllegalArgumentException("invalid guarantorId, should be non null and has length of 12");
-
+        PageHelper.startPage(pageNum, pageSize);
+        List<LoanApplication> applicationList;
         try {
-            return loanApplicationDao.getApplicationByGuarantorId(guarantorId);
+            applicationList = loanApplicationDao.getApplicationByGuarantorId(guarantorId);
         }
         catch (Exception e) {
             throw new SQLException(e);
         }
+        return new PageInfo<>(applicationList);
     }
 
     @Override
-    public List<LoanApplication> getApplicationByBorrowerId(String borrowerId, Integer status) throws SQLException, IllegalArgumentException {
+    public PageInfo<LoanApplication> getApplicationByBorrowerId(String borrowerId, Integer status, Integer pageNum, Integer pageSize) throws SQLException, IllegalArgumentException {
         if (borrowerId == null || borrowerId.length() != 12)
             throw new IllegalArgumentException("invalid borrowerId, should be non null and has length of 12");
         if (status == null )
@@ -143,16 +179,19 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
             throw new IllegalArgumentException(e);
         }
 
+        PageHelper.startPage(pageNum, pageSize);
+        List<LoanApplication> applicationList;
         try {
-            return loanApplicationDao.getApplicationByBorrowerIdAndStatus(borrowerId,loanStatus.getStatus());
+            applicationList = loanApplicationDao.getApplicationByBorrowerIdAndStatus(borrowerId,status);
         }
         catch (Exception e) {
             throw new SQLException(e);
         }
+        return new PageInfo<>(applicationList);
     }
 
     @Override
-    public List<LoanApplication> getApplicationByGuarantorId(String guarantorId, Integer status) throws SQLException, IllegalArgumentException {
+    public PageInfo<LoanApplication> getApplicationByGuarantorId(String guarantorId, Integer status, Integer pageNum, Integer pageSize) throws SQLException, IllegalArgumentException {
         if (guarantorId == null || guarantorId.length() != 12)
             throw new IllegalArgumentException("invalid guarantorId, should be non null and has length of 12");
         if (status == null )
@@ -167,21 +206,27 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
             throw new IllegalArgumentException(e);
         }
 
+        PageHelper.startPage(pageNum, pageSize);
+        List<LoanApplication> applicationList;
         try {
-            return loanApplicationDao.getApplicationByGuarantorIdAndStatus(guarantorId,loanStatus.getStatus());
+            applicationList = loanApplicationDao.getApplicationByGuarantorIdAndStatus(guarantorId, status);
         }
         catch (Exception e) {
             throw new SQLException(e);
         }
+        return new PageInfo<>(applicationList);
     }
 
     @Override
-    public List<LoanApplication> getApplicationReviewedPassed() throws SQLException{
+    public PageInfo<LoanApplication> getApplicationReviewedPassed(Integer pageNum, Integer pageSize) throws SQLException{
+        PageHelper.startPage(pageNum, pageSize);
+        List<LoanApplication> applicationList;
         try {
-            return loanApplicationDao.getApplicationReviewedPassed();
+            applicationList = loanApplicationDao.getApplicationReviewedPassed();
         }
         catch (Exception e) {
             throw new SQLException(e);
         }
+        return new PageInfo<>(applicationList);
     }
 }
