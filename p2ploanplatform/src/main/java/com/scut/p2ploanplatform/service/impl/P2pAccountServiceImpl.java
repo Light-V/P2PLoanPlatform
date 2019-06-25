@@ -58,7 +58,7 @@ public class P2pAccountServiceImpl implements P2pAccountService {
     @Override
     public Boolean verifyPassword(String thirdPartyId, String password) throws SQLException,IllegalArgumentException
     {
-        if (password==p2pAccountDao.findPasswordByThirdPartyId(thirdPartyId))
+        if (password.equals(p2pAccountDao.findPasswordByThirdPartyId(thirdPartyId)))
             return true;
         else
             return false;

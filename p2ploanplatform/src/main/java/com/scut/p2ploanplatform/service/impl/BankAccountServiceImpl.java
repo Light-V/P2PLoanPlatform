@@ -48,7 +48,7 @@ public class BankAccountServiceImpl implements BankAccountService {
     public Boolean verifyPassword(String cardId,String paymentPassword) throws SQLException,IllegalArgumentException
     {
         String truePassword=bankAccountDao.findPaymentPasswordByCardId(cardId);
-        if (truePassword==paymentPassword)
+        if (truePassword.equals(paymentPassword))
             return true;
         else
             return false;
