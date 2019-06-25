@@ -61,13 +61,13 @@ public class UserController {
     public ResultVo signup(HttpServletRequest request )throws SQLException {
         ResultVo vo = new ResultVo();
 
-        String userId = request.getParameter("userId");
+        String userId = request.getParameter("user_id");
         String password = request.getParameter("password");
-        String passwordRepeat = request.getParameter("passwordRepeat");
+        String passwordRepeat = request.getParameter("password_repeat");
         String departmentId = request.getParameter("departmentId");
         String phone = request.getParameter("phone");
-        String idCard = request.getParameter("idCard");
-        String thirdPartyId = request.getParameter("thirdPartyId");
+        String idCard = request.getParameter("id_card");
+        String thirdPartyId = request.getParameter("third_partyId");
         String name = request.getParameter("name");
         String address = request.getParameter("address");
         int departmentIdInt = Integer.parseInt(departmentId);
@@ -145,7 +145,7 @@ public class UserController {
         ResultVo vo = new ResultVo();
         String userId = (String) session.getAttribute("user");
         String password = request.getParameter("password");
-        String passwordRepeat = request.getParameter("passwordRepeat");
+        String passwordRepeat = request.getParameter("password_repeat");
 
         if(  password == null || password.equals("")){
             vo.setCode(1);
