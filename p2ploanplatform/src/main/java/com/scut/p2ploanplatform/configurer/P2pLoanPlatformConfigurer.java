@@ -23,7 +23,7 @@ public class P2pLoanPlatformConfigurer implements WebMvcConfigurer {
         InterceptorRegistration interceptorRegistration = registry.addInterceptor(new LoginInterceptor());
         interceptorRegistration.addPathPatterns("/**");
         //添加不拦截路径
-        interceptorRegistration.excludePathPatterns("/user/login","/user/signup");
+        interceptorRegistration.excludePathPatterns("/user/login","/user/signup","/error");
 
     }
 
