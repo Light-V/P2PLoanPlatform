@@ -4,6 +4,7 @@ import com.scut.p2ploanplatform.entity.CreditInfo;
 import com.scut.p2ploanplatform.enums.ResultEnum;
 import com.scut.p2ploanplatform.form.CreditInfoForm;
 import com.scut.p2ploanplatform.service.CreditService;
+import com.scut.p2ploanplatform.utils.ParamModel;
 import com.scut.p2ploanplatform.utils.ResultVoUtil;
 import com.scut.p2ploanplatform.vo.ResultVo;
 import org.apache.ibatis.jdbc.SQL;
@@ -55,11 +56,7 @@ public class CreditController {
 
     @RequestMapping("/update_credit_info")
     @PostMapping
-    public ResultVo updateCreditInfo(@Valid CreditInfoForm form, BindingResult bindingResult, HttpSession session) {
-        if (bindingResult.hasErrors()){
-            String error_msg = bindingResult.getFieldError().getDefaultMessage();
-            return ResultVoUtil.error(ResultEnum.PARAM_IS_INVALID);
-        }
+    public ResultVo updateCreditInfo(@Valid @ParamModel CreditInfoForm form, HttpSession session) {
         String userId = (String)session.getAttribute("user");
 
         BigDecimal result = null;

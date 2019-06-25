@@ -6,10 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 import java.math.BigDecimal;
 
 /**
@@ -27,13 +24,6 @@ public class CreditInfoForm {
     @DecimalMin("0")
     private BigDecimal income;
 
-    public void setFamily_income(BigDecimal family_income) {
-        this.familyIncome = family_income;
-    }
-
-    public void setFamily_number(Integer family_number) {
-        this.familyNumber = family_number;
-    }
 
     /**
      * 家庭收入 （单位:人民币）
