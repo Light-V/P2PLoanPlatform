@@ -17,6 +17,14 @@ public class ResultVoUtil {
         return resultVo;
     }
 
+    public static ResultVo success(String msg, Object o) {
+        ResultVo resultVo = new ResultVo();
+        resultVo.setCode(ResultEnum.SUCCESS.getCode());
+        resultVo.setMsg(msg);
+        resultVo.setData(o);
+        return resultVo;
+    }
+
     public static ResultVo success() {
         return success(null);
     }

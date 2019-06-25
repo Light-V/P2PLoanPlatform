@@ -19,15 +19,16 @@ public enum  ResultEnum {
 
     /* 资源不存在：30001-39999*/
     NOTICE_NOT_EXIST(30001, "通知不存在"),
+    APPLICATION_NOT_EXIST(30002,"借款申请不存在"),
 
     /*借款申请、订单错误：40001-49999*/
     APPLICATION_NOT_REVIEWED(40001,"借款申请未审核"),
     APPLICATION_NOT_PASS_REVIEWED(40002,"借款申请未发布"),
     APPLICATION_REJECTED(40003,"借款申请已被拒绝"),
     APPLICATION_EXPIRED(40004,"借款申请已过期"),
-
     PURCHASE_NOT_SUBSCRIBED(40010,"订单状态异常"),
-    PURCHASE_ACCOMPLISHED(40011,"订单已终止")
+    PURCHASE_ACCOMPLISHED(40011,"订单已终止"),
+    ILLEGAL_OPERATION(40012,"非法操作")
 
     ;
     private Integer code;

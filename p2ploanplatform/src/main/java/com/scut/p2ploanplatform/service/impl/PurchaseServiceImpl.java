@@ -28,7 +28,7 @@ public class PurchaseServiceImpl implements PurchaseService {
 
 
     @Override
-    public Boolean subscribed(String investorId, Integer applicationId) throws SQLException, IllegalArgumentException, LoanStatusException {
+    public Purchase subscribed(String investorId, Integer applicationId) throws SQLException, IllegalArgumentException, LoanStatusException {
         try {
             LoanApplication application = applicationService.getApplicationById(applicationId);
             if(application == null){
@@ -39,7 +39,11 @@ public class PurchaseServiceImpl implements PurchaseService {
             }
             Purchase purchase = new Purchase(application);
             purchase.setInvestorId(investorId);
-            return purchaseDao.createPurchaseItem(purchase);
+            if(purchaseDao.createPurchaseItem(purchase)){
+                return purchase;
+            }else{
+                throw new SQLException("数据库操作失败");
+            }
         }
         catch (Exception e) {
             throw new SQLException(e);
