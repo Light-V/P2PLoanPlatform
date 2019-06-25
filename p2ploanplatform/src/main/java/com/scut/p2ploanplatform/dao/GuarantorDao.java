@@ -14,10 +14,10 @@ import org.apache.ibatis.annotations.Update;
  */
 public interface GuarantorDao {
 
-    @Insert("INSERT INTO `p2p`.`guarantor` (`guarantor_id`, `authority_amount`) VALUES (#{guarantorId}, #{guarantorId}")
+    @Insert("INSERT INTO `p2p`.`guarantor` (`guarantor_id`, `password`, `name`, `third_party_id`, `authority_id`) VALUES (#{guarantorId}, #{password}, #{name}, #{thirdPartyId}, #{authorityId}")
     int insertGuarantor(Guarantor guarantor);
 
-    @Update("UPDATE `p2p`.`guarantor` SET `authority_amount` = #{authorityAmount} WHERE `guarantor_id` = #{guarantorId}")
+    @Update("UPDATE `p2p`.`guarantor` SET `password` = #{password}, name` = #{name}, third_party_id` = #{thirdPartyId}, authority_id` = #{authorityId} WHERE `guarantor_id` = #{guarantorId}")
     int updateGuarantor(Guarantor guarantor);
 
     @Select("SELECT * FROM `p2p`.`guarantor` WHERE guarantor_id = #{guarantorId}")
