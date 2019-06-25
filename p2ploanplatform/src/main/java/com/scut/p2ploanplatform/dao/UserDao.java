@@ -14,17 +14,17 @@ import org.springframework.stereotype.Repository;
 @Mapper
 public interface UserDao {
 
-    @Insert("INSERT INTO `p2p`.`User`(`user_id`, `department_id`, `password`, `phone`, `id_card`, `third_party_id`, `name`,`address`)" +
+    @Insert("INSERT INTO `p2p`.`user`(`user_id`, `department_id`, `password`, `phone`, `id_card`, `third_party_id`, `name`,`address`)" +
             " VALUES (#{userId}, #{departmentId}, #{password}, #{phone}, #{idCard}, #{thirdPartyId}, #{name}, #{address})")
     int insertUser(User newUser);
 
-    @Select("SELECT * FROM `p2p`.`User` WHERE `user_id` = #{value}")
+    @Select("SELECT * FROM `p2p`.`user` WHERE `user_id` = #{value}")
     User findUser(String id);
 
-    @Update("UPDATE `p2p`.`User` SET `password` = #{password} WHERE `user_id` = #{userId}")
+    @Update("UPDATE `p2p`.`user` SET `password` = #{password} WHERE `user_id` = #{userId}")
     int updatePassword(User user);
 
-    @Update("UPDATE `p2p`.`User` SET `phone` = #{phone}, `address` = #{address} WHERE `user_id` = #{userId}")
+    @Update("UPDATE `p2p`.`user` SET `phone` = #{phone}, `address` = #{address} WHERE `user_id` = #{userId}")
     int updateUser(User user);
 
 }
