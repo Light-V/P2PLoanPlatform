@@ -30,14 +30,8 @@ public class ApplicationController {
 
     @RequestMapping("/new")
     @PostMapping
-    public ResultVo createApplication(@Valid @ParamModel ApplicationInfoForm form, HttpSession session){
-
-        String userId;
-        try{
-            userId = (String)session.getAttribute("user");
-        }catch (Exception e){
-            return ResultVoUtil.error(ResultEnum.USER_NOT_LOGIN);
-        }
+    public ResultVo createApplication(@Valid @ParamModel ApplicationInfoForm form,
+                                      @SessionAttribute(value = "user") String userId){
 
         LoanApplication application = new LoanApplication();
 
@@ -58,18 +52,10 @@ public class ApplicationController {
 
     @RequestMapping("/cancel")
     @GetMapping
-    public ResultVo cancelApplication(HttpServletRequest request, HttpSession session){
+    public ResultVo cancelApplication(@RequestParam(value = "application_id") Integer applicationId,
+                                      @SessionAttribute(value = "user") String userId){
 
-        String userId;
-        Integer applicationId = Integer.valueOf(request.getParameter("application_id"));
         LoanApplication application;
-
-        try{
-            userId = (String)session.getAttribute("user");
-        }catch (Exception e){
-            return ResultVoUtil.error(ResultEnum.USER_NOT_LOGIN);
-        }
-
         try{
             application = applicationService.getApplicationById(applicationId);
             if(userId.equals(application.getBorrowerId())){
@@ -103,11 +89,12 @@ public class ApplicationController {
         return  ResultVoUtil.success(application);
     }
 
-    @RequestMapping("/user_applications/all")
+    @RequestMapping("/all")
     @GetMapping
     public ResultVo showAllApplications(@RequestParam(value = "page_num", defaultValue = "1") Integer pageNum,
-                                        @RequestParam(value = "page_size", defaultValue = "30") Integer pageSize){
-        PageInfo<LoanApplication> applicationPageInfo = null;
+                                        @RequestParam(value = "page_size", required = false, defaultValue = "10") Integer pageSize,
+                                        @SessionAttribute(value = "user") String userId){
+        PageInfo<LoanApplication> applicationPageInfo;
         try{
             applicationPageInfo = applicationService.getAllApplication(pageNum, pageSize);
         }catch (Exception e){
@@ -126,4 +113,76 @@ public class ApplicationController {
         ));
     }
 
+    @RequestMapping("uer_applications/{status}")
+    @GetMapping
+    public ResultVo showBorrowerApplications(@RequestParam(value = "page_num", defaultValue = "1") Integer pageNum,
+                                             @RequestParam(value = "page_size", required = false, defaultValue = "10") Integer pageSize,
+                                             @SessionAttribute(value = "user") String userId,
+                                             @PathVariable String status){
+        PageInfo<LoanApplication> applicationPageInfo = null;
+        try{
+            switch (status){
+                case "all":
+                    applicationPageInfo = applicationService.getApplicationByBorrowerId( userId, pageNum, pageSize);
+                    break;
+                case "reviewing":
+                    applicationPageInfo = applicationService.getApplicationByBorrowerId(userId,
+                            LoanStatus.UNREVIEWED.getStatus(), pageNum, pageSize);
+                    break;
+                case "review_passed":
+                    applicationPageInfo = applicationService.getApplicationByBorrowerId(userId,
+                            LoanStatus.REVIEWED_PASSED.getStatus(), pageNum, pageSize);
+                    break;
+                case "review_rejected":
+                    applicationPageInfo = applicationService.getApplicationByBorrowerId(userId,
+                            LoanStatus.REVIEWED_REJECTED.getStatus(), pageNum, pageSize);
+                    break;
+                case "subscribed":
+                    applicationPageInfo = applicationService.getApplicationByBorrowerId(userId,
+                            LoanStatus.SUBSCRIBED.getStatus(), pageNum, pageSize);
+                    break;
+                case "expired":
+                    applicationPageInfo = applicationService.getApplicationByBorrowerId(userId,
+                            LoanStatus.EXPIRED.getStatus(), pageNum, pageSize);
+                    break;
+            }
+
+        }catch (Exception e){
+            return ResultVoUtil.error(ResultEnum.APPLICATION_NOT_EXIST);
+        }
+        if(applicationPageInfo == null||applicationPageInfo.getTotal()==0){
+            return ResultVoUtil.error(ResultEnum.APPLICATION_NOT_EXIST);
+        }
+
+        return ResultVoUtil.success(new PageVo(
+                applicationPageInfo.getPages(),
+                applicationPageInfo.getTotal(),
+                applicationPageInfo.getPageSize(),
+                applicationPageInfo.getPageNum(),
+                applicationPageInfo.getList()
+        ));
+    }
+
+    @RequestMapping("/onsale")
+    @GetMapping
+    public ResultVo showOnSaleApplications(@RequestParam(value = "page_num", defaultValue = "1") Integer pageNum,
+                                           @RequestParam(value = "page_size", required = false, defaultValue = "10") Integer pageSize){
+        PageInfo<LoanApplication> applicationPageInfo;
+        try{
+            applicationPageInfo = applicationService.getApplicationReviewedPassed(pageNum, pageSize);
+        }catch (Exception e){
+            return ResultVoUtil.error(ResultEnum.APPLICATION_NOT_EXIST);
+        }
+        if(applicationPageInfo == null||applicationPageInfo.getTotal()==0){
+            return ResultVoUtil.error(ResultEnum.APPLICATION_NOT_EXIST);
+        }
+
+        return ResultVoUtil.success(new PageVo(
+                applicationPageInfo.getPages(),
+                applicationPageInfo.getTotal(),
+                applicationPageInfo.getPageSize(),
+                applicationPageInfo.getPageNum(),
+                applicationPageInfo.getList()
+        ));
+    }
 }

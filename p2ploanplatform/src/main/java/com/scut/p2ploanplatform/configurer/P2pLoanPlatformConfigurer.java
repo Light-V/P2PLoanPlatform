@@ -28,7 +28,7 @@ public class P2pLoanPlatformConfigurer implements WebMvcConfigurer {
                 "/user/signup",
                 "/error",
                 "/loan_application/detail/*",   //产品详情页
-                "/loan_application/user_applications/all"   //展示所有产品申请页
+                "/loan_application/onsale"
         );
 
     }
