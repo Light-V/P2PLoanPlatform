@@ -48,6 +48,17 @@ public class P2pAccountServiceImplTest {
 
     @Test
     @Transactional
+    public void verifyIfExistsTest() throws SQLException,IllegalArgumentException
+    {
+        p2pAccountService.addP2pAccount("201736824347","654321",new BigDecimal(1000),1,0);
+        Boolean trueResult=p2pAccountService.verifyIfExists("201736824347");
+        Boolean falseResult=p2pAccountService.verifyIfExists("201736824349");
+        assertEquals(true,trueResult);
+        assertEquals(false,falseResult);
+    }
+
+    @Test
+    @Transactional
     public void verifyTradeTest() throws SQLException,IllegalArgumentException
     {
         BigDecimal balance=new BigDecimal(1000);

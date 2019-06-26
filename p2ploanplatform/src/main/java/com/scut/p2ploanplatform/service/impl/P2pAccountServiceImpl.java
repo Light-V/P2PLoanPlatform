@@ -13,17 +13,19 @@ import java.sql.SQLException;
 public class P2pAccountServiceImpl implements P2pAccountService {
 
     @Autowired
-    P2pAccountDao p2pAccountDao;
+    private P2pAccountDao p2pAccountDao;
 
     @Autowired
-    BankAccountDao bankAccountDao;
+    private BankAccountDao bankAccountDao;
 
     @Override
     public int addP2pAccount(String thirdPartyId, String paymentPassword, BigDecimal balance, Integer status, Integer type) throws SQLException,IllegalArgumentException
     {
-        if (p2pAccountDao.findByThirdPartyId(thirdPartyId)!=null)
-            return 0;
-        else
+        if (balance.compareTo(BigDecimal.ZERO)<0||(status!=1&&status!=0)||(type!=1&&type!=0))
+            throw new IllegalArgumentException("非法参数！");
+        if (verifyIfExists(thirdPartyId))
+            throw new IllegalArgumentException("id为%s的账户已经存在！");
+        try
         {
             P2pAccount p2pAccount=new P2pAccount();
             p2pAccount.setThirdPartyId(thirdPartyId);
@@ -32,24 +34,47 @@ public class P2pAccountServiceImpl implements P2pAccountService {
             p2pAccount.setStatus(status);
             p2pAccount.setType(type);
             p2pAccountDao.addP2pAccount(p2pAccount);
-            return 1;
         }
+        catch (Exception e)
+        {
+            throw new SQLException(e);
+        }
+        return 1;
     }
 
     @Override
     public BigDecimal findBalance(String thirdPartyId) throws SQLException,IllegalArgumentException
     {
-        return p2pAccountDao.findBalanceByThirdPartyId(thirdPartyId);
+        if (!verifyIfExists(thirdPartyId))
+            throw new IllegalArgumentException(String.format("id为%s的账户还未创建！",thirdPartyId));
+        try
+        {
+            return p2pAccountDao.findBalanceByThirdPartyId(thirdPartyId);
+        }
+        catch (Exception e)
+        {
+            throw new SQLException(e);
+        }
+    }
+
+    @Override
+    public Boolean verifyIfExists(String thirdPartyId)
+    {
+        if (p2pAccountDao.findByThirdPartyId(thirdPartyId)==null)
+            return false;
+        else
+            return true;
     }
 
     @Override
     public Boolean verifyTrade(String payerId, BigDecimal amount) throws SQLException,IllegalArgumentException
     {
-        BigDecimal zero=new BigDecimal(0);
-        if (amount.compareTo(zero)==-1)
-            return false;
+        if (!verifyIfExists(payerId))
+            throw new IllegalArgumentException(String.format("id为%s的账户还未创建！",payerId));
+        if (amount.compareTo(BigDecimal.ZERO)<0)
+            throw new IllegalArgumentException("金额必须为正数！");
         BigDecimal balance=findBalance(payerId);
-        if (balance.compareTo(amount)==0 || balance.compareTo(amount)==1)
+        if (balance.compareTo(amount)>=0)
             return true;
         else
             return false;
@@ -58,10 +83,16 @@ public class P2pAccountServiceImpl implements P2pAccountService {
     @Override
     public Boolean verifyPassword(String thirdPartyId, String password) throws SQLException,IllegalArgumentException
     {
-        if (password.equals(p2pAccountDao.findPasswordByThirdPartyId(thirdPartyId)))
-            return true;
-        else
-            return false;
+        if (!verifyIfExists(thirdPartyId))
+            throw new IllegalArgumentException(String.format("id为%s的账户还未创建！",thirdPartyId));
+        try
+        {
+            return password.equals(p2pAccountDao.findPasswordByThirdPartyId(thirdPartyId));
+        }
+        catch (Exception e)
+        {
+            throw new SQLException(e);
+        }
     }
 
     @Override
@@ -84,21 +115,26 @@ public class P2pAccountServiceImpl implements P2pAccountService {
     @Override
     public Boolean verifyPasswordIsSet(String thirdPartyId) throws SQLException,IllegalArgumentException
     {
-        String password=p2pAccountDao.findPasswordByThirdPartyId(thirdPartyId);
-        if (password==null||password.equals(""))
-            return false;
-        else
-            return true;
+        if (!verifyIfExists(thirdPartyId))
+            throw new IllegalArgumentException(String.format("id为%s的账户还未创建！",thirdPartyId));
+        try
+        {
+            String password=p2pAccountDao.findPasswordByThirdPartyId(thirdPartyId);
+            return !password.equals("");
+        }
+        catch (Exception e)
+        {
+            throw new SQLException(e);
+        }
     }
 
     @Override
     public Boolean recharge(String thirdPartyId, String cardId, BigDecimal amount) throws SQLException,IllegalArgumentException
     {
-        BigDecimal zero=new BigDecimal(0);
-        if (amount.compareTo(zero)==-1)
-            return false;
+        if (amount.compareTo(BigDecimal.ZERO)<0)
+            throw new IllegalArgumentException("金额必须为正数！");
         BigDecimal cardBalance=bankAccountDao.findBalanceByCardId(cardId);
-        if (cardBalance.compareTo(amount)==0 || cardBalance.compareTo(amount)==1)
+        if (cardBalance.compareTo(amount)>=0)
         {
             BigDecimal p2pBalance=findBalance(thirdPartyId);
             BigDecimal newCardBalance=cardBalance.subtract(amount);
@@ -114,11 +150,10 @@ public class P2pAccountServiceImpl implements P2pAccountService {
     @Override
     public Boolean withdraw(String thirdPartyId, String cardId, BigDecimal amount) throws SQLException,IllegalArgumentException
     {
-        BigDecimal zero=new BigDecimal(0);
-        if (amount.compareTo(zero)==-1)
-            return false;
+        if (amount.compareTo(BigDecimal.ZERO)<0)
+            throw new IllegalArgumentException("金额必须为正数！");
         BigDecimal p2pBalance=findBalance(thirdPartyId);
-        if (p2pBalance.compareTo(amount)==0 || p2pBalance.compareTo(amount)==1)
+        if (p2pBalance.compareTo(amount)>=0)
         {
             BigDecimal cardBalance=bankAccountDao.findBalanceByCardId(cardId);
             BigDecimal newP2pBalance=p2pBalance.subtract(amount);

@@ -4,6 +4,7 @@ import com.scut.p2ploanplatform.service.BankAccountService;
 import com.scut.p2ploanplatform.service.P2pAccountService;
 import com.scut.p2ploanplatform.vo.ResultVo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,6 +23,26 @@ public class ThirdPartyController {
     @Autowired
     private BankAccountService bankAccountService;
 
+    @GetMapping("/findBalance")
+    public ResultVo findBalance(HttpSession session) throws SQLException,IllegalArgumentException
+    {
+        ResultVo resultVo=new ResultVo();
+        String thirdPartyId=(String) session.getAttribute("thirdPartyId");
+        if (!p2pAccountService.verifyIfExists(thirdPartyId))
+        {
+            resultVo.setMsg(String.format("id为%s的账户还未创建！",thirdPartyId));
+            resultVo.setCode(0);
+        }
+        else
+        {
+            BigDecimal balance=p2pAccountService.findBalance(thirdPartyId);
+            resultVo.setMsg("查询成功！");
+            resultVo.setCode(1);
+            resultVo.setData(balance);
+        }
+        return resultVo;
+    }
+
     @PutMapping("/purchase")
     public ResultVo transfer(HttpSession session) throws SQLException,IllegalArgumentException
     {
@@ -35,18 +56,18 @@ public class ThirdPartyController {
             Boolean result=p2pAccountService.transfer(payerId,payeeId,amount);
             if (result)
             {
-                resultVo.setMsg("Success!");
+                resultVo.setMsg("交易成功!");
                 resultVo.setCode(1);
             }
             else
             {
-                resultVo.setMsg("The payer's balance is not enough to pay!");
+                resultVo.setMsg("余额不足!");
                 resultVo.setCode(0);
             }
         }
         else
         {
-            resultVo.setMsg("The password is wrong!");
+            resultVo.setMsg("密码错误!");
             resultVo.setCode(0);
         }
         return resultVo;
@@ -66,17 +87,17 @@ public class ThirdPartyController {
             if (result)
             {
                 resultVo.setCode(1);
-                resultVo.setMsg("Success!");
+                resultVo.setMsg("充值成功!");
             }
             else
             {
                 resultVo.setCode(0);
-                resultVo.setMsg("The balance is not enough to recharge!");
+                resultVo.setMsg("余额不足!");
             }
         }
         else
         {
-            resultVo.setMsg("The password is wrong!");
+            resultVo.setMsg("密码错误!");
             resultVo.setCode(0);
         }
         return resultVo;
@@ -96,18 +117,18 @@ public class ThirdPartyController {
             if (result)
             {
                 resultVo.setCode(1);
-                resultVo.setMsg("Success!");
+                resultVo.setMsg("提现成功!");
             }
             else
             {
                 resultVo.setCode(0);
-                resultVo.setMsg("The balance is not enough to withdraw!");
+                resultVo.setMsg("余额不足！");
             }
         }
         else
         {
             resultVo.setCode(0);
-            resultVo.setMsg("The password is wrong!");
+            resultVo.setMsg("密码错误!");
         }
         return resultVo;
     }
