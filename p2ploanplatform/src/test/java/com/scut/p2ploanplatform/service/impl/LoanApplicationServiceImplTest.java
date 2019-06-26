@@ -285,4 +285,25 @@ public class LoanApplicationServiceImplTest {
         assertEquals(1, applicationPageInfo.getPageNum());
         assertEquals(10, applicationPageInfo.getPageSize());
     }
+
+    @Test
+    public void getApplicationUnReviewed() {
+        try{
+            applicationService.addApplication(application);
+        }catch (Exception e){
+            e.printStackTrace();
+            fail();
+        }
+        PageInfo<LoanApplication> applicationPageInfo = null;
+        try{
+            applicationPageInfo= applicationService.getApplicationUnReviewed(1, 10);
+        }catch (Exception e){
+            e.printStackTrace();
+            fail();
+        }
+
+        assertNotNull(applicationPageInfo);
+        assertEquals(1, applicationPageInfo.getPageNum());
+        assertEquals(10, applicationPageInfo.getPageSize());
+    }
 }

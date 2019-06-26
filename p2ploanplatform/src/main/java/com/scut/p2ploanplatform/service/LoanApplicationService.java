@@ -91,7 +91,6 @@ public interface LoanApplicationService {
      */
     PageInfo<LoanApplication> getAllApplication(Integer pageNum, Integer pageSize) throws SQLException, IllegalArgumentException;
 
-
     /**
      * 查询特定借款人的所有借款申请
      * @param borrowerId 借款人Id
@@ -148,4 +147,15 @@ public interface LoanApplicationService {
      * @throws IllegalArgumentException 非法参数错误
      */
     PageInfo<LoanApplication> getApplicationReviewedPassed(Integer pageNum, Integer pageSize) throws SQLException;
+
+    /**
+     * 查询所有待审核的借款申请
+     * 产品交易平台展示内容
+     * @param pageNum 请求页码
+     * @param pageSize 每页包含的字段数
+     * @return 借款申请列表
+     * @throws SQLException sql错误
+     * @throws IllegalArgumentException 非法参数错误
+     */
+    PageInfo<LoanApplication> getApplicationUnReviewed(Integer pageNum, Integer pageSize) throws SQLException;
 }

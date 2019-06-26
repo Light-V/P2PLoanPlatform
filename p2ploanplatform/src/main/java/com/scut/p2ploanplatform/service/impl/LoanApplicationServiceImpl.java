@@ -229,4 +229,17 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
         }
         return new PageInfo<>(applicationList);
     }
+
+    @Override
+    public PageInfo<LoanApplication> getApplicationUnReviewed(Integer pageNum, Integer pageSize) throws SQLException {
+        PageHelper.startPage(pageNum, pageSize);
+        List<LoanApplication> applicationList;
+        try {
+            applicationList = loanApplicationDao.getApplicationUnReviewed();
+        }
+        catch (Exception e) {
+            throw new SQLException(e);
+        }
+        return new PageInfo<>(applicationList);
+    }
 }

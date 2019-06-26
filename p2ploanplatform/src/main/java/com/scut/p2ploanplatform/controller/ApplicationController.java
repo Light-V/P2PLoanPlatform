@@ -76,7 +76,8 @@ public class ApplicationController {
 
     @RequestMapping(value = "/detail/{applicationId}")
     @GetMapping
-    public ResultVo applicationDetail(@PathVariable Integer applicationId){
+    public ResultVo applicationDetail(@PathVariable Integer applicationId,
+                                      @SessionAttribute(value = "user") String userId){
         LoanApplication application;
         try{
             application = applicationService.getApplicationById(applicationId);
