@@ -27,11 +27,21 @@ public class NoticeController {
         return ResultVoUtil.success(notice);
     }
 
-    @GetMapping("/all")
+    @GetMapping("/get")
     public ResultVo all(@RequestParam(value = "page_num", defaultValue = "1") Integer pageNum,
                         @RequestParam(value = "page_size", defaultValue = "30") Integer pageSize,
+                        @RequestParam(value = "status", required = false) Integer status,
                         @SessionAttribute(value = "user") String userId) {
-        PageInfo<Notice> noticePageInfo = noticeService.getNotices(userId, pageNum, pageSize);
+        PageInfo<Notice> noticePageInfo;
+        if (status == null) {
+            noticePageInfo = noticeService.getNotices(userId, pageNum, pageSize);
+        } else if (status == 0){
+            noticePageInfo = noticeService.getUnreadNotices(userId, pageNum, pageSize);
+        } else if (status == 1) {
+            noticePageInfo = noticeService.getReadNotices(userId, pageNum, pageSize);
+        } else {
+            noticePageInfo = noticeService.getNotices(userId, pageNum, pageSize);
+        }
         return ResultVoUtil.success(new PageVo(
                 noticePageInfo.getPages(),
                 noticePageInfo.getTotal(),
@@ -41,21 +51,7 @@ public class NoticeController {
         ));
     }
 
-    @GetMapping("/unread")
-    public ResultVo unread(@RequestParam(value = "page_name", defaultValue = "1") Integer pageNum,
-                           @RequestParam(value = "page_size", defaultValue = "30") Integer pageSize,
-                           @SessionAttribute(value = "user") String userId) {
-        PageInfo<Notice> noticePageInfo = noticeService.getUnreadNotices(userId, pageNum, pageSize);
-        return ResultVoUtil.success(new PageVo(
-                noticePageInfo.getPages(),
-                noticePageInfo.getTotal(),
-                noticePageInfo.getPageSize(),
-                noticePageInfo.getPageNum(),
-                noticePageInfo.getList()
-        ));
-    }
-
-    @GetMapping("/read")
+    @GetMapping("/update")
     public ResultVo read(@RequestParam(value = "notice_id", defaultValue = "") Integer noticeId,
                          @SessionAttribute(value = "user") String userId) {
         noticeService.readNotice(userId, noticeId);

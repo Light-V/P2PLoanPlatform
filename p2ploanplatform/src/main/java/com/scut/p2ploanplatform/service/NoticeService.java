@@ -39,6 +39,15 @@ public interface NoticeService {
     PageInfo<Notice> getUnreadNotices(String userId, Integer pageNum, Integer pageSize);
 
     /**
+     * 获取已读通知
+     * @param userId 用户或担保人id
+     * @param pageNum 页码
+     * @param pageSize  每页记录数
+     * @return
+     */
+    PageInfo<Notice> getReadNotices(String userId, Integer pageNum, Integer pageSize);
+
+    /**
      * 读通知，将通知状态改成已读
      * @param userId 用户id
      * @param noticeId 通知的id

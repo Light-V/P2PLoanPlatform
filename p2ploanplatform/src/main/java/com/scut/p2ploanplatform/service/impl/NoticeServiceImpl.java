@@ -51,6 +51,13 @@ public class NoticeServiceImpl implements NoticeService {
     }
 
     @Override
+    public PageInfo<Notice> getReadNotices(String userId, Integer pageNum, Integer pageSize) {
+        PageHelper.startPage(pageNum, pageSize);
+        List<Notice> noticeList = noticeDao.findByUserIdAndStatus(userId, NoticeStatusEnum.READ.getCode());
+        return new PageInfo<>(noticeList);
+    }
+
+    @Override
     public void deleteNotice(String userId, Integer noticeId) {
         Notice notice = noticeDao.findByNoticeId(noticeId);
         if (notice == null || !notice.getUserId().equals(userId)) {

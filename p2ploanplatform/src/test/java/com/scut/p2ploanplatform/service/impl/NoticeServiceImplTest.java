@@ -60,6 +60,25 @@ public class NoticeServiceImplTest {
         assertNotNull(noticePageInfo);
         assertEquals(1, noticePageInfo.getPageNum());
         assertEquals(9, noticePageInfo.getPageSize());
+        for (Notice notice : noticePageInfo.getList()) {
+            assertEquals(NoticeStatusEnum.UNREAD.getCode(), notice.getStatus());
+        }
+    }
+
+    @Test
+    @Transactional
+    public void getReadNotices() {
+        for (int i = 0; i < 5; ++i) {
+            Notice notice = noticeService.sendNotice("123456789098", "Test", "This is a test");
+            noticeService.readNotice("123456789098", notice.getNoticeId());
+        }
+        PageInfo<Notice> noticePageInfo = noticeService.getReadNotices("123456789098", 1, 9);
+        assertNotNull(noticePageInfo);
+        assertEquals(1, noticePageInfo.getPageNum());
+        assertEquals(9, noticePageInfo.getPageSize());
+        for (Notice notice : noticePageInfo.getList()) {
+            assertEquals(NoticeStatusEnum.READ.getCode(), notice.getStatus());
+        }
     }
 
     @Test

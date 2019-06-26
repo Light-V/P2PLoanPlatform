@@ -1,6 +1,7 @@
 package com.scut.p2ploanplatform.interceptor;
 
 import com.scut.p2ploanplatform.enums.ResultEnum;
+import com.scut.p2ploanplatform.exception.AuthorizeException;
 import com.scut.p2ploanplatform.exception.CustomException;
 import com.scut.p2ploanplatform.utils.ResultVoUtil;
 import com.scut.p2ploanplatform.vo.ResultVo;
@@ -76,5 +77,11 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResultVo customExceptionHandler(CustomException e) {
         return ResultVoUtil.error(e.getCode(), e.getMessage());
+    }
+
+    @ExceptionHandler(AuthorizeException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ResultVo authorizeExceptionHandler() {
+        return ResultVoUtil.error(ResultEnum.USER_NOT_LOGIN);
     }
 }
