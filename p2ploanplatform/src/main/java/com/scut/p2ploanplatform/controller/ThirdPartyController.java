@@ -1,13 +1,10 @@
 package com.scut.p2ploanplatform.controller;
 
-import com.scut.p2ploanplatform.service.BankAccountService;
-import com.scut.p2ploanplatform.service.P2pAccountService;
+import com.scut.p2ploanplatform.service.impl.BankAccountServiceImpl;
+import com.scut.p2ploanplatform.service.impl.P2pAccountServiceImpl;
 import com.scut.p2ploanplatform.vo.ResultVo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
@@ -18,12 +15,12 @@ import java.sql.SQLException;
 @RequestMapping("/thirdParty")
 public class ThirdPartyController {
     @Autowired
-    private P2pAccountService p2pAccountService;
+    private P2pAccountServiceImpl p2pAccountService;
 
     @Autowired
-    private BankAccountService bankAccountService;
+    private BankAccountServiceImpl bankAccountService;
 
-    @GetMapping("/findBalance")
+    @GetMapping("/thirdParty/findBalance")
     public ResultVo findBalance(HttpSession session) throws SQLException,IllegalArgumentException
     {
         ResultVo resultVo=new ResultVo();
@@ -43,7 +40,56 @@ public class ThirdPartyController {
         return resultVo;
     }
 
-    @PutMapping("/addBankAccount")
+    @PutMapping("/thirdParty/setPassword")
+    public ResultVo setPassword(HttpSession session) throws SQLException
+    {
+        ResultVo resultVo=new ResultVo();
+        String thirdPartyId=(String) session.getAttribute("thirdPartyId");
+        String paymentPassword=(String) session.getAttribute("paymentPassword");
+        if (!p2pAccountService.verifyIfExists(thirdPartyId))
+        {
+            resultVo.setMsg(String.format("id为%s的账户还未创建！",thirdPartyId));
+            resultVo.setCode(0);
+        }
+        else
+        {
+            p2pAccountService.updatePassword(thirdPartyId,paymentPassword);
+            resultVo.setMsg("设置成功！");
+            resultVo.setCode(1);
+        }
+        return resultVo;
+    }
+
+    @PutMapping("/thirdParty/modifyPassword")
+    public ResultVo modifyPassword(HttpSession session) throws SQLException
+    {
+        ResultVo resultVo=new ResultVo();
+        String thirdPartyId=(String) session.getAttribute("thirdPartyId");
+        String oldPassword=(String) session.getAttribute("oldPassword");
+        String newPassword=(String) session.getAttribute("newPassword");
+        if (!p2pAccountService.verifyIfExists(thirdPartyId))
+        {
+            resultVo.setMsg(String.format("id为%s的账户还未创建！",thirdPartyId));
+            resultVo.setCode(0);
+        }
+        else
+        {
+            if (!p2pAccountService.verifyPassword(thirdPartyId,oldPassword))
+            {
+                resultVo.setMsg("密码错误！");
+                resultVo.setCode(0);
+            }
+            else
+            {
+                p2pAccountService.updatePassword(thirdPartyId,newPassword);
+                resultVo.setMsg("修改成功！");
+                resultVo.setCode(1);
+            }
+        }
+        return resultVo;
+    }
+
+    @PostMapping("/thirdParty/addBankAccount")
     public ResultVo addBankAccount(HttpSession session) throws SQLException,IllegalArgumentException
     {
         ResultVo resultVo=new ResultVo();
@@ -64,7 +110,7 @@ public class ThirdPartyController {
         return resultVo;
     }
 
-    @PutMapping("/transfer")
+    @PutMapping("/thirdParty/transfer")
     public ResultVo transfer(HttpSession session) throws SQLException,IllegalArgumentException
     {
         ResultVo resultVo=new ResultVo();
@@ -94,7 +140,7 @@ public class ThirdPartyController {
         return resultVo;
     }
 
-    @PutMapping("/recharge")
+    @PutMapping("/thirdParty/recharge")
     public ResultVo recharge(HttpSession session) throws SQLException,IllegalArgumentException
     {
         ResultVo resultVo=new ResultVo();
@@ -124,7 +170,7 @@ public class ThirdPartyController {
         return resultVo;
     }
 
-    @PutMapping("/withdraw")
+    @PutMapping("/thirdParty/withdraw")
     public ResultVo withdraw(HttpSession session) throws SQLException,IllegalArgumentException
     {
         ResultVo resultVo=new ResultVo();

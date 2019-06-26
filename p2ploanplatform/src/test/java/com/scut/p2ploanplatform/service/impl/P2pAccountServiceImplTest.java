@@ -1,6 +1,9 @@
 package com.scut.p2ploanplatform.service.impl;
 
 import com.scut.p2ploanplatform.dao.BankAccountDao;
+import com.scut.p2ploanplatform.dao.P2pAccountDao;
+import com.scut.p2ploanplatform.entity.P2pAccount;
+import com.scut.p2ploanplatform.enums.P2pAccountStatusEnum;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +24,9 @@ public class P2pAccountServiceImplTest {
 
     @Autowired
     private BankAccountDao bankAccountDao;
+
+    @Autowired
+    private P2pAccountDao p2pAccountDao;
 
     @Autowired
     private BankAccountServiceImpl bankAccountService;
@@ -44,6 +50,17 @@ public class P2pAccountServiceImplTest {
         p2pAccountService.addP2pAccount("201736824347","654321",balance,1,0);
         BigDecimal testBalance=p2pAccountService.findBalance("201736824347");
         assertEquals(0,testBalance.compareTo(balance));
+    }
+
+    @Test
+    @Transactional
+    public void updatePasswordTest() throws SQLException,IllegalArgumentException
+    {
+        p2pAccountService.addP2pAccount("201736824347","654321",new BigDecimal(1000),1,0);
+        int result=p2pAccountService.updatePassword("201736824347","123456");
+        assertEquals(1,result);
+        Boolean trueResult=p2pAccountService.verifyPassword("201736824347","123456");
+        assertEquals(true,trueResult);
     }
 
     @Test
@@ -147,5 +164,25 @@ public class P2pAccountServiceImplTest {
         assertEquals(0,new BigDecimal(1200).compareTo(newCardBalance));
     }
 
+    @Test
+    @Transactional
+    public void freezeTest() throws SQLException,IllegalArgumentException
+    {
+        p2pAccountService.addP2pAccount("201636824347","123456",new BigDecimal(1000),1,0);
+        int result=p2pAccountService.freeze("201636824347");
+        assertEquals(1,result);
+        P2pAccount p2pAccount=p2pAccountDao.findByThirdPartyId("201636824347");
+        assertEquals(P2pAccountStatusEnum.FROZEN.getCode(),p2pAccount.getStatus());
+    }
 
+    @Test
+    @Transactional
+    public void unfreezeTest() throws SQLException,IllegalArgumentException
+    {
+        p2pAccountService.addP2pAccount("201636824347","123456",new BigDecimal(1000),0,0);
+        int result=p2pAccountService.unfreeze("201636824347");
+        assertEquals(1,result);
+        P2pAccount p2pAccount=p2pAccountDao.findByThirdPartyId("201636824347");
+        assertEquals(P2pAccountStatusEnum.ACTIVE.getCode(),p2pAccount.getStatus());
+    }
 }

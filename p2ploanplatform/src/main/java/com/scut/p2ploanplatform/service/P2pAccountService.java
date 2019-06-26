@@ -25,6 +25,16 @@ public interface P2pAccountService {
     Boolean verifyIfExists(String thirdPartyId);
 
     /**
+     * 修改或设置第三方平台支付密码
+     * @param thirdPartyId 第三方ID
+     * @param paymentPassword 支付密码
+     * @return 成功返回1，失败返回0
+     * @throws SQLException SQL查询异常
+     * @throws IllegalArgumentException 非法参数异常
+     */
+    int updatePassword(String thirdPartyId, String paymentPassword) throws SQLException,IllegalArgumentException;
+
+    /**
      * 查询账户余额
      * @param thirdPartyId 第三方ID
      * @return balance 账户余额
@@ -94,4 +104,22 @@ public interface P2pAccountService {
      * @throws IllegalArgumentException 非法参数异常
      */
     Boolean withdraw(String thirdPartyId, String cardId, BigDecimal amount) throws SQLException,IllegalArgumentException;
+
+    /**
+     * 冻结账户
+     * @param thirdPartyId 第三方ID
+     * @return 成功返回1，失败返回0
+     * @throws SQLException SQL查询异常
+     * @throws IllegalArgumentException 非法参数异常
+     */
+    int freeze(String thirdPartyId) throws SQLException,IllegalArgumentException;
+
+    /**
+     * 解冻账户
+     * @param thirdPartyId 第三方ID
+     * @return 成功返回1，失败返回0
+     * @throws SQLException SQL查询异常
+     * @throws IllegalArgumentException 非法参数异常
+     */
+    int unfreeze(String thirdPartyId) throws SQLException,IllegalArgumentException;
 }

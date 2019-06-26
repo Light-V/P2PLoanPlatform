@@ -43,6 +43,22 @@ public class P2pAccountServiceImpl implements P2pAccountService {
     }
 
     @Override
+    public int updatePassword(String thirdPartyId, String paymentPassword) throws SQLException,IllegalArgumentException
+    {
+        if (!verifyIfExists(thirdPartyId))
+            throw new IllegalArgumentException(String.format("id为%s的账户还未创建！",thirdPartyId));
+        try
+        {
+            p2pAccountDao.updatePaymentPassword(thirdPartyId,paymentPassword);
+            return 1;
+        }
+        catch (Exception e)
+        {
+            throw new SQLException(e);
+        }
+    }
+
+    @Override
     public BigDecimal findBalance(String thirdPartyId) throws SQLException,IllegalArgumentException
     {
         if (!verifyIfExists(thirdPartyId))
@@ -164,5 +180,37 @@ public class P2pAccountServiceImpl implements P2pAccountService {
         }
         else
             return false;
+    }
+
+    @Override
+    public int freeze(String thirdPartyId) throws SQLException,IllegalArgumentException
+    {
+        if (!verifyIfExists(thirdPartyId))
+            throw new IllegalArgumentException(String.format("id为%s的账户还未创建！",thirdPartyId));
+        try
+        {
+            p2pAccountDao.updateStatus(thirdPartyId,0);
+            return 1;
+        }
+        catch (Exception e)
+        {
+            throw new SQLException(e);
+        }
+    }
+
+    @Override
+    public int unfreeze(String thirdPartyId) throws SQLException,IllegalArgumentException
+    {
+        if (!verifyIfExists(thirdPartyId))
+            throw new IllegalArgumentException(String.format("id为%s的账户还未创建！",thirdPartyId));
+        try
+        {
+            p2pAccountDao.updateStatus(thirdPartyId,1);
+            return 1;
+        }
+        catch (Exception e)
+        {
+            throw new SQLException(e);
+        }
     }
 }
