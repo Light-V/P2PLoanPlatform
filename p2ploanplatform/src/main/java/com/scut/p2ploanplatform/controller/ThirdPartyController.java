@@ -43,7 +43,28 @@ public class ThirdPartyController {
         return resultVo;
     }
 
-    @PutMapping("/purchase")
+    @PutMapping("/addBankAccount")
+    public ResultVo addBankAccount(HttpSession session) throws SQLException,IllegalArgumentException
+    {
+        ResultVo resultVo=new ResultVo();
+        String thirdPartyId=(String) session.getAttribute("thirdPartyId");
+        String cardId=(String) session.getAttribute("cardId");
+        String paymentPassword=(String) session.getAttribute("paymentPassword");
+        if (bankAccountService.verifyCardIsAdded(cardId))
+        {
+            resultVo.setMsg("该卡已被别的账户添加！");
+            resultVo.setCode(0);
+        }
+        else
+        {
+            bankAccountService.addBankAccount(cardId,thirdPartyId,paymentPassword,new BigDecimal(10000));
+            resultVo.setMsg("添加成功！");
+            resultVo.setCode(1);
+        }
+        return resultVo;
+    }
+
+    @PutMapping("/transfer")
     public ResultVo transfer(HttpSession session) throws SQLException,IllegalArgumentException
     {
         ResultVo resultVo=new ResultVo();

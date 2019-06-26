@@ -76,6 +76,15 @@ public class BankAccountServiceImpl implements BankAccountService {
     }
 
     @Override
+    public Boolean verifyCardIsAdded(String cardId) throws SQLException,IllegalArgumentException
+    {
+        if (bankAccountDao.findCardByCardId(cardId)==null)
+            return false;
+        else
+            return true;
+    }
+
+    @Override
     public Boolean verifyPassword(String cardId,String paymentPassword) throws SQLException,IllegalArgumentException
     {
         if (bankAccountDao.findCardByCardId(cardId)== null)

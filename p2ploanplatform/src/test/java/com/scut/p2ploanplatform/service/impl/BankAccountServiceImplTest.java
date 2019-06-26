@@ -55,6 +55,17 @@ public class BankAccountServiceImplTest {
 
     @Test
     @Transactional
+    public void verifyCardIsAdded() throws SQLException,IllegalArgumentException
+    {
+        bankAccountService.addBankAccount("123456789012","201636824347","123456",new BigDecimal(1000));
+        Boolean trueResult=bankAccountService.verifyCardIsAdded("123456789012");
+        Boolean falseResult=bankAccountService.verifyCardIsAdded("123456789011");
+        assertEquals(true,trueResult);
+        assertEquals(false,falseResult);
+    }
+
+    @Test
+    @Transactional
     public void verifyPasswordTest() throws SQLException,IllegalArgumentException
     {
         bankAccountService.addBankAccount("123456789012","201636824347","123456",new BigDecimal(1000));

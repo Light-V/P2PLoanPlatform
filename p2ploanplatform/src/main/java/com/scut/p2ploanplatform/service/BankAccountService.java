@@ -41,6 +41,15 @@ public interface BankAccountService {
     /**
      *
      * @param cardId 卡号
+     * @return 该卡是否已被添加
+     * @throws SQLException SQL查询异常
+     * @throws IllegalArgumentException 非法参数异常
+     */
+    Boolean verifyCardIsAdded(String cardId) throws SQLException,IllegalArgumentException;
+
+    /**
+     *
+     * @param cardId 卡号
      * @param paymentPassword 支付密码
      * @return 密码是否正确
      * @throws SQLException
