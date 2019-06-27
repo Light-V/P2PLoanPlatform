@@ -4,11 +4,15 @@ import com.scut.p2ploanplatform.dao.BankAccountDao;
 import com.scut.p2ploanplatform.dao.P2pAccountDao;
 import com.scut.p2ploanplatform.entity.P2pAccount;
 import com.scut.p2ploanplatform.service.P2pAccountService;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.math.BigDecimal;
-import java.sql.SQLException;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
 @Service
 public class P2pAccountServiceImpl implements P2pAccountService {
 
@@ -17,6 +21,20 @@ public class P2pAccountServiceImpl implements P2pAccountService {
 
     @Autowired
     private BankAccountDao bankAccountDao;
+
+    private String apiKey;
+
+    public String generateApiKey()
+    {
+        String apiKey=RandomStringUtils.randomAlphanumeric(12);
+        this.apiKey=apiKey;
+        return apiKey;
+    }
+
+    public String getApiKey()
+    {
+        return apiKey;
+    }
 
     @Override
     public int addP2pAccount(String thirdPartyId, String paymentPassword, BigDecimal balance, Integer status, Integer type) throws SQLException,IllegalArgumentException
@@ -211,6 +229,41 @@ public class P2pAccountServiceImpl implements P2pAccountService {
         catch (Exception e)
         {
             throw new SQLException(e);
+        }
+    }
+
+    public String getSHA(String input)
+    {
+
+        try {
+
+            // Static getInstance method is called with hashing SHA
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+
+            // digest() method called
+            // to calculate message digest of an input
+            // and return array of byte
+            byte[] messageDigest = md.digest(input.getBytes());
+
+            // Convert byte array into signum representation
+            BigInteger no = new BigInteger(1, messageDigest);
+
+            // Convert message digest into hex value
+            String hashtext = no.toString(16);
+
+            while (hashtext.length() < 32) {
+                hashtext = "0" + hashtext;
+            }
+
+            return hashtext;
+        }
+
+        // For specifying wrong message digest algorithms
+        catch (NoSuchAlgorithmException e) {
+            System.out.println("Exception thrown"
+                    + " for incorrect algorithm: " + e);
+
+            return null;
         }
     }
 }

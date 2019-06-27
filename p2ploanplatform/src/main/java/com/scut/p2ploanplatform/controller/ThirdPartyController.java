@@ -5,7 +5,6 @@ import com.scut.p2ploanplatform.service.impl.P2pAccountServiceImpl;
 import com.scut.p2ploanplatform.vo.ResultVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
@@ -148,25 +147,57 @@ public class ThirdPartyController {
         ResultVo resultVo=new ResultVo();
         String payerId=request.getParameter("payer_id");
         String payeeId=request.getParameter("payee_id");
-        String payerPassword=request.getParameter("payer_password");
         BigDecimal amount=new BigDecimal(request.getParameter("amount"));
-        if (p2pAccountService.verifyPassword(payerId,payerPassword))
+        String apiKey=request.getParameter("api_key");
+        String signature=request.getParameter("signature");
+        String currSignature=p2pAccountService.getSHA(payerId+payeeId+request.getParameter("amount")+apiKey);
+        if (currSignature.equals(signature))
         {
             Boolean result=p2pAccountService.transfer(payerId,payeeId,amount);
             if (result)
             {
-                resultVo.setMsg("交易成功!");
+                resultVo.setMsg("转账成功！");
                 resultVo.setCode(0);
             }
             else
             {
-                resultVo.setMsg("余额不足!");
+                resultVo.setMsg("余额不足！");
                 resultVo.setCode(1);
             }
         }
         else
         {
-            resultVo.setMsg("密码错误!");
+            resultVo.setMsg("警告！系统可能遭受攻击！信息可能遭到篡改！");
+            resultVo.setCode(1);
+        }
+        return resultVo;
+    }
+
+    @PutMapping("/purchase")
+    public ResultVo purchase(HttpServletRequest request) throws SQLException,IllegalArgumentException
+    {
+        ResultVo resultVo=new ResultVo();
+        String payerId=request.getParameter("payer_id");
+        String payeeId=request.getParameter("payee_id");
+        BigDecimal amount=new BigDecimal(request.getParameter("amount"));
+        String paymentPassword=request.getParameter("payment_password");
+        if (p2pAccountService.verifyPassword(payerId,paymentPassword))
+        {
+            Boolean result=p2pAccountService.transfer(payerId,payeeId,amount);
+            if (result)
+            {
+                resultVo.setMsg("购买成功！");
+                resultVo.setCode(0);
+            }
+            else
+            {
+                resultVo.setMsg("余额不足！");
+                resultVo.setCode(1);
+            }
+        }
+        else
+        {
+            resultVo.setMsg("密码错误！");
             resultVo.setCode(1);
         }
         return resultVo;
