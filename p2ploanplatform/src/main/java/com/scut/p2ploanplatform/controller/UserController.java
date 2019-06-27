@@ -175,7 +175,7 @@ public class UserController {
 
         int success = userService.insertUser(userId,departmentIdInt,password,phone,idCard,thirdPartyId,name,address);
         if(success == 1){
-            success = p2pAccountService.addP2pAccount(thirdPartyId,"123456",new BigDecimal(10000),1,0);
+            success = p2pAccountService.addP2pAccount(thirdPartyId,"",new BigDecimal(10000),1,0);
             if(success==1) {
                 vo.setCode(0);
                 vo.setMsg("成功");
