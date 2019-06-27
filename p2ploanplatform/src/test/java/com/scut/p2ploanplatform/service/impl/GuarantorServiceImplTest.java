@@ -20,7 +20,7 @@ import static org.junit.Assert.*;
  */
 @SpringBootTest
 @RunWith(SpringRunner.class)
-public class RuarantorServiceImplTest {
+public class GuarantorServiceImplTest {
 
     @Autowired
     private GuarantorService guarantorService;

@@ -156,7 +156,12 @@ public class UserController {
             vo.setCode(1);
             vo.setMsg("错误！第三方账号符合规范。");
             return vo;
-        }//code find p2p account
+        } else if(p2pAccountService.verifyIfExists(thirdPartyId))
+        {
+            vo.setCode(1);
+            vo.setMsg("错误！第三方账号已存在。");
+            return vo;
+        }
         if(name == null||name.equals("")){
             vo.setCode(1);
             vo.setMsg("错误！姓名为空。");
