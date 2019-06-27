@@ -54,6 +54,7 @@ public class LoanApplicationServiceImplTest {
     }
 
     @Test
+    @Transactional
     public void reviewPass() {
         Boolean result;
         String guarantorId = "201623016845";
@@ -78,6 +79,7 @@ public class LoanApplicationServiceImplTest {
     }
 
     @Test
+    @Transactional
     public void reviewReject() {
 
         String guarantorId = "201623016845";
@@ -102,6 +104,7 @@ public class LoanApplicationServiceImplTest {
     }
 
     @Test
+    @Transactional
     public void subscribe() {
         try{
             applicationService.addApplication(application);
@@ -125,6 +128,7 @@ public class LoanApplicationServiceImplTest {
     }
 
     @Test
+    @Transactional
     public void expire() {
         try{
             applicationService.addApplication(application);
@@ -148,14 +152,17 @@ public class LoanApplicationServiceImplTest {
     }
 
     @Test
+    @Transactional
     public void changeStatusById() {
     }
 
     @Test
+    @Transactional
     public void modifyApplication() {
     }
 
     @Test
+    @Transactional
     public void deleteApplicationById() {
         try{
             applicationService.addApplication(application);
@@ -177,11 +184,13 @@ public class LoanApplicationServiceImplTest {
     }
 
     @Test
+    @Transactional
     public void getApplicationById() {
 
     }
 
     @Test
+    @Transactional
     public void getApplicationByBorrowerId() {
         try{
             applicationService.addApplication(application);
@@ -203,6 +212,7 @@ public class LoanApplicationServiceImplTest {
     }
 
     @Test
+    @Transactional
     public void getApplicationByGuarantorId() {
         try{
             applicationService.addApplication(application);
@@ -224,6 +234,7 @@ public class LoanApplicationServiceImplTest {
     }
 
     @Test
+    @Transactional
     public void getApplicationByBorrowerId1() {
         try{
             applicationService.addApplication(application);
@@ -245,6 +256,7 @@ public class LoanApplicationServiceImplTest {
     }
 
     @Test
+    @Transactional
     public void getApplicationByGuarantorId1() {
         try{
             applicationService.addApplication(application);
@@ -266,6 +278,7 @@ public class LoanApplicationServiceImplTest {
     }
 
     @Test
+    @Transactional
     public void getApplicationReviewedPassed() {
         try{
             applicationService.addApplication(application);
@@ -287,6 +300,7 @@ public class LoanApplicationServiceImplTest {
     }
 
     @Test
+    @Transactional
     public void getApplicationUnReviewed() {
         try{
             applicationService.addApplication(application);

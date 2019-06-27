@@ -114,6 +114,7 @@ create table `purchase` (
 	-- foreign key (`application_id`) references `loan_application`(`application_id`),
 	-- foreign key (`investor_id`) references `user`(`user_id`),
 	-- foreign key (`borrower_id`) references `user`(`user_id`),
+	unique key (`application_id`),
 	primary key (`purchase_id`)
 ) engine=InnoDB default charset=utf8mb4 comment '认购信息表';
 

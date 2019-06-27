@@ -21,12 +21,12 @@ public interface PurchaseDao {
 
     /**
      * 修改订单状态
-     * @param purchaseID 订单Id
+     * @param purchaseId 订单Id
      * @param status 订单状态
      * @return 操作状态（成功/失败）
      */
     @Update("UPDATE `purchase` SET `status`= #{status} WHERE `purchase_id` = #{purchaseId}")
-    Boolean updatePurchaseStatus(Integer purchaseID,Integer status);
+    Boolean updatePurchaseStatus(Integer purchaseId,Integer status);
 
     /**
      * 查询所有订单
@@ -52,10 +52,28 @@ public interface PurchaseDao {
     List<Purchase> getPurchaseByInvestorId(String investorId);
 
     /**
+     * 查询特定投资人特定状态的订单
+     * @param investorId 投资人Id
+     * @param status 订单状态
+     * @return 订单列表
+     */
+    @Select("SELECT * FROM `purchase` WHERE `investor_id` = #{investorId} and `status` =#{status}")
+    List<Purchase> getPurchaseByInvestorIdAndStatus(String investorId, Integer status);
+
+    /**
      * 查询特定投资人的所有订单
      * @param borrowerId 投资人Id
      * @return 订单列表
      */
     @Select("SELECT * FROM `purchase` WHERE `borrower_id` = #{borrowerId}")
     List<Purchase> getPurchaseByBorrowerId(String borrowerId);
+
+    /**
+     * 查询特定投资人特定状态的订单
+     * @param borrowerId 投资人Id
+     * @param status 订单状态
+     * @return 订单列表
+     */
+    @Select("SELECT * FROM `purchase` WHERE `borrower_id` = #{borrowerId} and `status` =#{status}")
+    List<Purchase> getPurchaseByBorrowerIdAndStatus(String borrowerId, Integer status);
 }

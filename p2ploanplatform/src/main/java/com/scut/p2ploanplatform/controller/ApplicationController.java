@@ -21,6 +21,9 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.scut.p2ploanplatform.utils.ConfigInitial.interestRates;
+import static com.scut.p2ploanplatform.utils.ConfigInitial.loanMonths;
+
 @RestController
 @RequestMapping("/loan_application")
 public class ApplicationController {
@@ -28,11 +31,19 @@ public class ApplicationController {
     @Autowired
     LoanApplicationService applicationService;
 
+    @RequestMapping("/new/config")
+    @GetMapping
+    public ResultVo sendApplicationConfig(){
+        Map<String,Object> map = new HashMap<>();
+        map.put("loan_months", loanMonths);
+        map.put("interest_rates", interestRates);
+        return ResultVoUtil.success(map);
+    }
+
     @RequestMapping("/new")
     @PostMapping
     public ResultVo createApplication(@Valid @ParamModel ApplicationInfoForm form,
                                       @SessionAttribute(value = "user") String userId){
-
         LoanApplication application = new LoanApplication();
 
         try{
@@ -82,7 +93,7 @@ public class ApplicationController {
         try{
             application = applicationService.getApplicationById(applicationId);
         }catch (Exception e){
-            return ResultVoUtil.error(ResultEnum.PARAM_IS_INVALID.getCode(),e.getLocalizedMessage());
+            return ResultVoUtil.error(ResultEnum.PARAM_IS_INVALID);
         }
         if(application == null){
             return ResultVoUtil.error(ResultEnum.APPLICATION_NOT_EXIST);

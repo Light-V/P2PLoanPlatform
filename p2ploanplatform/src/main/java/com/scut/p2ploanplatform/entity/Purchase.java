@@ -6,6 +6,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 订单类
@@ -68,6 +69,10 @@ public class Purchase {
      * 修改时间（最后一次状态改变时间）
      */
     private Date updateTime;
+    /**
+     * 还款计划
+     */
+    private List<RepayPlan> repayPlans;
 
     public Purchase(LoanApplication application) {
         this.applicationId = application.getApplicationId();

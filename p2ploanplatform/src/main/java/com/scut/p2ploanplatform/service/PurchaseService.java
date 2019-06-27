@@ -1,5 +1,6 @@
 package com.scut.p2ploanplatform.service;
 
+import com.github.pagehelper.PageInfo;
 import com.scut.p2ploanplatform.enums.LoanStatus;
 import com.scut.p2ploanplatform.entity.Purchase;
 import com.scut.p2ploanplatform.exception.LoanStatusException;
@@ -27,10 +28,11 @@ public interface PurchaseService {
     Boolean purchaseOverdue(Integer purchaseId) throws SQLException,IllegalArgumentException;
 
     /**
-     * 查询所有订单
-     * @return 订单列表
+     * 完成订单
+     * @param purchaseId 订单Id
+     * @return 操作状态（成功/失败)
      */
-    List<Purchase> showAllPurchase() throws SQLException;
+    Boolean accomplishPurchase(Integer purchaseId) throws SQLException,IllegalArgumentException;
 
     /**
      * 根据订单id查询订单
@@ -40,23 +42,40 @@ public interface PurchaseService {
     Purchase showPurchaseById(Integer purchaseId) throws SQLException,IllegalArgumentException;
 
     /**
+     * 查询所有订单
+     * @return 订单列表
+     */
+    PageInfo<Purchase> showAllPurchase(Integer pageNum, Integer pageSize) throws SQLException;
+
+    /**
      * 查询特定投资人的所有订单
      * @param investorID 投资人Id
      * @return 订单列表
      */
-    List<Purchase> showPurchaseByInvestorId(String investorID) throws SQLException,IllegalArgumentException;
+    PageInfo<Purchase> showPurchaseByInvestorId(String investorID, Integer pageNum, Integer pageSize) throws SQLException,IllegalArgumentException;
 
     /**
-     * 查询特定借款人人的所有订单
+     * 查询特定投资人特定状态的订单
+     * @param investorID 投资人Id
+     * @param status 订单状态
+     * @return 订单列表
+     */
+    PageInfo<Purchase> showPurchaseByInvestorId(String investorID, LoanStatus status, Integer pageNum, Integer pageSize) throws SQLException,IllegalArgumentException;
+
+    /**
+     * 查询特定借款人的所有订单
      * @param borrowerID 借款人ID
      * @return 订单列表
      */
-    List<Purchase> showPurchaseByBorrowerId(String borrowerID) throws SQLException,IllegalArgumentException;
+    PageInfo<Purchase> showPurchaseByBorrowerId(String borrowerID, Integer pageNum, Integer pageSize) throws SQLException,IllegalArgumentException;
 
     /**
-     * 完成订单
-     * @param purchaseId 订单Id
-     * @return 操作状态（成功/失败)
+     * 查询特定借款人特定状态的订单
+     * @param borrowerID 借款人ID
+     * @param status 订单状态
+     * @return 订单列表
      */
-    Boolean accomplishPurchase(Integer purchaseId) throws SQLException,IllegalArgumentException;
+    PageInfo<Purchase> showPurchaseByBorrowerId(String borrowerID, LoanStatus status, Integer pageNum, Integer pageSize) throws SQLException,IllegalArgumentException;
+
+
 }

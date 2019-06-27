@@ -94,7 +94,7 @@ public interface LoanApplicationDao {
     List<LoanApplication> getApplicationReviewedPassed();
 
     /**
-     * 查询所有审核已通过的借款申请
+     * 查询所有未审核的借款申请
      * 产品交易平台展示内容
      * @return 借款申请列表
      */
