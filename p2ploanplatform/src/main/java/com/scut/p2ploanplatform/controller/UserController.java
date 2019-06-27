@@ -195,8 +195,19 @@ public class UserController {
     public ResultVo updataPassword(HttpServletRequest request, HttpSession session)throws SQLException {
         ResultVo vo = new ResultVo();
         String userId = (String) session.getAttribute("user");
+        String old_password = request.getParameter("old_password");
         String password = request.getParameter("password");
         String passwordRepeat = request.getParameter("password_repeat");
+        User user = userService.findUser(userId);
+        if(  old_password == null || old_password.equals("")){
+            vo.setCode(1);
+            vo.setMsg("错误！密码为空。");
+            return vo;
+        } else if(!old_password.equals(user.getPassword())) {
+            vo.setCode(1);
+            vo.setMsg("错误！原密码与不正确。");
+            return vo;
+        }
 
         if(  password == null || password.equals("")){
             vo.setCode(1);
