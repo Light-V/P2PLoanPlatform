@@ -1,8 +1,7 @@
 package com.scut.p2ploanplatform.utils;
 
 import lombok.Getter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.PrintWriter;
@@ -17,8 +16,8 @@ import java.util.Date;
  * （PS：通过Setter方式注入的请在字段上加上@com.scut.p2ploanplatform.utils.AutowireField，实例可以参考com.scut.p2ploanplatform.service.impl.RepayServiceImpl）
  */
 @Getter
+@Slf4j
 public class AutoTrigger implements Runnable {
-    private static final Logger logger = LoggerFactory.getLogger(AutoTrigger.class);
 
     private Method invokeMethod;
     private Object[] invokeArgs;
@@ -32,13 +31,14 @@ public class AutoTrigger implements Runnable {
 
     /**
      * 默认构造函数
-     * @param invokeMethod 回调方法，如调用foo()，则为getClass().getDeclaredMethod("foo")
-     * @param invokeObject 调用该方法的实例化对象，如this，则相当于this.foo()
-     * @param triggerHour 每日触发的小时（0~23）
-     * @param triggerMinute 每日触发的分钟（0~59）
-     * @param triggerSecond 每日触发的秒数（0~59）
+     *
+     * @param invokeMethod              回调方法，如调用foo()，则为getClass().getDeclaredMethod("foo")
+     * @param invokeObject              调用该方法的实例化对象，如this，则相当于this.foo()
+     * @param triggerHour               每日触发的小时（0~23）
+     * @param triggerMinute             每日触发的分钟（0~59）
+     * @param triggerSecond             每日触发的秒数（0~59）
      * @param triggerAfterInstantiation 是否在实例化后立刻触发回调
-     * @param invokeArgs 回调函数的参数（可选）
+     * @param invokeArgs                回调函数的参数（可选）
      */
     public AutoTrigger(Method invokeMethod, Object invokeObject, int triggerHour, int triggerMinute, int triggerSecond, boolean triggerAfterInstantiation, Object... invokeArgs) throws IllegalArgumentException {
         if (triggerHour < 0 || triggerHour > 23)
@@ -68,7 +68,7 @@ public class AutoTrigger implements Runnable {
         while (true) {
             boolean isAllFieldSet = true;
             Field[] fields = c.getDeclaredFields();
-            for (Field field: fields) {
+            for (Field field : fields) {
                 if (field.isAnnotationPresent(Autowired.class) || field.isAnnotationPresent(AutowireField.class)) {
                     field.setAccessible(true);
                     Object fieldValue = field.get(invokeObject);
@@ -100,7 +100,7 @@ public class AutoTrigger implements Runnable {
             long nextTriggerTimestamp = nextTriggerDate * 86400000 + triggerTimeOfDay;
 
             if (triggerAfterInstantiation) {
-                logger.info("Started trigger invocation: " + invokeMethod.toString());
+                log.debug("Started trigger invocation: " + invokeMethod.toString());
                 doInvoke();
             }
 
@@ -110,25 +110,25 @@ public class AutoTrigger implements Runnable {
                 if (sleepTimeForNextDay > 0)
                     Thread.sleep(sleepTimeForNextDay);
 
-                logger.info("Started trigger invocation: " + invokeMethod.toString());
+                log.debug("Started trigger invocation: " + invokeMethod.toString());
                 doInvoke();
 
                 nextTriggerTimestamp += 86400000;
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
             String exceptionDetails = sw.toString();
-            logger.error(exceptionDetails);
+            log.error(exceptionDetails);
 
             // 重试
             Thread thread = new Thread(() -> {
                 try {
-                    logger.warn("Unhandled exception caught in auto trigger thread, restarting in 1 hours");
+                    log.warn("Unhandled exception caught in auto trigger thread, restarting in 1 hours");
                     Thread.sleep(3600000);
                     new AutoTrigger(invokeMethod, invokeObject, triggerHour, triggerMinute, triggerSecond, triggerAfterInstantiation, invokeArgs);
+                } catch (InterruptedException ignore) {
                 }
-                catch (InterruptedException ignore) {}
             });
 
             thread.setDaemon(true);

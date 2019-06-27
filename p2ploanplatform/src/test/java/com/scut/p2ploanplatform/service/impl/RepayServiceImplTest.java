@@ -1,8 +1,11 @@
 package com.scut.p2ploanplatform.service.impl;
 
+import com.scut.p2ploanplatform.entity.LoanApplication;
+import com.scut.p2ploanplatform.entity.Purchase;
 import com.scut.p2ploanplatform.entity.RepayPlan;
+import com.scut.p2ploanplatform.enums.LoanStatus;
 import com.scut.p2ploanplatform.enums.RepayPlanStatus;
-import com.scut.p2ploanplatform.service.RepayService;
+import com.scut.p2ploanplatform.service.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +13,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
+import java.sql.SQLException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -149,8 +155,103 @@ public class RepayServiceImplTest {
         }
     }
 
+    @Autowired
+    private PurchaseService purchaseService;
+
+    @Autowired
+    private LoanApplicationService loanApplicationService;
+
+    @Autowired
+    private UserService userService;
+
     @Test
     @Transactional
-    public void doRepayTest() {
+    @SuppressWarnings("deprecation")
+    public void doRepayTest() throws Exception {
+        // inserting simulated users
+        assertEquals(1, userService.insertUser("12345", 1, "123456", "13000000000", "440000000000000000", "123", "郑优秀", "滑稽理工大学养猪场"));
+        assertEquals(1, userService.insertUser("12346", 1, "123456", "13000000001", "440000000000000001", "124", "郑成功", "双鸭山大学"));
+        assertEquals(1, userService.insertUser("12347", 1, "123456", "13000000002", "440000000000000002", "125", "郑龟龟", "滑稽理工大学养猪场"));
+        // fill loan application
+        LoanApplication application = new LoanApplication();
+        application.setAmount(BigDecimal.valueOf(1234.56));
+        application.setBorrowerId("12345");
+        application.setGuarantorId("12346");
+        application.setInterestRate(BigDecimal.valueOf(0.1234));
+        application.setLoanMonth(12);
+        application.setPurchaseDeadline(new Date(new Date().getTime() + 86400000));
+        application.setStatus(LoanStatus.REVIEWED_PASSED.getStatus());
+        application.setTitle("在这无情的社会，只有金钱还有点温度");
+        assertTrue(loanApplicationService.addApplication(application));
+        // product subscribe
+        Purchase purchase = purchaseService.subscribed("12347", application.getApplicationId());
+        assertNotNull(purchase);
+        // todo: auto adding plan
+        for (int i = -1; i <= 1; i++) {
+            Date today = new Date(new Date().getTime() / 86400000 * 86400000);
+            Calendar c = Calendar.getInstance();
+            c.setTime(today);
+            c.add(Calendar.MONTH, i);
+            Date newDate = c.getTime();
+            assertNotNull(repayService.insertPlan(purchase.getPurchaseId(), newDate, BigDecimal.valueOf(233.33)));
+        }
+
+        Field field = RepayServiceImpl.class.getDeclaredField("p2pAccountService");
+        field.setAccessible(true);
+        P2pAccountService p2pAccountService = (P2pAccountService) field.get(userService);
+        assertNotNull(p2pAccountService);
+        try {
+            // re-implement third-party payment service (assume all operations are success)
+            //noinspection RedundantThrows
+//            ((RepayServiceImpl)repayService).setP2pAccountService(new P2pAccountService() {
+//                @Override
+//                public int addP2pAccount(String thirdPartyId, String paymentPassword, BigDecimal balance, Integer status, Integer type) throws SQLException, IllegalArgumentException {
+//                    return 1;
+//                }
+//
+//                @Override
+//                public BigDecimal findBalance(String thirdPartyId) throws SQLException, IllegalArgumentException {
+//                    return BigDecimal.valueOf(1000000, 2);
+//                }
+//
+//                @Override
+//                public Boolean verifyTrade(String payerId, BigDecimal amount) throws SQLException, IllegalArgumentException {
+//                    return true;
+//                }
+//
+//                @Override
+//                public Boolean verifyPasswordIsSet(String thirdPartyId) throws SQLException, IllegalArgumentException {
+//                    return true;
+//                }
+//
+//                @Override
+//                public Boolean verifyPassword(String thirdPartyId, String password) throws SQLException, IllegalArgumentException {
+//                    return true;
+//                }
+//
+//                @Override
+//                public Boolean transfer(String payerId, String payeeId, BigDecimal amount) throws SQLException, IllegalArgumentException {
+//                    return true;
+//                }
+//
+//                @Override
+//                public Boolean recharge(String thirdPartyId, String cardId, BigDecimal amount) throws SQLException, IllegalArgumentException {
+//                    return true;
+//                }
+//
+//                @Override
+//                public Boolean withdraw(String thirdPartyId, String cardId, BigDecimal amount) throws SQLException, IllegalArgumentException {
+//                    return true;
+//                }
+//            });
+
+            // calling repay operation
+            repayService.doRepay();
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        } finally {
+            ((RepayServiceImpl)repayService).setP2pAccountService(p2pAccountService);
+        }
     }
 }

@@ -8,8 +8,7 @@ import com.scut.p2ploanplatform.enums.RepayPlanStatus;
 import com.scut.p2ploanplatform.service.*;
 import com.scut.p2ploanplatform.utils.AutoTrigger;
 import com.scut.p2ploanplatform.utils.AutowireField;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,10 +19,10 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@Slf4j
 @SuppressWarnings({"deprecation", "RedundantSuppression"})
 public class RepayServiceImpl implements RepayService {
     private static final String NOTICE_TITLE = "喵了个咪";
-    private Logger logger = LoggerFactory.getLogger(RepayServiceImpl.class);
     private boolean isColdStart = true;
 
     @AutowireField
@@ -89,7 +88,7 @@ public class RepayServiceImpl implements RepayService {
         plan.setPlanId(UUID.randomUUID().toString().replace("-", ""));
         plan.setPurchaseId(purchaseId);
         if (repayDate.before(new Date())) {
-            logger.warn("Trying to insert an overdue repay plan, check your code");
+            log.warn("Trying to insert an overdue repay plan, check your code");
             plan.setStatus(RepayPlanStatus.OVERDUE.getStatus());
         } else {
             plan.setStatus(RepayPlanStatus.SCHEDULED.getStatus());
@@ -97,8 +96,7 @@ public class RepayServiceImpl implements RepayService {
 
         try {
             repayPlanDao.insertPlan(plan);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new SQLException(e);
         }
 
@@ -112,8 +110,7 @@ public class RepayServiceImpl implements RepayService {
 
         try {
             return repayPlanDao.findPlanByPurchaseId(id);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new SQLException(e);
         }
     }
@@ -125,8 +122,7 @@ public class RepayServiceImpl implements RepayService {
 
         try {
             return repayPlanDao.findPlanByPlanId(id);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new SQLException(e);
         }
     }
@@ -146,28 +142,26 @@ public class RepayServiceImpl implements RepayService {
             plan.setStatus(status.getStatus());
             plan.setRealRepayDate(realRepayDate);
             repayPlanDao.updatePlan(plan);
-        }
-        catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             throw e;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new SQLException(e);
         }
     }
 
     @Override
     public synchronized void doRepay() {
-        logger.info("Starting daily repay process");
+        log.info("Starting daily repay process");
 
         if (isColdStart) {
             isColdStart = false;
-            logger.info("Updating plan status (from cold start)");
+            log.info("Updating plan status (from cold start)");
             int rowsAffected = repayPlanDao.updatePlanStatus();
-            logger.info("Completed query, " + rowsAffected + " rows affected");
+            log.info("Completed query, " + rowsAffected + " rows affected");
         }
 
         List<RepayPlan> plans = repayPlanDao.findAllUnpaidPlan();
-        logger.info("Completed query, got " + plans.size() + " results");
+        log.info("Completed query, got " + plans.size() + " results");
 
         for (RepayPlan plan : plans) {
             // 还款流程
@@ -185,7 +179,7 @@ public class RepayServiceImpl implements RepayService {
                 // 已由担保人代付，还款默认转到担保人账号，其余情况都转到投资者账号
                 User payee = (plan.getStatus() == RepayPlanStatus.GUARANTOR_PAID_ADVANCE.getStatus()) ? guarantor : investor;
                 User payer = borrower;
-                String borrowerMessage, guarantorMessage = null, investorMessage = null;
+                String borrowerMessage = null, guarantorMessage = null, investorMessage = null;
 
                 transactionSuccess = p2pAccountService.transfer(payer.getThirdPartyId(), payee.getThirdPartyId(), plan.getAmount());
 
@@ -201,23 +195,29 @@ public class RepayServiceImpl implements RepayService {
                         investorMessage = String.format("尊敬的 %s 用户，您本月投资的贷款已完成还款，已成功收款 %s 元", investor.getName(), plan.getAmount().toString());
                     }
                 } else {
-                    // 贷款人还款失败，执行垫付：担保人 -> 投资者
-                    payer = guarantor;
-                    transactionSuccess = p2pAccountService.transfer(payer.getThirdPartyId(), payee.getThirdPartyId(), plan.getAmount());
-                    borrowerMessage = String.format("尊敬的 %s 用户，您的贷款本月还款失败，请检查第三方账号中金额，确保在系统重试还款前，拥有足够金额进行划扣", borrower.getName());
+                    if (plan.getStatus() != RepayPlanStatus.GUARANTOR_PAID_ADVANCE.getStatus()) {
+                        // 贷款人还款失败，执行垫付：担保人 -> 投资者
+                        payer = guarantor;
+                        transactionSuccess = p2pAccountService.transfer(payer.getThirdPartyId(), payee.getThirdPartyId(), plan.getAmount());
+                        borrowerMessage = String.format("尊敬的 %s 用户，您的贷款本月还款失败，请检查第三方账号中金额，确保在系统重试还款前，拥有足够金额进行划扣", borrower.getName());
 
-                    if (transactionSuccess) {
-                        // 担保人代付成功
-                        plan.setStatus(RepayPlanStatus.GUARANTOR_PAID_ADVANCE.getStatus());
-                        investorMessage = String.format("尊敬的 %s 用户，您投资的贷款已完成本月还款，已成功收款 %s 元", borrower.getName(), plan.getAmount().toString());
-                    } else {
-                        // 支付失败，投资方money全部木大
-                        // 只对首次失败通知投资方
-                        if (plan.getStatus() != RepayPlanStatus.OVERDUE.getStatus()) {
-                            investorMessage = String.format("尊敬的 %s 用户，您投资贷款本月未及时还款，系统已经为您执行逾期流程", investor.getName());
-                            plan.setStatus(RepayPlanStatus.OVERDUE.getStatus());
+                        if (transactionSuccess) {
+                            // 担保人代付成功
+                            plan.setStatus(RepayPlanStatus.GUARANTOR_PAID_ADVANCE.getStatus());
+                            investorMessage = String.format("尊敬的 %s 用户，您投资的贷款已完成本月还款，已成功收款 %s 元", borrower.getName(), plan.getAmount().toString());
+                        } else {
+                            // 支付失败，投资方money全部木大
+                            // 只对首次失败通知投资方
+                            if (plan.getStatus() != RepayPlanStatus.OVERDUE.getStatus()) {
+                                investorMessage = String.format("尊敬的 %s 用户，您投资贷款本月未及时还款，系统已经为您执行逾期流程", investor.getName());
+                                plan.setStatus(RepayPlanStatus.OVERDUE.getStatus());
+                                // calling PurchaseService: set overdue status
+                                purchaseService.purchaseOverdue(plan.getPurchaseId());
+                            }
                         }
                     }
+
+                    // todo: 28 天逾期后锁定银行卡
                 }
                 repayPlanDao.updatePlan(plan);
                 waterBillService.addRepayRecord(plan.getPlanId(), plan.getPurchaseId(), payer.getUserId(), payee.getUserId(), plan.getRepayDate(), plan.getAmount());
@@ -228,9 +228,8 @@ public class RepayServiceImpl implements RepayService {
                     noticeService.sendNotice(guarantor.getUserId(), NOTICE_TITLE, guarantorMessage);
                 if (investorMessage != null)
                     noticeService.sendNotice(investor.getUserId(), NOTICE_TITLE, investorMessage);
-            }
-            catch (Exception e) {
-                logger.error("Exception caught while executing repay routine in plan id: " + plan.getPlanId(), e);
+            } catch (Exception e) {
+                log.error("Exception caught while executing repay routine in plan id: " + plan.getPlanId(), e);
             }
 
         }
