@@ -59,7 +59,7 @@ public class UserServiceTest {
     public void updataPasswordTest() throws SQLException, IllegalArgumentException{
         userService.insertUser(sampleUser.getUserId(),sampleUser.getDepartmentId(),sampleUser.getPassword(), sampleUser.getPhone(),sampleUser.getIdCard(),sampleUser.getThirdPartyId(),sampleUser.getName(),sampleUser.getAddress());
         sampleUser.setPassword("147");
-        userService.updataPassword(sampleUser.getUserId(),sampleUser.getPassword());
+        userService.updatePassword(sampleUser.getUserId(),sampleUser.getPassword());
         assertEquals(sampleUser,userService.findUser(sampleUser.getUserId()));
     }
 
@@ -69,7 +69,7 @@ public class UserServiceTest {
         userService.insertUser(sampleUser.getUserId(),sampleUser.getDepartmentId(),sampleUser.getPassword(), sampleUser.getPhone(),sampleUser.getIdCard(),sampleUser.getThirdPartyId(),sampleUser.getName(),sampleUser.getAddress());
         sampleUser.setPhone("15544332211");
         sampleUser.setAddress("华南理工幼儿园附属大学");
-        userService.updataUser(sampleUser.getUserId(),sampleUser.getPhone(),sampleUser.getAddress());
+        userService.updateUser(sampleUser.getUserId(),sampleUser.getPhone(),sampleUser.getAddress());
         assertEquals(sampleUser,userService.findUser(sampleUser.getUserId()));
     }
 

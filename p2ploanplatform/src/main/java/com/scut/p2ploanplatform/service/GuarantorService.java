@@ -34,7 +34,7 @@ public interface GuarantorService {
      * @throws IllegalArgumentException 参数错误
      * @return 修改成功后返回1,失败返回0
      */
-    int updataGuarantor(String guarantorId) throws SQLException, IllegalArgumentException;
+    int updateGuarantor(String guarantorId) throws SQLException, IllegalArgumentException;
 
     /**
      * 删除担保人

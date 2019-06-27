@@ -191,7 +191,7 @@ public class UserController {
         return vo;
     }
 
-    @RequestMapping("/updatapassword")
+    @RequestMapping("/update_password")
     public ResultVo updataPassword(HttpServletRequest request, HttpSession session)throws SQLException {
         ResultVo vo = new ResultVo();
         String userId = (String) session.getAttribute("user");
@@ -219,7 +219,7 @@ public class UserController {
             return vo;
         }
 
-        int success = userService.updataPassword(userId,password);
+        int success = userService.updatePassword(userId,password);
         if(success == 1){
             vo.setCode(0);
             vo.setMsg("成功");
@@ -230,7 +230,7 @@ public class UserController {
         return vo;
     }
 
-        @RequestMapping("/updata")
+        @RequestMapping("/update_user")
     public ResultVo updataUser(HttpServletRequest request, HttpSession session)throws SQLException {
         ResultVo vo = new ResultVo();
 
@@ -252,7 +252,7 @@ public class UserController {
             return vo;
         }
 
-        int success = userService.updataUser(userId,phone,address);
+        int success = userService.updateUser(userId,phone,address);
         if(success == 1){
             vo.setCode(0);
             vo.setMsg("成功");

@@ -44,7 +44,7 @@ public class RuarantorServiceImpl implements GuarantorService {
     }
 
     @Override
-    public int updataGuarantor(String userId) throws SQLException, IllegalArgumentException {
+    public int updateGuarantor(String userId) throws SQLException, IllegalArgumentException {
         //need to fix
         return 0;
     }

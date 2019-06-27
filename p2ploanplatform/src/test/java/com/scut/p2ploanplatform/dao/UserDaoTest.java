@@ -63,7 +63,7 @@ public class UserDaoTest {
 
     @Test
     @Transactional
-    public void updataPasswordTest() {
+    public void updatePasswordTest() {
         insertUser(sampleUser);
         sampleUser.setPassword("123");
         int ret = userDao.updatePassword(sampleUser);
@@ -74,7 +74,7 @@ public class UserDaoTest {
 
     @Test
     @Transactional
-    public void updataUserTest() {
+    public void updateUserTest() {
         insertUser(sampleUser);
         sampleUser.setPhone("15544332211");
         sampleUser.setAddress("华南理工幼儿园附属大学");

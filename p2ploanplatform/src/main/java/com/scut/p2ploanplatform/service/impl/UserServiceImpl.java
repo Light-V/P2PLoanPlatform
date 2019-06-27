@@ -46,7 +46,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public int updataPassword(String userId, String password) throws SQLException, IllegalArgumentException {
+    public int updatePassword(String userId, String password) throws SQLException, IllegalArgumentException {
         User user = userDao.findUser(userId);
         if(user != null){
             user.setPassword(password);
@@ -57,7 +57,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public int updataUser(String userId, String phone, String address) throws SQLException, IllegalArgumentException {
+    public int updateUser(String userId, String phone, String address) throws SQLException, IllegalArgumentException {
         User user = userDao.findUser(userId);
         if(user != null){
             user.setPhone(phone);
