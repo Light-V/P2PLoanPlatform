@@ -72,4 +72,14 @@ public class UserServiceTest {
         userService.updataUser(sampleUser.getUserId(),sampleUser.getPhone(),sampleUser.getAddress());
         assertEquals(sampleUser,userService.findUser(sampleUser.getUserId()));
     }
+
+    @Test
+    @Transactional
+    public void deleteUserTest() throws SQLException, IllegalArgumentException{
+        int result =userService.deleteUser(sampleUser.getUserId());
+        assertEquals(0,result);
+        userService.insertUser(sampleUser.getUserId(),sampleUser.getDepartmentId(),sampleUser.getPassword(), sampleUser.getPhone(),sampleUser.getIdCard(),sampleUser.getThirdPartyId(),sampleUser.getName(),sampleUser.getAddress());
+        result =userService.deleteUser(sampleUser.getUserId());
+        assertEquals(1,result);
+    }
 }

@@ -27,4 +27,6 @@ public interface UserDao {
     @Update("UPDATE `p2p`.`user` SET `phone` = #{phone}, `address` = #{address} WHERE `user_id` = #{userId}")
     int updateUser(User user);
 
+    @Delete("DELETE FROM `p2p`.`user` WHERE `user_id` = #{value}")
+    int deleteUser(String id);
 }

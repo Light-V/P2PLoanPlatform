@@ -85,4 +85,11 @@ public class UserDaoTest {
         assertEquals("华南理工幼儿园附属大学", it.getAddress());
     }
 
+    @Test
+    @Transactional
+    public void deleteUserTest() {
+        insertUser(sampleUser);
+        int result = userDao.deleteUser(sampleUser.getUserId());
+        assertEquals(1, result);
+    }
 }
