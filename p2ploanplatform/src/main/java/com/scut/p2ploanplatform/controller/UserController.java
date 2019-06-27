@@ -1,6 +1,9 @@
 package com.scut.p2ploanplatform.controller;
 
 
+import com.scut.p2ploanplatform.entity.Guarantor;
+import com.scut.p2ploanplatform.service.GuarantorService;
+import com.scut.p2ploanplatform.service.P2pAccountService;
 import com.scut.p2ploanplatform.vo.ResultVo;
 import com.scut.p2ploanplatform.entity.User;
 import com.scut.p2ploanplatform.service.UserService;
@@ -9,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +33,10 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private P2pAccountService p2pAccountService;
+    @Autowired
+    private GuarantorService guarantorService;
 
     @RequestMapping("/login")
     public ResultVo login(HttpServletRequest request, HttpSession session)
@@ -37,23 +45,49 @@ public class UserController {
         String userId = request.getParameter("user_id");
         String password = request.getParameter("password");
         String userType = request.getParameter("user_type");
-        User user = userService.findUser(userId);
-        if (user != null ) {
-            if( user.getPassword().equals(password) ){
-                session.setAttribute("user", userId);
-                Map<String,Object> data=new HashMap<String,Object>();
-                data.put("user_id",user.getUserId());
-                data.put("third_party_id",user.getThirdPartyId());
-                vo.setData(data);
-                vo.setCode(0);
-                vo.setMsg("登录成功");
+        int type = Integer.parseInt(userType);
+        if(type==1){
+            User user = userService.findUser(userId);
+            if (user != null ) {
+                if( user.getPassword().equals(password) ){
+                    session.setAttribute("user", userId);
+                    session.setAttribute("user_type",userType);
+                    session.setAttribute("third_party_id", user.getThirdPartyId());
+                    Map<String,Object> data=new HashMap<String,Object>();
+                    data.put("user_id",user.getUserId());
+                    data.put("third_party_id",user.getThirdPartyId());
+                    vo.setData(data);
+                    vo.setCode(0);
+                    vo.setMsg("登录成功");
+                } else {
+                    vo.setCode(1);
+                    vo.setMsg("密码错误");
+                }
             } else {
                 vo.setCode(1);
-                vo.setMsg("密码错误");
+                vo.setMsg("账号不存在");
             }
         } else {
-            vo.setCode(1);
-            vo.setMsg("账号不存在");
+            Guarantor user = guarantorService.findGuarantor(userId);
+            if (user != null ) {
+                if( user.getPassword().equals(password) ){
+                    session.setAttribute("user", userId);
+                    session.setAttribute("user_type",userType);
+                    session.setAttribute("third_party_id", user.getThirdPartyId());
+                    Map<String,Object> data=new HashMap<String,Object>();
+                    data.put("user_id",user.getGuarantorId());
+                    data.put("third_party_id",user.getThirdPartyId());
+                    vo.setData(data);
+                    vo.setCode(0);
+                    vo.setMsg("登录成功");
+                } else {
+                    vo.setCode(1);
+                    vo.setMsg("密码错误");
+                }
+            } else {
+                vo.setCode(1);
+                vo.setMsg("账号不存在");
+            }
         }
         return vo;
     }
@@ -118,7 +152,11 @@ public class UserController {
             vo.setCode(1);
             vo.setMsg("错误！第三方账号为空。");
             return vo;
-        }
+        } else if(thirdPartyId.length()!=12) {
+            vo.setCode(1);
+            vo.setMsg("错误！第三方账号符合规范。");
+            return vo;
+        }//code find p2p account
         if(name == null||name.equals("")){
             vo.setCode(1);
             vo.setMsg("错误！姓名为空。");
@@ -132,8 +170,15 @@ public class UserController {
 
         int success = userService.insertUser(userId,departmentIdInt,password,phone,idCard,thirdPartyId,name,address);
         if(success == 1){
-            vo.setCode(0);
-            vo.setMsg("成功");
+            success = p2pAccountService.addP2pAccount(thirdPartyId,"123456",new BigDecimal(10000),1,0);
+            if(success==1) {
+                vo.setCode(0);
+                vo.setMsg("成功");
+            } else {
+                userService.deleteUser(userId);
+                vo.setCode(1);
+                vo.setMsg("创建第三方账户失败");
+            }
         } else {
             vo.setCode(1);
             vo.setMsg("用户已存在");
@@ -199,10 +244,33 @@ public class UserController {
             vo.setCode(1);
             vo.setMsg("修改失败。");
         }
-
         return vo;
     }
 
+    @RequestMapping("/user_message")
+    public ResultVo getUserMessage(HttpServletRequest request, HttpSession session)throws SQLException {
+        ResultVo vo = new ResultVo();
+
+        String userId = (String) session.getAttribute("user");
+        User user = userService.findUser(userId);
+        if(user == null){
+            vo.setCode(1);
+            vo.setMsg("找不到用户");
+        } else {
+            vo.setCode(0);
+            vo.setMsg("成功");
+            Map<String,Object> data=new HashMap<String,Object>();
+            data.put("user_id",user.getUserId());
+            data.put("name",user.getName());
+            data.put("address",user.getAddress());
+            data.put("phone",user.getPhone());
+            data.put("id_card",user.getIdCard());
+            data.put("department_id",user.getDepartmentId());
+            data.put("third_party_id",user.getThirdPartyId());
+            vo.setData(data);
+        }
+        return vo;
+    }
     private boolean isIDNumber(String IDNumber) {
         if (IDNumber == null || "".equals(IDNumber)) {
             return false;

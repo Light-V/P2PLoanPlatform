@@ -67,4 +67,10 @@ public class UserServiceImpl implements UserService {
             return 0;
         }
     }
+
+    @Override
+    public int deleteUser(String userId) throws SQLException, IllegalArgumentException {
+        int result = userDao.deleteUser(userId);
+        return result;
+    }
 }

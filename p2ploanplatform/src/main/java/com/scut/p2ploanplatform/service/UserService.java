@@ -30,6 +30,7 @@ public interface UserService {
 
     /**
      * 根据用户账号查找用户资料
+     * @param userId 用户ID
      * @throws SQLException SQL错误
      * @throws IllegalArgumentException 参数错误
      * @return 返回对应的User
@@ -56,4 +57,14 @@ public interface UserService {
      * @return 修改成功后返回1,失败返回0
      */
     int updataUser(String userId, String phone, String address) throws SQLException, IllegalArgumentException;
+
+    /**
+     * 删除用户
+     * @param userId 用户ID
+     * @throws SQLException SQL错误
+     * @throws IllegalArgumentException 参数错误
+     * @return 添加成功后返回1,失败返回0
+     */
+    int deleteUser ( String userId ) throws SQLException, IllegalArgumentException;
+
 }
