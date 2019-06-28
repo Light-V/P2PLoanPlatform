@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -248,7 +249,7 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
         List<LoanApplication> applicationList;
         try {
             applicationList = loanApplicationDao.getApplicationReviewedPassed();
-            applicationList =setUserName(applicationList);
+            applicationList = setUserName(applicationList);
         }
         catch (Exception e) {
             throw new SQLException(e);
@@ -295,5 +296,38 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
 //            application.setGuarantorName(userService.findUser(application.getGuarantorName()).getName());
         }
         return list;
+    }
+
+    @Override
+    public PageInfo<LoanApplication> getApplicationReviewedRejected(Integer pageNum, Integer pageSize) throws SQLException {
+        PageHelper.startPage(pageNum, pageSize);
+        List<LoanApplication> applicationList;
+        try {
+            applicationList = loanApplicationDao.getApplicationReviewedRejected();
+            applicationList = setUserName(applicationList);
+        }
+        catch (Exception e) {
+            throw new SQLException(e);
+        }
+        return new PageInfo<>(applicationList);
+    }
+
+    @Override
+    public PageInfo<LoanApplication> getApplicationReviewExpired(Integer pageNum, Integer pageSize) throws SQLException {
+        PageHelper.startPage(pageNum, pageSize);
+        List<LoanApplication> applicationList;
+        try {
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.HOUR_OF_DAY, 0);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.MILLISECOND, 0);
+            applicationList = loanApplicationDao.getApplicationReviewExpired(calendar.getTime());
+            applicationList = setUserName(applicationList);
+        }
+        catch (Exception e) {
+            throw new SQLException(e);
+        }
+        return new PageInfo<>(applicationList);
     }
 }

@@ -95,6 +95,14 @@ public interface LoanApplicationDao {
     List<LoanApplication> getApplicationReviewedPassed();
 
     /**
+     * 查询所有审核未通过的借款申请
+     * 产品交易平台展示内容
+     * @return 借款申请列表
+     */
+    @Select("SELECT * FROM `loan_application` WHERE `status` = 2")
+    List<LoanApplication> getApplicationReviewedRejected();
+
+    /**
      * 查询所有未审核的借款申请
      * 产品交易平台展示内容
      * @return 借款申请列表
@@ -109,4 +117,13 @@ public interface LoanApplicationDao {
      */
     @Select("SELECT * FROM `loan_application` WHERE `status` = 1 AND purchase_deadline < #{now} FOR UPDATE")
     List<LoanApplication> getApplicationReviewedPassedExpired(Date now);
+
+    /**
+     * 查询所有到达认购期限的申请
+     * @param now 当前时间
+     * @return 申请的list
+     */
+    @Select("SELECT * FROM `loan_application` WHERE purchase_deadline < #{now} FOR UPDATE")
+    List<LoanApplication> getApplicationReviewExpired(Date now);
+
 }
