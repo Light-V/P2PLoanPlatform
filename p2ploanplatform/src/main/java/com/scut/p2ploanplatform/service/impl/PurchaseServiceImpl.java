@@ -89,7 +89,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         String borrowerNotice = "尊敬的 %s：\n\t您编号为 %06d 的借款申请已被认购，订单编号为 %06d，请及时检查款项是否到账，并前往订单详情页确认还款计划，及时还款。";
         noticeService.sendNotice(borrower.getUserId(), "借款申请被认购", String.format(borrowerNotice, borrower.getName(),application.getApplicationId(),purchase.getPurchaseId()));
         String investorNotice = "尊敬的 %s：\n\t您已成功认购编号为 %06d 的借款申请，订单编号为 %06d，可以前往订单详情页确认还款计划。";
-        noticeService.sendNotice(investorId, "借款申请被认购", String.format(investorNotice, investor.getName(),application.getApplicationId()));
+        noticeService.sendNotice(investorId, "借款申请被认购", String.format(investorNotice, investor.getName(),application.getApplicationId(),purchase.getPurchaseId()));
 
         return purchase;
     }
@@ -140,6 +140,9 @@ public class PurchaseServiceImpl implements PurchaseService {
             List<RepayPlan> repayPlans = repayService.findPlanByPurchaseId(purchaseId);
             repayPlans.sort(Comparator.comparing(RepayPlan::getRepayDate));
             purchase.setRepayPlans(repayPlans);
+            purchase.setBorrowerName(userService.findUser(purchase.getBorrowerId()).getName());
+            purchase.setInvestorName(userService.findUser(purchase.getInvestorId()).getName());
+            purchase.setGuarantorName(userService.findUser(purchase.getGuarantorId()).getName());
         }
         catch (Exception e){
             throw new SQLException(e);
@@ -153,6 +156,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         List<Purchase> purchaseList;
         try{
             purchaseList = purchaseDao.showAllPurchase();
+            purchaseList = setUserName(purchaseList);
         }
         catch (Exception e){
             throw new SQLException(e);
@@ -166,6 +170,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         List<Purchase> purchaseList;
         try{
             purchaseList = purchaseDao.getPurchaseByBorrowerId(borrowerID);
+            purchaseList = setUserName(purchaseList);
         }
         catch (Exception e){
             throw new SQLException(e);
@@ -179,6 +184,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         List<Purchase> purchaseList;
         try{
             purchaseList = purchaseDao.getPurchaseByBorrowerIdAndStatus(borrowerID, status.getStatus());
+            purchaseList = setUserName(purchaseList);
         }
         catch (Exception e){
             throw new SQLException(e);
@@ -192,6 +198,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         List<Purchase> purchaseList;
         try{
             purchaseList = purchaseDao.getPurchaseByInvestorId(investorID);
+            purchaseList = setUserName(purchaseList);
         }
         catch (Exception e){
             throw new SQLException(e);
@@ -205,6 +212,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         List<Purchase> purchaseList;
         try{
             purchaseList = purchaseDao.getPurchaseByInvestorIdAndStatus(investorID,status.getStatus());
+            purchaseList = setUserName(purchaseList);
         }
         catch (Exception e){
             throw new SQLException(e);
@@ -212,4 +220,13 @@ public class PurchaseServiceImpl implements PurchaseService {
         return new PageInfo<>(purchaseList);
     }
 
+    private List<Purchase> setUserName(List<Purchase> list) throws Exception
+    {
+        for(Purchase purchase:list){
+            purchase.setBorrowerName(userService.findUser(purchase.getBorrowerId()).getName());
+            purchase.setInvestorName(userService.findUser(purchase.getInvestorId()).getName());
+            purchase.setGuarantorName(userService.findUser(purchase.getGuarantorId()).getName());
+        }
+        return list;
+    }
 }

@@ -18,13 +18,15 @@ public class LoanApplication {
      */
     private Integer applicationId;
     /**
-     * 借款人Id
+     * 借款人
      */
     private String borrowerId;
+    private String borrowerName;
     /**
-     * 担保人Id
+     * 担保人
      */
     private String guarantorId;
+//    private String guarantorName;
     /**
      * 借款申请标题
      */

@@ -25,17 +25,20 @@ public class Purchase {
      */
     private Integer applicationId;
     /**
-     * 借款人Id
+     * 借款人
      */
     private String borrowerId;
+    private String borrowerName;
     /**
-     * 担保人Id
+     * 担保人
      */
     private String guarantorId;
+    private String guarantorName;
     /**
-     * 投资人Id
+     * 投资人
      */
     private String investorId;
+    private String investorName;
     /**
      * 借款申请标题
      */

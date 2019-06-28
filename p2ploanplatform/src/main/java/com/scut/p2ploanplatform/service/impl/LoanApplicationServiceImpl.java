@@ -6,6 +6,7 @@ import com.scut.p2ploanplatform.dao.LoanApplicationDao;
 import com.scut.p2ploanplatform.entity.LoanApplication;
 import com.scut.p2ploanplatform.enums.LoanStatus;
 import com.scut.p2ploanplatform.service.LoanApplicationService;
+import com.scut.p2ploanplatform.service.UserService;
 import com.scut.p2ploanplatform.utils.AutoTrigger;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,9 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
 
     @Autowired
     private LoanApplicationDao loanApplicationDao;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private NoticeServiceImpl noticeService;
@@ -124,13 +128,15 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
     public LoanApplication getApplicationById(Integer id) throws SQLException, IllegalArgumentException {
         if (id == null)
             throw new IllegalArgumentException("invalid applicationId, should be non null");
-
+        LoanApplication application;
         try {
-            return loanApplicationDao.getApplicationById(id);
+            application = loanApplicationDao.getApplicationById(id);
+            application.setBorrowerName(userService.findUser(application.getBorrowerId()).getName());
         }
         catch (Exception e) {
             throw new SQLException(e);
         }
+        return application;
     }
 
     @Override
@@ -139,6 +145,7 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
         List<LoanApplication> applicationList;
         try {
             applicationList = loanApplicationDao.getAllApplication();
+            applicationList =setUserName(applicationList);
         }
         catch (Exception e) {
             throw new SQLException(e);
@@ -154,10 +161,12 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
         List<LoanApplication> applicationList;
         try {
             applicationList = loanApplicationDao.getApplicationByBorrowerId(borrowerId);
+            applicationList =setUserName(applicationList);
         }
         catch (Exception e) {
             throw new SQLException(e);
         }
+
         return new PageInfo<>(applicationList);
     }
 
@@ -169,6 +178,7 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
         List<LoanApplication> applicationList;
         try {
             applicationList = loanApplicationDao.getApplicationByGuarantorId(guarantorId);
+            applicationList =setUserName(applicationList);
         }
         catch (Exception e) {
             throw new SQLException(e);
@@ -196,6 +206,7 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
         List<LoanApplication> applicationList;
         try {
             applicationList = loanApplicationDao.getApplicationByBorrowerIdAndStatus(borrowerId,status);
+            applicationList =setUserName(applicationList);
         }
         catch (Exception e) {
             throw new SQLException(e);
@@ -223,6 +234,7 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
         List<LoanApplication> applicationList;
         try {
             applicationList = loanApplicationDao.getApplicationByGuarantorIdAndStatus(guarantorId, status);
+            applicationList =setUserName(applicationList);
         }
         catch (Exception e) {
             throw new SQLException(e);
@@ -236,6 +248,7 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
         List<LoanApplication> applicationList;
         try {
             applicationList = loanApplicationDao.getApplicationReviewedPassed();
+            applicationList =setUserName(applicationList);
         }
         catch (Exception e) {
             throw new SQLException(e);
@@ -249,6 +262,7 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
         List<LoanApplication> applicationList;
         try {
             applicationList = loanApplicationDao.getApplicationUnReviewed();
+            applicationList =setUserName(applicationList);
         }
         catch (Exception e) {
             throw new SQLException(e);
@@ -271,5 +285,15 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
             noticeService.sendNotice(loanApplication.getBorrowerId(), "贷款申请已过期",
                     "你的贷款申请由于长时间没被认购，已过期");
         }
+    }
+
+    private List<LoanApplication> setUserName(List<LoanApplication> list) throws Exception
+    {
+        for(LoanApplication application:list){
+            application.setBorrowerName(userService.findUser(application.getBorrowerId()).getName());
+//            if(application.getStatus().equals(LoanStatus.UNREVIEWED.getStatus()))
+//            application.setGuarantorName(userService.findUser(application.getGuarantorName()).getName());
+        }
+        return list;
     }
 }

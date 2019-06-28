@@ -11,11 +11,8 @@ import com.scut.p2ploanplatform.utils.ResultVoUtil;
 import com.scut.p2ploanplatform.vo.PageVo;
 import com.scut.p2ploanplatform.vo.ResultVo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.sql.SQLException;
 import java.util.HashMap;
