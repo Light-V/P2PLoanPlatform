@@ -86,9 +86,9 @@ public class PurchaseServiceImpl implements PurchaseService {
         }
 
         //通知
-        String borrowerNotice = "尊敬的 %s：\n\t您编号为 %06d 的借款申请已被认购，订单编号为 %06d,请及时检查款项是否到账，并前往订单详情页确认还款计划，及时还款。";
-        noticeService.sendNotice(borrower.getUserId(), "借款申请被认购", String.format(borrowerNotice, borrower.getName(),application.getApplicationId()));
-        String investorNotice = "尊敬的 %s：\n\t您已成功认购编号为 %06d 的借款申请，可以前往订单详情页确认还款计划。";
+        String borrowerNotice = "尊敬的 %s：\n\t您编号为 %06d 的借款申请已被认购，订单编号为 %06d，请及时检查款项是否到账，并前往订单详情页确认还款计划，及时还款。";
+        noticeService.sendNotice(borrower.getUserId(), "借款申请被认购", String.format(borrowerNotice, borrower.getName(),application.getApplicationId(),purchase.getPurchaseId()));
+        String investorNotice = "尊敬的 %s：\n\t您已成功认购编号为 %06d 的借款申请，订单编号为 %06d，可以前往订单详情页确认还款计划。";
         noticeService.sendNotice(investorId, "借款申请被认购", String.format(investorNotice, investor.getName(),application.getApplicationId()));
 
         return purchase;
