@@ -14,7 +14,7 @@ import java.sql.SQLException;
  */
 
 @Service
-public class RuarantorServiceImpl implements GuarantorService {
+public class GuarantorServiceImpl implements GuarantorService {
 
     @Autowired
     private GuarantorDao guarantorDao;
