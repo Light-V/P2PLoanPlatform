@@ -4,6 +4,7 @@ import lombok.Data;
 
 import javax.validation.constraints.*;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 @Data
 public class ApplicationInfoForm {
@@ -39,4 +40,5 @@ public class ApplicationInfoForm {
     @NotNull(message = "认购期限不能为空")
     @Future
     private Date purchaseDeadline;
+
 }

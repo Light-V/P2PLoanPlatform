@@ -80,7 +80,7 @@ public class PurchaseController {
         ));
     }
 
-    @RequestMapping("uer_purchases/{type}/{status}")
+    @RequestMapping("user_purchases/{type}/{status}")
     @GetMapping
     public ResultVo showBorrowerApplications(@RequestParam(value = "page_num", defaultValue = "1") Integer pageNum,
                                              @RequestParam(value = "page_size", required = false, defaultValue = "10") Integer pageSize,
