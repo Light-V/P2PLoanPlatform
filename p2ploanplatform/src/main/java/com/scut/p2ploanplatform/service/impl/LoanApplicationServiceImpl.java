@@ -6,11 +6,15 @@ import com.scut.p2ploanplatform.dao.LoanApplicationDao;
 import com.scut.p2ploanplatform.entity.LoanApplication;
 import com.scut.p2ploanplatform.enums.LoanStatus;
 import com.scut.p2ploanplatform.service.LoanApplicationService;
+import com.scut.p2ploanplatform.utils.AutoTrigger;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -19,10 +23,18 @@ import java.util.List;
 
 //todo: notice
 @Service
+@Slf4j
 public class LoanApplicationServiceImpl implements LoanApplicationService{
 
     @Autowired
     private LoanApplicationDao loanApplicationDao;
+
+    @Autowired
+    private NoticeServiceImpl noticeService;
+
+    public LoanApplicationServiceImpl() throws Exception {
+        new AutoTrigger(getClass().getDeclaredMethod("manualExpire"), this, 16, 0, 0, true);
+    }
 
     @Override
     public Boolean addApplication(LoanApplication loanApplication) throws SQLException {
@@ -241,5 +253,22 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
             throw new SQLException(e);
         }
         return new PageInfo<>(applicationList);
+    }
+
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public void manualExpire() {
+        log.info("贷款申请认购期限审查");
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        List<LoanApplication> applicationList = loanApplicationDao.getApplicationReviewedPassedExpired(calendar.getTime());
+        for (LoanApplication loanApplication : applicationList) {
+            loanApplication.setStatus(LoanStatus.EXPIRED.getStatus());
+            loanApplicationDao.updateApplication(loanApplication);
+            noticeService.sendNotice(loanApplication.getBorrowerId(), "贷款申请已过期",
+                    "你的贷款申请由于长时间没被认购，已过期");
+        }
     }
 }
