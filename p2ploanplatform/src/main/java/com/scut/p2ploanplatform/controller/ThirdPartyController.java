@@ -260,13 +260,13 @@ public class ThirdPartyController {
     {
         ResultVo resultVo=new ResultVo();
         String thirdPartyId=(String) session.getAttribute("third_party_id");
-        String cardId=request.getParameter("card_id");
         BigDecimal amount=new BigDecimal(request.getParameter("amount"));
         String password=request.getParameter("payment_password");
-        if (!bankAccountService.findCardByThirdPartyId(thirdPartyId).getCardID().equals(cardId))
+        String cardId=bankAccountService.findCardByThirdPartyId(thirdPartyId).getCardID();
+        if (bankAccountService.findCardByThirdPartyId(thirdPartyId)==null)
         {
-            resultVo.setCode(0);
-            resultVo.setMsg(String.format("您未绑定卡号为 %s 的这张卡！",cardId));
+            resultVo.setCode(1);
+            resultVo.setMsg("您未绑定银行卡！");
             return resultVo;
         }
         if (bankAccountService.verifyPassword(cardId,password))
@@ -296,13 +296,13 @@ public class ThirdPartyController {
     {
         ResultVo resultVo=new ResultVo();
         String thirdPartyId=(String) session.getAttribute("third_party_id");
-        String cardId=request.getParameter("card_id");
+        String cardId=bankAccountService.findCardByThirdPartyId(thirdPartyId).getCardID();
         BigDecimal amount=new BigDecimal(request.getParameter("amount"));
         String password=request.getParameter("payment_password");
-        if (!bankAccountService.findCardByThirdPartyId(thirdPartyId).getCardID().equals(cardId))
+        if (bankAccountService.findCardByThirdPartyId(thirdPartyId)==null)
         {
-            resultVo.setCode(0);
-            resultVo.setMsg(String.format("您未绑定卡号为 %s 的这张卡！",cardId));
+            resultVo.setCode(1);
+            resultVo.setMsg("您未绑定银行卡！");
             return resultVo;
         }
         if (p2pAccountService.verifyPassword(thirdPartyId,password))
