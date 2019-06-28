@@ -1,10 +1,7 @@
 package com.scut.p2ploanplatform.dao;
 
 import com.scut.p2ploanplatform.entity.BankAccount;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
@@ -30,4 +27,6 @@ public interface BankAccountDao {
     @Update("update `p2p`.`bank_account` set `balance` = #{balance} where `card_id` = #{cardId}")
     int updateBalance(String cardId, BigDecimal balance);
 
+    @Delete("delete from `p2p`.`bank_account` where `card_id` = #{cardId}")
+    int deleteCard(String cardId);
 }
