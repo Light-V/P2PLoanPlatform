@@ -30,6 +30,7 @@ public enum  ResultEnum {
     PURCHASE_NOT_SUBSCRIBED(40010,"订单状态异常"),
     PURCHASE_ACCOMPLISHED(40011,"订单已终止"),
     ILLEGAL_OPERATION(40012,"非法操作"),
+    REVIEW_PRIVILEGE_DENY(40013, "担保权限不足"),
 
 
     UNHANDLED_EXCEPTION(50000,"未知错误")
