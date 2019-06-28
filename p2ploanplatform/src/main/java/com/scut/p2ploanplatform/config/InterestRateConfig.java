@@ -7,5 +7,6 @@ import java.util.List;
 @Data
 public class InterestRateConfig {
 
-    private BigDecimal rate;
+    private List<BigDecimal> rate;
+
 }

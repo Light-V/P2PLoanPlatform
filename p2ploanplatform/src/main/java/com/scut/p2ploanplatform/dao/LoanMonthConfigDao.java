@@ -12,5 +12,5 @@ import java.util.List;
 public interface LoanMonthConfigDao {
 
     @Select("SELECT * FROM `loan_month`")
-    List<LoanMonthConfig> getLoanMonths();
+    List<Integer> getLoanMonths();
 }

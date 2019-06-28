@@ -11,5 +11,5 @@ import java.util.List;
 @Mapper
 public interface InterestRateConfigDao {
     @Select("SELECT * FROM `loan_interest_rate`")
-    List<InterestRateConfig> getInterestRates();
+    List<BigDecimal> getInterestRates();
 }

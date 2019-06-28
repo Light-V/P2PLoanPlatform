@@ -10,10 +10,14 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 @Service
 public class LoanMonthConfigServiceImpl implements LoanMonthConfigService {
-    @Autowired
-    LoanMonthConfigDao loanMonthConfigDao;
+    private final LoanMonthConfigDao loanMonthConfigDao;
+
+    public LoanMonthConfigServiceImpl(LoanMonthConfigDao loanMonthConfigDao) {
+        this.loanMonthConfigDao = loanMonthConfigDao;
+    }
+
     @Override
-    public List<LoanMonthConfig> getLoanmonths() {
+    public List<Integer> getLoanmonths() {
         return loanMonthConfigDao.getLoanMonths();
     }
 }

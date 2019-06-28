@@ -6,5 +6,5 @@ import java.util.List;
 @Data
 public class LoanMonthConfig {
 
-    private Integer month;
+    private List<Integer> month;
 }
