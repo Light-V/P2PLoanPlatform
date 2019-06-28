@@ -1,7 +1,9 @@
 package com.scut.p2ploanplatform.controller;
 
 import com.github.pagehelper.PageInfo;
+import com.scut.p2ploanplatform.entity.LoanApplication;
 import com.scut.p2ploanplatform.enums.ResultEnum;
+import com.scut.p2ploanplatform.service.GuarantorService;
 import com.scut.p2ploanplatform.service.LoanApplicationService;
 import com.scut.p2ploanplatform.service.UserService;
 import com.scut.p2ploanplatform.utils.ResultVoUtil;
@@ -10,6 +12,8 @@ import com.scut.p2ploanplatform.vo.ResultVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import static com.scut.p2ploanplatform.utils.ResultVoUtil.error;
 
 /**
  * @author: Light
@@ -24,8 +28,12 @@ public class GuarantorController {
     LoanApplicationService loanApplicationService;
     @Autowired
     UserService userService;
+    @Autowired
+    GuarantorService guarantorService;
+    @Autowired
+    LoanApplicationService applicationService;
 
-    @RequestMapping("/requests")
+    @RequestMapping("/guarantee/requests")
     @GetMapping
     public ResultVo requests(@RequestParam(value = "page_num", defaultValue = "1") Integer pageNum,
                              @RequestParam(value = "page_size", required = false, defaultValue = "10") Integer pageSize,
@@ -49,7 +57,7 @@ public class GuarantorController {
         return null;
     }
 
-    @RequestMapping("/pass")
+    @RequestMapping("/guarantee/pass")
     @GetMapping
     public ResultVo pass(@RequestParam Integer productId,
                          @SessionAttribute(value = "user") String userId) {
@@ -58,7 +66,7 @@ public class GuarantorController {
                 return ResultVoUtil.success();
             }
             else{
-                return ResultVoUtil.error(ResultEnum.UNHANDLED_EXCEPTION);
+                return error(ResultEnum.UNHANDLED_EXCEPTION);
             }
         }
         catch (Exception e) {
@@ -66,7 +74,7 @@ public class GuarantorController {
         }
     }
 
-    @RequestMapping("/reject")
+    @RequestMapping("/guarantee/reject")
     @GetMapping
     public ResultVo reject(@RequestParam Integer productId,
                          @SessionAttribute(value = "user") String userId) {
@@ -75,11 +83,32 @@ public class GuarantorController {
                 return ResultVoUtil.success();
             }
             else{
-                return ResultVoUtil.error(ResultEnum.UNHANDLED_EXCEPTION);
+                return error(ResultEnum.UNHANDLED_EXCEPTION);
             }
         }
         catch (Exception e) {
             return null;
         }
+    }
+
+    @RequestMapping("/guarantee/detail/{applicationId}")
+    @GetMapping
+    public ResultVo getDetail(@PathVariable Integer applicationId,
+                              @SessionAttribute(value = "user_type") int userType){
+        if (userType != 2) {
+            return error(ResultEnum.USER_AUTHORITY_DENY);
+        }
+
+        LoanApplication application;
+        try{
+            application = applicationService.getApplicationById(applicationId);
+        }catch (Exception e){
+            return error(ResultEnum.PARAM_IS_INVALID);
+        }
+        if(application == null){
+            return error(ResultEnum.APPLICATION_NOT_EXIST);
+        }
+        return ResultVoUtil.success(application);
+
     }
 }

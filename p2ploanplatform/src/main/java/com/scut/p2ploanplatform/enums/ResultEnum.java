@@ -16,6 +16,7 @@ public enum  ResultEnum {
 
     /* 用户错误：20001-29999*/
     USER_NOT_LOGIN(20001, "用户未登录"),
+    USER_AUTHORITY_DENY(20002, "用户组权限不足"),
 
     /* 资源不存在：30001-39999*/
     NOTICE_NOT_EXIST(30001, "通知不存在"),
