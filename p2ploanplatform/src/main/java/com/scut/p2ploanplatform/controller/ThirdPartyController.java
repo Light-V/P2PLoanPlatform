@@ -1,5 +1,6 @@
 package com.scut.p2ploanplatform.controller;
 
+import com.scut.p2ploanplatform.entity.BankAccount;
 import com.scut.p2ploanplatform.service.impl.BankAccountServiceImpl;
 import com.scut.p2ploanplatform.service.impl.P2pAccountServiceImpl;
 import com.scut.p2ploanplatform.vo.ResultVo;
@@ -48,6 +49,48 @@ public class ThirdPartyController {
         return resultVo;
     }
 
+    @GetMapping("/find_card")
+    public ResultVo findCard(HttpSession session) throws SQLException,IllegalArgumentException
+    {
+        ResultVo resultVo=new ResultVo();
+        String thirdPartyId=(String) session.getAttribute("third_party_id");
+        BankAccount bankAccount=bankAccountService.findCardByThirdPartyId(thirdPartyId);
+        if (bankAccount==null)
+        {
+            resultVo.setCode(1);
+            resultVo.setMsg("无已绑定的银行卡！");
+        }
+        else
+        {
+            resultVo.setCode(0);
+            resultVo.setMsg("查询成功！");
+            Map<String,Object> data=new HashMap<String, Object>();
+            data.put("card_number",bankAccount.getCardID());
+            resultVo.setData(data);
+        }
+        return resultVo;
+    }
+
+    @DeleteMapping("/untie_bank_card")
+    public ResultVo untieBankCard(HttpSession session) throws SQLException,IllegalArgumentException
+    {
+        ResultVo resultVo=new ResultVo();
+        String thirdPartyId=(String) session.getAttribute("third_party_id");
+        String cardId=bankAccountService.findCardByThirdPartyId(thirdPartyId).getCardID();
+        int result=bankAccountService.untieBankAccount(thirdPartyId,cardId);
+        if (result==1)
+        {
+            resultVo.setCode(0);
+            resultVo.setMsg("解绑成功！");
+        }
+        else
+        {
+            resultVo.setCode(1);
+            resultVo.setMsg("解绑失败！");
+        }
+        return resultVo;
+    }
+
     @GetMapping("/verify_password_set")
     public ResultVo verifyPasswordSet(HttpSession session) throws SQLException
     {
@@ -66,7 +109,7 @@ public class ThirdPartyController {
             resultVo.setMsg("支付密码还未设置");
             data.put("isSet",false);
             resultVo.setData(data);
-            resultVo.setCode(0);
+            resultVo.setCode(1);
         }
         return resultVo;
     }

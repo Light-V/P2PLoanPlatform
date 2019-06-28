@@ -34,15 +34,6 @@ public class BankAccountServiceImplTest {
 
     @Test
     @Transactional
-    public void findBalanceByCardIdTest() throws SQLException,IllegalArgumentException
-    {
-        bankAccountService.addBankAccount("123456789012","201636824347","123456",new BigDecimal(1000));
-        BigDecimal testBalance=bankAccountService.findBalanceByCardId("123456789012");
-        assertEquals(0,new BigDecimal(1000).compareTo(testBalance));
-    }
-
-    @Test
-    @Transactional
     public void findCardByThirdPartyIdTest() throws SQLException,IllegalArgumentException
     {
         bankAccountService.addBankAccount("123456789012","201636824347","123456",new BigDecimal(1000));

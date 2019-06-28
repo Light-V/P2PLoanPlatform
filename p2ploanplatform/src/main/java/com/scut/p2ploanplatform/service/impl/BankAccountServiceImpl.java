@@ -44,22 +44,23 @@ public class BankAccountServiceImpl implements BankAccountService {
     }
 
     @Override
-    public BigDecimal findBalanceByCardId(String cardId) throws SQLException,IllegalArgumentException
+    public int untieBankAccount(String thirdPartyId, String cardId) throws SQLException,IllegalArgumentException
     {
-        if (bankAccountDao.findCardByCardId(cardId)== null)
-            throw new IllegalArgumentException(String.format("卡号为%s的银行卡还未添加！",cardId));
+        if (bankAccountDao.findCardByThirdPartyId(thirdPartyId)==null
+                ||!bankAccountDao.findCardByThirdPartyId(thirdPartyId).getCardID().equals(cardId))
+            throw new IllegalArgumentException(String.format("卡号为%s的银行卡未和您绑定！",cardId));
         else
         {
             try
             {
-                return bankAccountDao.findBalanceByCardId(cardId);
+                bankAccountDao.deleteCard(cardId);
+                return 1;
             }
             catch (Exception e)
             {
                 throw new SQLException(e);
             }
         }
-
     }
 
     @Override
