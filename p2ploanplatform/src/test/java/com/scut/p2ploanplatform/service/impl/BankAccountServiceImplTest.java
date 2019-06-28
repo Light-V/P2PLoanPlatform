@@ -12,8 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -42,6 +41,15 @@ public class BankAccountServiceImplTest {
         assertNotNull(bankAccount.getThirdPartyId());
         assertNotNull(bankAccount.getBalance());
         assertNotNull(bankAccount.getPaymentPassword());
+    }
+
+    @Test
+    @Transactional
+    public void untieBankAccountTest() throws SQLException,IllegalArgumentException
+    {
+        bankAccountService.addBankAccount("123456789012","201636824347","123456",new BigDecimal(1000));
+        bankAccountService.untieBankAccount("201636824347","123456789012");
+        assertNull(bankAccountService.findCardByThirdPartyId("201636824347"));
     }
 
     @Test

@@ -72,21 +72,30 @@ public class ThirdPartyController {
     }
 
     @DeleteMapping("/untie_bank_card")
-    public ResultVo untieBankCard(HttpSession session) throws SQLException,IllegalArgumentException
+    public ResultVo untieBankCard(HttpSession session, HttpServletRequest request) throws SQLException,IllegalArgumentException
     {
         ResultVo resultVo=new ResultVo();
         String thirdPartyId=(String) session.getAttribute("third_party_id");
-        String cardId=bankAccountService.findCardByThirdPartyId(thirdPartyId).getCardID();
-        int result=bankAccountService.untieBankAccount(thirdPartyId,cardId);
-        if (result==1)
+        if (bankAccountService.findCardByThirdPartyId(thirdPartyId)==null)
         {
-            resultVo.setCode(0);
-            resultVo.setMsg("解绑成功！");
+            resultVo.setCode(1);
+            resultVo.setMsg("该用户未绑卡！");
         }
         else
         {
-            resultVo.setCode(1);
-            resultVo.setMsg("解绑失败！");
+            String paymentPassword=request.getParameter("payment_password");
+            String cardId=bankAccountService.findCardByThirdPartyId(thirdPartyId).getCardID();
+            if (bankAccountService.verifyPassword(cardId,paymentPassword))
+            {
+                bankAccountService.untieBankAccount(thirdPartyId,cardId);
+                resultVo.setCode(0);
+                resultVo.setMsg("解绑成功！");
+            }
+            else
+            {
+                resultVo.setCode(1);
+                resultVo.setMsg("密码错误！");
+            }
         }
         return resultVo;
     }
@@ -191,7 +200,7 @@ public class ThirdPartyController {
         String payerId=request.getParameter("payer_id");
         String payeeId=request.getParameter("payee_id");
         BigDecimal amount=new BigDecimal(request.getParameter("amount"));
-        String apiKey=request.getParameter("api_key");
+        String apiKey=p2pAccountService.getApiKey();
         String signature=request.getParameter("signature");
         String currSignature=p2pAccountService.getSHA(payerId+payeeId+request.getParameter("amount")+apiKey);
         if (currSignature.equals(signature))

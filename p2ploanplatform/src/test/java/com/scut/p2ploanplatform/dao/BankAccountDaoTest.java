@@ -10,8 +10,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+
+import static org.junit.Assert.*;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -92,4 +92,16 @@ public class BankAccountDaoTest {
         assertEquals(1,result);
     }
 
+    @Test
+    @Transactional
+    public void deleteCardTest()
+    {
+        bankAccountDao.addBankAccount(sampleBankAccount);
+        assertNotNull(sampleBankAccount.getCardID());
+        assertNotNull(sampleBankAccount.getThirdPartyId());
+        assertNotNull(sampleBankAccount.getBalance());
+        assertNotNull(sampleBankAccount.getPaymentPassword());
+        bankAccountDao.deleteCard(sampleBankAccount.getCardID());
+        assertNull(bankAccountDao.findCardByCardId(sampleBankAccount.getCardID()));
+    }
 }
