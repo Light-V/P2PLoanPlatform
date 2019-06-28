@@ -39,20 +39,13 @@ public interface RepayService {
     RepayPlan findPlanById(String id) throws SQLException, IllegalArgumentException;
 
     /**
-     * 更新还款计划信息（不推荐外部调用）
+     * 更新还款计划信息
      * @param id 计划ID
      * @param status 还款计划状态
      * @param realRepayDate 实际还款日期（为null则为未还）
      * @throws SQLException SQL错误
      * @throws IllegalArgumentException 参数错误
      */
-    @Deprecated
     void updateRepayPlan(String id, RepayPlanStatus status, Date realRepayDate) throws SQLException, IllegalArgumentException;
-
-    /**
-     * 执行还款流程，参考详细设计文档的顺序图（定时触发，不推荐模块外部调用）
-     */
-    @Deprecated
-    void doRepay();
 
 }

@@ -131,7 +131,6 @@ public class RepayServiceImplTest {
 
     @Test
     @Transactional
-    @SuppressWarnings("deprecation")
     public void updateRepayPlanTest() {
         Date targetDate = new Date(new Date().getTime() + 86400000);
 
@@ -164,38 +163,4 @@ public class RepayServiceImplTest {
     @Autowired
     private UserService userService;
 
-    @Test
-    @Transactional
-    @SuppressWarnings("deprecation")
-    public void doRepayTest() throws Exception {
-        // inserting simulated users
-        assertEquals(1, userService.insertUser("12345", 1, "123456", "13000000000", "440000000000000000", "123", "郑优秀", "滑稽理工大学养猪场"));
-        assertEquals(1, userService.insertUser("12346", 1, "123456", "13000000001", "440000000000000001", "124", "郑成功", "双鸭山大学"));
-        assertEquals(1, userService.insertUser("12347", 1, "123456", "13000000002", "440000000000000002", "125", "郑龟龟", "滑稽理工大学养猪场"));
-        // fill loan application
-        LoanApplication application = new LoanApplication();
-        application.setAmount(BigDecimal.valueOf(1234.56));
-        application.setBorrowerId("12345");
-        application.setGuarantorId("12346");
-        application.setInterestRate(BigDecimal.valueOf(0.1234));
-        application.setLoanMonth(12);
-        application.setPurchaseDeadline(new Date(new Date().getTime() + 86400000));
-        application.setStatus(LoanStatus.REVIEWED_PASSED.getStatus());
-        application.setTitle("在这无情的社会，只有金钱还有点温度");
-        assertTrue(loanApplicationService.addApplication(application));
-        // product subscribe
-        Purchase purchase = purchaseService.subscribed("12347", application.getApplicationId());
-        assertNotNull(purchase);
-        // todo: auto adding plan
-        for (int i = -1; i <= 1; i++) {
-            Date today = new Date(new Date().getTime() / 86400000 * 86400000);
-            Calendar c = Calendar.getInstance();
-            c.setTime(today);
-            c.add(Calendar.MONTH, i);
-            Date newDate = c.getTime();
-            assertNotNull(repayService.insertPlan(purchase.getPurchaseId(), newDate, BigDecimal.valueOf(233.33)));
-        }
-
-        repayService.doRepay();
-    }
 }
