@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 @Repository
 @Mapper
@@ -100,4 +101,12 @@ public interface LoanApplicationDao {
      */
     @Select("SELECT * FROM `loan_application` WHERE `status` = 0")
     List<LoanApplication> getApplicationUnReviewed();
+
+    /**
+     * 查询审核通过且到达认购期限的申请
+     * @param now 当前时间
+     * @return 申请的list
+     */
+    @Select("SELECT * FROM `loan_application` WHERE `status` = 1 AND purchase_deadline < #{now} FOR UPDATE")
+    List<LoanApplication> getApplicationReviewedPassedExpired(Date now);
 }

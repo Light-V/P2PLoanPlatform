@@ -87,7 +87,7 @@ create table `loan_application` (
 	`amount` decimal(12, 2) not null comment '贷款金额',
 	`interest_rate` decimal(5, 4) not null comment '利率',
 	`loan_month` int not null comment '借款月数',
-	`purchase_deadline` date not null comment '认购期限',
+	`purchase_deadline` timestamp not null default current_timestamp comment '认购期限',
 	`create_time` timestamp not null default current_timestamp comment '创建时间',
 	`update_time` timestamp not null default current_timestamp on update current_timestamp comment '修改时间',
 	-- foreign key (`borrower_id`) references `user`(`user_id`),

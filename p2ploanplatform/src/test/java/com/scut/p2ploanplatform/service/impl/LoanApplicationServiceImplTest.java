@@ -1,6 +1,5 @@
 package com.scut.p2ploanplatform.service.impl;
 
-import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
 import com.scut.p2ploanplatform.entity.LoanApplication;
 import com.scut.p2ploanplatform.enums.LoanStatus;
@@ -15,8 +14,12 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 import static org.junit.Assert.*;
 @SpringBootTest
@@ -27,6 +30,9 @@ public class LoanApplicationServiceImplTest {
 
     @Autowired
     LoanApplicationService applicationService;
+
+    @Autowired
+    LoanApplicationServiceImpl loanApplicationService;
 
     @Before
     public void newApplication(){
@@ -319,5 +325,31 @@ public class LoanApplicationServiceImplTest {
         assertNotNull(applicationPageInfo);
         assertEquals(1, applicationPageInfo.getPageNum());
         assertEquals(10, applicationPageInfo.getPageSize());
+    }
+
+
+    @Test
+    @Transactional
+    public void manualExpire() throws Exception {
+        DateFormat pattern = new SimpleDateFormat("yyyy-MM-dd");
+        application.setStatus(LoanStatus.REVIEWED_PASSED.getStatus());
+        Date date = pattern.parse("2019-6-26");
+        application.setPurchaseDeadline(date);
+        loanApplicationService.addApplication(application);
+        Integer expireId = application.getApplicationId();
+
+        Date today = new Date();
+        String todayFormat = pattern.format(today);
+        today = pattern.parse(todayFormat);
+        application.setPurchaseDeadline(today);
+        loanApplicationService.addApplication(application);
+        Integer newId = application.getApplicationId();
+
+        loanApplicationService.manualExpire();
+        LoanApplication loanApplication = loanApplicationService.getApplicationById(expireId);
+        Assert.assertEquals(LoanStatus.EXPIRED.getStatus(), loanApplication.getStatus());
+        loanApplication = loanApplicationService.getApplicationById(newId);
+        Assert.assertEquals(LoanStatus.REVIEWED_PASSED.getStatus(), loanApplication.getStatus());
+
     }
 }
