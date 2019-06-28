@@ -32,6 +32,7 @@ public enum  ResultEnum {
     ILLEGAL_OPERATION(40012,"非法操作"),
 
 
+
     UNHANDLED_EXCEPTION(50000,"未知错误")
     ;
     private Integer code;

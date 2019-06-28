@@ -1,6 +1,7 @@
 package com.scut.p2ploanplatform.service;
 
 import com.github.pagehelper.PageInfo;
+import com.scut.p2ploanplatform.entity.RepayPlan;
 import com.scut.p2ploanplatform.enums.LoanStatus;
 import com.scut.p2ploanplatform.entity.Purchase;
 import com.scut.p2ploanplatform.exception.LoanStatusException;
@@ -76,6 +77,5 @@ public interface PurchaseService {
      * @return 订单列表
      */
     PageInfo<Purchase> showPurchaseByBorrowerId(String borrowerID, LoanStatus status, Integer pageNum, Integer pageSize) throws SQLException,IllegalArgumentException;
-
 
 }

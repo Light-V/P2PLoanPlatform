@@ -4,9 +4,11 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.github.pagehelper.PageInfo;
 import com.scut.p2ploanplatform.entity.LoanApplication;
 import com.scut.p2ploanplatform.entity.Purchase;
+import com.scut.p2ploanplatform.entity.RepayPlan;
 import com.scut.p2ploanplatform.enums.LoanStatus;
 import com.scut.p2ploanplatform.exception.LoanStatusException;
 import com.scut.p2ploanplatform.service.LoanApplicationService;
+import com.scut.p2ploanplatform.service.RepayService;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -17,7 +19,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.xml.crypto.Data;
 import java.sql.SQLException;
+import java.util.Comparator;
+import java.util.List;
 
 import static org.junit.Assert.*;
 @SpringBootTest
@@ -25,6 +30,9 @@ import static org.junit.Assert.*;
 public class PurchaseServiceImplTest {
     @Autowired
     PurchaseServiceImpl purchaseService;
+
+    @Autowired
+    RepayService repayService;
 
     @Autowired
     LoanApplicationService applicationService;
@@ -39,12 +47,17 @@ public class PurchaseServiceImplTest {
         Integer applicationId = 61;
         Purchase purchase=null;
         LoanApplication application = null;
+
         try{
             purchase = purchaseService.subscribed(investorId, applicationId);
             application = applicationService.getApplicationById(applicationId);
         }catch (Exception e){
             e.printStackTrace();
             fail();
+        }
+        List<RepayPlan> repayPlans = purchase.getRepayPlans();
+        for (RepayPlan repayPlan : repayPlans) {
+            System.out.println(repayPlan);
         }
         Assert.assertNotNull(purchase);
         Assert.assertEquals(LoanStatus.SUBSCRIBED.getStatus(), application.getStatus());

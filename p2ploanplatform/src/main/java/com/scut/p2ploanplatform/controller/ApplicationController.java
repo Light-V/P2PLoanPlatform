@@ -125,7 +125,7 @@ public class ApplicationController {
         ));
     }
 
-    @RequestMapping("uer_applications/{status}")
+    @RequestMapping("user_applications/{status}")
     @GetMapping
     public ResultVo showBorrowerApplications(@RequestParam(value = "page_num", defaultValue = "1") Integer pageNum,
                                              @RequestParam(value = "page_size", required = false, defaultValue = "10") Integer pageSize,
@@ -157,6 +157,9 @@ public class ApplicationController {
                     applicationPageInfo = applicationService.getApplicationByBorrowerId(userId,
                             LoanStatus.EXPIRED.getStatus(), pageNum, pageSize);
                     break;
+                case "accomplished":
+                    applicationPageInfo = applicationService.getApplicationByBorrowerId(userId,
+                            LoanStatus.FINISHED.getStatus(), pageNum, pageSize);
             }
 
         }catch (Exception e){
