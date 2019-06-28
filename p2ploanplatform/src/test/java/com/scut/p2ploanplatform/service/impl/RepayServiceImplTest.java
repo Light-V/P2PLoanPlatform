@@ -33,7 +33,7 @@ public class RepayServiceImplTest {
     @Test
     @Transactional
     public void insertPlanTest() {
-        Date targetDate = new Date(new Date().getTime() + 86400000);
+        Date targetDate = new Date(new Date().getTime() / 86400000 * 86400000 + 86400000);
         try {
             RepayPlan plan = repayService.insertPlan(123, targetDate, BigDecimal.valueOf(100, 2));
             assertNotNull(plan);
@@ -196,62 +196,6 @@ public class RepayServiceImplTest {
             assertNotNull(repayService.insertPlan(purchase.getPurchaseId(), newDate, BigDecimal.valueOf(233.33)));
         }
 
-        Field field = RepayServiceImpl.class.getDeclaredField("p2pAccountService");
-        field.setAccessible(true);
-        P2pAccountService p2pAccountService = (P2pAccountService) field.get(userService);
-        assertNotNull(p2pAccountService);
-        try {
-            // re-implement third-party payment service (assume all operations are success)
-            //noinspection RedundantThrows
-//            ((RepayServiceImpl)repayService).setP2pAccountService(new P2pAccountService() {
-//                @Override
-//                public int addP2pAccount(String thirdPartyId, String paymentPassword, BigDecimal balance, Integer status, Integer type) throws SQLException, IllegalArgumentException {
-//                    return 1;
-//                }
-//
-//                @Override
-//                public BigDecimal findBalance(String thirdPartyId) throws SQLException, IllegalArgumentException {
-//                    return BigDecimal.valueOf(1000000, 2);
-//                }
-//
-//                @Override
-//                public Boolean verifyTrade(String payerId, BigDecimal amount) throws SQLException, IllegalArgumentException {
-//                    return true;
-//                }
-//
-//                @Override
-//                public Boolean verifyPasswordIsSet(String thirdPartyId) throws SQLException, IllegalArgumentException {
-//                    return true;
-//                }
-//
-//                @Override
-//                public Boolean verifyPassword(String thirdPartyId, String password) throws SQLException, IllegalArgumentException {
-//                    return true;
-//                }
-//
-//                @Override
-//                public Boolean transfer(String payerId, String payeeId, BigDecimal amount) throws SQLException, IllegalArgumentException {
-//                    return true;
-//                }
-//
-//                @Override
-//                public Boolean recharge(String thirdPartyId, String cardId, BigDecimal amount) throws SQLException, IllegalArgumentException {
-//                    return true;
-//                }
-//
-//                @Override
-//                public Boolean withdraw(String thirdPartyId, String cardId, BigDecimal amount) throws SQLException, IllegalArgumentException {
-//                    return true;
-//                }
-//            });
-
-            // calling repay operation
-            repayService.doRepay();
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail();
-        } finally {
-            ((RepayServiceImpl)repayService).setP2pAccountService(p2pAccountService);
-        }
+        repayService.doRepay();
     }
 }

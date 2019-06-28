@@ -13,7 +13,7 @@ public interface RepayPlanDao {
     @Insert("INSERT INTO `p2p`.`repay_plan`(`plan_id`, `purchase_id`, `repay_date`, `real_repay_date`, `amount`, `status`) VALUES (#{planId}, #{purchaseId}, #{repayDate}, #{realRepayDate}, #{amount}, #{status})")
     int insertPlan(RepayPlan plan);
 
-    @Select("SELECT * FROM `p2p`.`repay_plan` WHERE `purchase_id` = #{value}")
+    @Select("SELECT * FROM `p2p`.`repay_plan` WHERE `purchase_id` = #{value} ORDER BY `repay_date` ASC")
     List<RepayPlan> findPlanByPurchaseId(Integer id);
 
     @Select("SELECT * FROM `p2p`.`repay_plan` WHERE `plan_id` = #{value}")

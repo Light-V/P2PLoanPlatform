@@ -34,7 +34,7 @@ public class AutoTrigger implements Runnable {
      *
      * @param invokeMethod              回调方法，如调用foo()，则为getClass().getDeclaredMethod("foo")
      * @param invokeObject              调用该方法的实例化对象，如this，则相当于this.foo()
-     * @param triggerHour               每日触发的小时（0~23）
+     * @param triggerHour               每日触发的小时（0~23）（注意：时区为UTC）
      * @param triggerMinute             每日触发的分钟（0~59）
      * @param triggerSecond             每日触发的秒数（0~59）
      * @param triggerAfterInstantiation 是否在实例化后立刻触发回调
@@ -100,7 +100,7 @@ public class AutoTrigger implements Runnable {
             long nextTriggerTimestamp = nextTriggerDate * 86400000 + triggerTimeOfDay;
 
             if (triggerAfterInstantiation) {
-                log.debug("Started trigger invocation: " + invokeMethod.toString());
+                log.info("Started trigger invocation: " + invokeMethod.toString());
                 doInvoke();
             }
 
@@ -110,7 +110,7 @@ public class AutoTrigger implements Runnable {
                 if (sleepTimeForNextDay > 0)
                     Thread.sleep(sleepTimeForNextDay);
 
-                log.debug("Started trigger invocation: " + invokeMethod.toString());
+                log.info("Started trigger invocation: " + invokeMethod.toString());
                 doInvoke();
 
                 nextTriggerTimestamp += 86400000;
