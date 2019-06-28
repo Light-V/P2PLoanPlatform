@@ -38,11 +38,12 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
 
     @Override
     public Boolean addApplication(LoanApplication loanApplication) throws SQLException {
-        try {
-            return loanApplicationDao.addApplication(loanApplication);
+        if( loanApplicationDao.addApplication(loanApplication)) {
+            noticeService.sendNotice(loanApplication.getBorrowerId(), "贷款申请提交成功", "您的贷款申请已提交成功，正在等待审核。");
+            return true;
         }
-        catch (Exception e) {
-            throw new SQLException(e);
+        else {
+            throw new SQLException("数据库操作失败");
         }
     }
 
