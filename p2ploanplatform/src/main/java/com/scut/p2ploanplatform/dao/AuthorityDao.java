@@ -23,7 +23,7 @@ public interface AuthorityDao {
     int updateAuthority(Authority authority);
 
     @Select("SELECT * FROM `p2p`.`authority` WHERE authority_id = #{authorityId}")
-    List<Authority> selectAllAuthority(String authorityId);
+    Authority selectAuthority(Integer authorityId);
 
     @Delete("DELETE FROM `p2p`.`authority` WHERE authority_id = #{authorityId}")
     int deleteAuthority(String authorityId);
