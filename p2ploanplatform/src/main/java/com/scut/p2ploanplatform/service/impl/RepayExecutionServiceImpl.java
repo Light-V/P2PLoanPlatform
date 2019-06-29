@@ -1,6 +1,5 @@
 package com.scut.p2ploanplatform.service.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.scut.p2ploanplatform.dao.RepayPlanDao;
 import com.scut.p2ploanplatform.entity.Purchase;
 import com.scut.p2ploanplatform.entity.RepayPlan;
@@ -9,28 +8,15 @@ import com.scut.p2ploanplatform.enums.RepayPlanStatus;
 import com.scut.p2ploanplatform.service.*;
 import com.scut.p2ploanplatform.utils.AutoTrigger;
 import com.scut.p2ploanplatform.utils.AutowireField;
+import com.scut.p2ploanplatform.utils.ThirdPartyOperationInterface;
 import com.scut.p2ploanplatform.vo.RepayExecutionResultVo;
-import lombok.Data;
+import com.scut.p2ploanplatform.vo.ResultVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SerializationUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.math.BigDecimal;
-import java.net.URI;
-import java.security.MessageDigest;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,18 +26,6 @@ import java.util.List;
 public class RepayExecutionServiceImpl implements RepayExecutionService {
     private static final String NOTICE_TITLE = "喵了个咪";
     private boolean isColdStart = true;
-
-    private static String THIRD_PARTY_API_URL = "http://localhost:8080/third_party/";
-
-    public static String getThirdPartyApiUrl() {
-        return THIRD_PARTY_API_URL;
-    }
-
-    public static void setThirdPartyApiUrl(String thirdPartyApiUrl) {
-        if (!thirdPartyApiUrl.endsWith("/"))
-            thirdPartyApiUrl = thirdPartyApiUrl + "/";
-        THIRD_PARTY_API_URL = thirdPartyApiUrl;
-    }
 
     @AutowireField
     private PurchaseService purchaseService;
@@ -101,52 +75,6 @@ public class RepayExecutionServiceImpl implements RepayExecutionService {
         new AutoTrigger(getClass().getDeclaredMethod("doRepay"), this, 1, 0, 0, true);
     }
 
-
-    @Data
-    public static class ThirdPartyTransferResult {
-        private Integer code;
-        private String msg;
-    }
-
-    private static String API_KEY = null;
-//    private static final String API_SECRET_KEY = "";
-
-    private String computeThirdPartyParamSign(String paramString) throws Exception {
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        byte[] sha256 = digest.digest(paramString.getBytes());
-        StringBuilder stringBuilder = new StringBuilder();
-        for (byte b : sha256) {
-            String hex = Integer.toHexString(b & 0xff);
-            if (hex.length() == 1)
-                stringBuilder.append('0');
-            stringBuilder.append(hex);
-        }
-        return stringBuilder.toString();
-    }
-
-    private ThirdPartyTransferResult sendTransferRequest(String payerId, String payeeId, BigDecimal amount) throws Exception{
-        String url = THIRD_PARTY_API_URL + "transfer";
-        List<NameValuePair> queryParams = new LinkedList<>();
-        queryParams.add(new BasicNameValuePair("payer_id", payerId));
-        queryParams.add(new BasicNameValuePair("payee_id", payeeId));
-        queryParams.add(new BasicNameValuePair("amount", amount.toString()));
-        queryParams.add(new BasicNameValuePair("api_key", API_KEY));
-        queryParams.add(new BasicNameValuePair("signature", computeThirdPartyParamSign(payerId + payeeId + amount.toString() + API_KEY)));
-
-        CloseableHttpClient httpClient = HttpClients.createDefault();
-        URI uri = new URIBuilder(url).addParameters(queryParams).build();
-
-        HttpPut httpPut = new HttpPut(uri);
-        try (CloseableHttpResponse httpResponse = httpClient.execute(httpPut)) {
-            HttpEntity entity = httpResponse.getEntity();
-            String content = EntityUtils.toString(entity);
-            ObjectMapper objectMapper = new ObjectMapper();
-            ThirdPartyTransferResult result = objectMapper.readValue(content, ThirdPartyTransferResult.class);
-            log.info(content);
-            return result;
-        }
-    }
-
     private <T extends Serializable> T deepCopy(T object) throws Exception {
         return (T)SerializationUtils.clone(object);
     }
@@ -161,12 +89,6 @@ public class RepayExecutionServiceImpl implements RepayExecutionService {
             log.debug("Updating plan status (from cold start)");
             int rowsAffected = repayPlanDao.updatePlanStatus();
             log.debug("Completed query, " + rowsAffected + " rows affected");
-        }
-
-        if (API_KEY == null) {
-            log.debug("requiring API_KEY");
-            API_KEY = p2pAccountService.generateApiKey();
-            log.debug("done, got API_KEY = " + API_KEY);
         }
 
         log.debug("Querying unpaid plans");
@@ -187,13 +109,13 @@ public class RepayExecutionServiceImpl implements RepayExecutionService {
                 User guarantor = userService.findUser(purchase.getGuarantorId());
 
                 // 转账
-                ThirdPartyTransferResult transferResult;
+                ResultVo transferResult;
                 // 已由担保人代付，还款默认转到担保人账号，其余情况都转到投资者账号
                 User payee = (plan.getStatus() == RepayPlanStatus.GUARANTOR_PAID_ADVANCE.getStatus()) ? guarantor : investor;
                 User payer = borrower;
                 String borrowerMessage = null, guarantorMessage = null, investorMessage = null;
 
-                transferResult = sendTransferRequest(payer.getThirdPartyId(), payee.getThirdPartyId(), plan.getAmount());
+                transferResult = ThirdPartyOperationInterface.transfer(payer.getThirdPartyId(), payee.getThirdPartyId(), plan.getAmount());
                 result.setBorrowerTransferResult(transferResult);
 
                 if (transferResult.getCode() == 0) {
@@ -211,7 +133,7 @@ public class RepayExecutionServiceImpl implements RepayExecutionService {
                     if (plan.getStatus() != RepayPlanStatus.GUARANTOR_PAID_ADVANCE.getStatus()) {
                         // 贷款人还款失败，执行垫付：担保人 -> 投资者
                         payer = guarantor;
-                        transferResult = sendTransferRequest(payer.getThirdPartyId(), payee.getThirdPartyId(), plan.getAmount());
+                        transferResult = ThirdPartyOperationInterface.transfer(payer.getThirdPartyId(), payee.getThirdPartyId(), plan.getAmount());
                         result.setGuarantorTransferResult(transferResult);
                         borrowerMessage = String.format("尊敬的 %s 用户，您的贷款本月还款失败，请检查第三方账号中金额，确保在系统重试还款前，拥有足够金额进行划扣", borrower.getName());
 

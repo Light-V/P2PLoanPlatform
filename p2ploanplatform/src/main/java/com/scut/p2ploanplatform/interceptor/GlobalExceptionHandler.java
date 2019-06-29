@@ -30,6 +30,12 @@ import java.util.Set;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    // 为什么不加个通常Exception的Handler呢 手动doge脸
+    @ExceptionHandler(Exception.class)
+    public ResultVo globalExceptionHandler(HttpServletRequest request, Exception e) {
+        return ResultVoUtil.error(500, String.format("Internal error for request %s: %s", request.getRequestURI(), e.getMessage()));
+    }
+
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
     public ResultVo httpRequestMethodNotSupportedExceptionHandler(HttpServletRequest request,
