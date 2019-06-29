@@ -48,7 +48,7 @@ public class RepayServiceImpl implements RepayService {
         plan.setAmount(amount);
         plan.setPlanId(UUID.randomUUID().toString().replace("-", ""));
         plan.setPurchaseId(purchaseId);
-        if (repayDate.before(new Date())) {
+        if (repayDate.before(getDate(new Date()))) {
             log.warn("Trying to insert an overdue repay plan, check your code");
             plan.setStatus(RepayPlanStatus.OVERDUE.getStatus());
         } else {
