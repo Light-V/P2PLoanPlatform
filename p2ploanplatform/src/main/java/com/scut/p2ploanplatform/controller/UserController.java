@@ -154,7 +154,7 @@ public class UserController {
             return vo;
         } else if(thirdPartyId.length()!=12) {
             vo.setCode(1);
-            vo.setMsg("错误！第三方账号符合规范。");
+            vo.setMsg("错误！第三方账号不符合规范。");
             return vo;
         } else if(p2pAccountService.verifyIfExists(thirdPartyId))
         {
