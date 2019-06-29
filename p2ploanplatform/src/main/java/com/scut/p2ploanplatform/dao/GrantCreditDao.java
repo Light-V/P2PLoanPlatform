@@ -19,7 +19,7 @@ public interface GrantCreditDao {
     @Insert("INSERT INTO `p2p`.`grant_credit` (`user_id`, `income`, `quota`, `rate`, `expire`) VALUES (#{userId}, #{income}, #{quota}, #{rate}, #{expire})")
     int insertGrantCredit(GrantCredit grantCredit);
 
-    @Update("UPDATE `p2p`.`grant_credit` SET `user_id` = #{userId}, `income` = #{income}, `quota`= #{quota}, `rate` = #{rate}, `expire` = #{expire}")
+    @Update("UPDATE `p2p`.`grant_credit` SET `income` = #{income}, `quota`= #{quota}, `rate` = #{rate}, `expire` = #{expire} WHERE `user_id` = #{userId}")
     int updateGrantCredit(GrantCredit grantCredit);
 
     @Select("SELECT * FROM `p2p`.`grant_credit` WHERE `user_id` = #{userId}")
