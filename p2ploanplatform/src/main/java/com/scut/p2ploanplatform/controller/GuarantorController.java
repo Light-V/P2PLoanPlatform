@@ -208,7 +208,10 @@ public class GuarantorController {
         if (userType != 2) {
             return error(ResultEnum.USER_AUTHORITY_DENY);
         }
+
         try {
+            LoanApplication loanApplication = applicationService.getApplicationById(applicationId);
+            if (loanApplication.getStatus()!=0) return ResultVoUtil.error(ResultEnum.REVIEW_PRIVILEGE_DENY);
             if(applicationService.reviewPass(applicationId, userId)){
                 return ResultVoUtil.success();
             }
@@ -228,6 +231,8 @@ public class GuarantorController {
             return error(ResultEnum.USER_AUTHORITY_DENY);
         }
         try {
+            LoanApplication loanApplication = applicationService.getApplicationById(applicationId);
+            if (loanApplication.getStatus()!=0) return ResultVoUtil.error(ResultEnum.REVIEW_PRIVILEGE_DENY);
             if (applicationService.reviewReject(applicationId, userId)){
                 return ResultVoUtil.success();
             }

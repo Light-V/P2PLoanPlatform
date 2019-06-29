@@ -119,11 +119,10 @@ public interface LoanApplicationDao {
     List<LoanApplication> getApplicationReviewedPassedExpired(Date now);
 
     /**
-     * 查询所有到达认购期限的申请
-     * @param now 当前时间
+     * 查询所有逾期未还款的申请
      * @return 申请的list
      */
-    @Select("SELECT * FROM `loan_application` WHERE purchase_deadline < #{now} FOR UPDATE")
-    List<LoanApplication> getApplicationReviewExpired(Date now);
+    @Select("SELECT * FROM `loan_application` WHERE `status` = 5")
+    List<LoanApplication> getApplicationReviewExpired();
 
 }
