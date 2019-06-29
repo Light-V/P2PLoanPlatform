@@ -3,9 +3,12 @@ package com.scut.p2ploanplatform.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.scut.p2ploanplatform.dao.LoanApplicationDao;
+import com.scut.p2ploanplatform.dto.UserHistory;
 import com.scut.p2ploanplatform.entity.LoanApplication;
+import com.scut.p2ploanplatform.entity.Purchase;
 import com.scut.p2ploanplatform.enums.LoanStatus;
 import com.scut.p2ploanplatform.service.LoanApplicationService;
+import com.scut.p2ploanplatform.service.PurchaseService;
 import com.scut.p2ploanplatform.service.UserService;
 import com.scut.p2ploanplatform.utils.AutoTrigger;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +36,9 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private PurchaseService purchaseService;
 
     @Autowired
     private NoticeServiceImpl noticeService;
@@ -329,5 +335,24 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
             throw new SQLException(e);
         }
         return new PageInfo<>(applicationList);
+    }
+
+    @Override
+    public PageInfo<LoanApplication> getOverdueApplicationById(Integer pageNum, Integer pageSize, String userId) throws SQLException {
+        PageHelper.startPage(pageNum, pageSize);
+        List<LoanApplication> applicationList;
+        try {
+            applicationList = loanApplicationDao.getOverdueApplicationById(userId);
+            applicationList = setUserName(applicationList);
+        }
+        catch (Exception e) {
+            throw new SQLException(e);
+        }
+        return new PageInfo<>(applicationList);
+    }
+
+    @Override
+    public PageInfo<UserHistory> getUserHistory(Integer pageNum, Integer pageSize, String userId) throws SQLException {
+        return null;
     }
 }
