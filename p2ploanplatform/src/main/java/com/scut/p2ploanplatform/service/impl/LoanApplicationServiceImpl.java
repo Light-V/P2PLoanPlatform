@@ -3,6 +3,7 @@ package com.scut.p2ploanplatform.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.scut.p2ploanplatform.dao.LoanApplicationDao;
+import com.scut.p2ploanplatform.dao.PurchaseDao;
 import com.scut.p2ploanplatform.dto.UserHistory;
 import com.scut.p2ploanplatform.entity.LoanApplication;
 import com.scut.p2ploanplatform.entity.Purchase;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -38,7 +40,7 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
     private UserService userService;
 
     @Autowired
-    private PurchaseService purchaseService;
+    private PurchaseDao purchaseDao;
 
     @Autowired
     private NoticeServiceImpl noticeService;
@@ -353,6 +355,30 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
 
     @Override
     public PageInfo<UserHistory> getUserHistory(Integer pageNum, Integer pageSize, String userId) throws SQLException {
-        return null;
+        PageHelper.startPage(pageNum, pageSize);
+        List<UserHistory> userHistoryList;
+        List<Purchase> purchaseList;
+        try {
+            purchaseList = purchaseDao.getPurchaseByBorrowerId(userId);
+            userHistoryList = setUserNameAndConvert(purchaseList);
+        }
+        catch (Exception e){
+            throw new SQLException(e);
+        }
+        return new PageInfo<>(userHistoryList);
+    }
+
+
+    private List<UserHistory> setUserNameAndConvert(List<Purchase> list) throws Exception
+    {
+        ArrayList<UserHistory> userHistoryList = new ArrayList<>();
+        for(Purchase purchase:list){
+            purchase.setBorrowerName(userService.findUser(purchase.getBorrowerId()).getName());
+            purchase.setInvestorName(userService.findUser(purchase.getInvestorId()).getName());
+            purchase.setGuarantorName(userService.findUser(purchase.getGuarantorId()).getName());
+            userHistoryList.add(new UserHistory(purchase));
+        }
+
+        return userHistoryList;
     }
 }
