@@ -22,12 +22,12 @@ public class P2pAccountServiceImpl implements P2pAccountService {
     @Autowired
     private BankAccountDao bankAccountDao;
 
-    private String apiKey;
+    private String apiKey = "f516d5a5-8380-4bd3-92d1-aff612b377a2";
 
     public String generateApiKey()
     {
-        String apiKey=RandomStringUtils.randomAlphanumeric(12);
-        this.apiKey=apiKey;
+//        String apiKey=RandomStringUtils.randomAlphanumeric(12);
+//        this.apiKey=apiKey;
         return apiKey;
     }
 

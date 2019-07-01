@@ -49,18 +49,28 @@ public class RepayExecutionServiceImplTest {
     @Autowired
     private P2pAccountServiceImpl p2pAccountService;
 
+    @Autowired
+    private GuarantorService guarantorService;
+
     private List<Purchase> purchases = new LinkedList<>();
     private List<LoanApplication> applications = new LinkedList<>();
     private List<RepayExecutionResultVo> repayResults = new LinkedList<>();
 
     @Test
     public void doRepayTest() throws Exception {
+        if (p2pAccountService.getApiKey() == null) {
+            p2pAccountService.generateApiKey();
+        }
+        ThirdPartyOperationInterface.setApiKey(p2pAccountService.getApiKey());
+        ThirdPartyOperationInterface.setThirdPartyApiUrl("http://localhost:" + port + "/third_party/");
+
         // inserting simulated users
         assertEquals(1, userService.insertUser("12345", 1, "123456", "13000000000", "440000000000000000", "111111111123", "郑优秀", "滑稽理工大学养猪场"));
-        assertEquals(1, userService.insertUser("12346", 1, "123456", "13000000001", "440000000000000001", "111111111124", "郑成功", "双鸭山大学"));
+        assertEquals(1, guarantorService.insertGuarantor("12346", "123456", "郑成功", "111111111124", 2));
         assertEquals(1, userService.insertUser("12347", 1, "123456", "13000000002", "440000000000000002", "111111111125", "郑龟龟", "滑稽理工大学养猪场"));
         assertEquals(1, userService.insertUser("12348", 1, "123456", "13000000003", "440000000000000003", "111111111126", "郑和", "滑稽理工老年大学"));
-        assertEquals(1, userService.insertUser("12349", 1, "123456", "13000000003", "440000000000000003", "111111111126", "桥本环奈", "立本"));
+        assertEquals(1, guarantorService.insertGuarantor("12349", "123456", "桥本环奈", "111111111126", 2));
+
         assertEquals(1, p2pAccountService.addP2pAccount("111111111123", "123456", BigDecimal.valueOf(1000000, 2), P2pAccountStatusEnum.ACTIVE.getCode(), AccountTypeEnum.NORMAL.getCode()));
         assertEquals(1, p2pAccountService.addP2pAccount("111111111124", "123456", BigDecimal.valueOf(1000000, 2), P2pAccountStatusEnum.ACTIVE.getCode(), AccountTypeEnum.NORMAL.getCode()));
         assertEquals(1, p2pAccountService.addP2pAccount("111111111125", "123456", BigDecimal.valueOf(1000000, 2), P2pAccountStatusEnum.ACTIVE.getCode(), AccountTypeEnum.NORMAL.getCode()));
@@ -127,10 +137,10 @@ public class RepayExecutionServiceImplTest {
         applications.add(application4);
 
         // product subscribe
-        Purchase purchase1 = purchaseService.subscribed("12347", application1.getApplicationId());
-        Purchase purchase2 = purchaseService.subscribed("12347", application2.getApplicationId());
-        Purchase purchase3 = purchaseService.subscribed("12347", application3.getApplicationId());
-        Purchase purchase4 = purchaseService.subscribed("12347", application4.getApplicationId());
+        Purchase purchase1 = purchaseService.subscribed("12347", application1.getApplicationId(), "123456");
+        Purchase purchase2 = purchaseService.subscribed("12347", application2.getApplicationId(), "123456");
+        Purchase purchase3 = purchaseService.subscribed("12347", application3.getApplicationId(), "123456");
+        Purchase purchase4 = purchaseService.subscribed("12347", application4.getApplicationId(), "123456");
         assertNotNull(purchase1);
         assertNotNull(purchase2);
         assertNotNull(purchase3);
@@ -175,11 +185,6 @@ public class RepayExecutionServiceImplTest {
 
         assertEquals(6, repayPlans.size());
 
-        if (p2pAccountService.getApiKey() == null) {
-            p2pAccountService.generateApiKey();
-        }
-        ThirdPartyOperationInterface.setApiKey(p2pAccountService.getApiKey());
-        ThirdPartyOperationInterface.setThirdPartyApiUrl("http://localhost:" + port + "/third_party/");
 
         // ***** DO REPAY HERE *****
         repayResults = repayExecutionService.doRepay();
@@ -249,10 +254,10 @@ public class RepayExecutionServiceImplTest {
     @After
     public void tearDown() throws Exception {
         userService.deleteUser("12345");
-        userService.deleteUser("12346");
+        databaseHelper.deleteGuarantor("12346");
         userService.deleteUser("12347");
         userService.deleteUser("12348");
-        userService.deleteUser("12349");
+        databaseHelper.deleteGuarantor("12349");
         databaseHelper.deleteP2pAccount("111111111123");
         databaseHelper.deleteP2pAccount("111111111124");
         databaseHelper.deleteP2pAccount("111111111125");
@@ -297,5 +302,8 @@ public class RepayExecutionServiceImplTest {
 
         @Delete("DELETE FROM `p2p`.`notice` WHERE `notice_id` = #{value}")
         void deleteNotice(Integer id);
+
+        @Delete("DELETE FROM `p2p`.`guarantor` WHERE `guarantor_id` = #{value}")
+        void deleteGuarantor(String id);
     }
 }
