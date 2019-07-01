@@ -10,6 +10,7 @@ import com.scut.p2ploanplatform.exception.LoanStatusException;
 import com.scut.p2ploanplatform.service.LoanApplicationService;
 import com.scut.p2ploanplatform.service.RepayService;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -20,7 +21,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.xml.crypto.Data;
+import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.util.Calendar;
 import java.util.Comparator;
 import java.util.List;
 
@@ -40,14 +43,27 @@ public class PurchaseServiceImplTest {
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();
 
+    private LoanApplication application = new LoanApplication();
+    private String investorId = "201603000000";
+
+    @Before
+    public void newApplication() throws Exception{
+        application.setBorrowerId("201601000000");
+        application.setTitle("测试");
+        application.setStatus(LoanStatus.UNREVIEWED.getStatus());
+        application.setAmount(new BigDecimal(1000000));
+        application.setInterestRate(new BigDecimal(0.0618));
+        application.setLoanMonth(6);
+        application.setPurchaseDeadline(Calendar.getInstance().getTime());
+        applicationService.reviewPass(application.getApplicationId(), "201602000000");
+    }
+
     @Test
-    @Transactional
+//    @Transactional
     public void subscribed_success() {
-        String investorId  ="201630419704";
-        Integer applicationId = 61;
+        Integer applicationId = application.getApplicationId();
         Purchase purchase=null;
         LoanApplication application = null;
-
         try{
             purchase = purchaseService.subscribed(investorId, applicationId);
             application = applicationService.getApplicationById(applicationId);
@@ -66,8 +82,9 @@ public class PurchaseServiceImplTest {
     @Test
     @Transactional
     public void subscribed_fail() throws SQLException, LoanStatusException {
-        String investorId  ="201630419704";
-        Integer applicationId = 26;
+//        String investorId  ="201630419704";
+        applicationService.expire(application.getApplicationId());
+        Integer applicationId = application.getApplicationId();
         expectedEx.expect(LoanStatusException.class);
         expectedEx.expectMessage("借款申请未发布");
         purchaseService.subscribed(investorId, applicationId);
@@ -76,7 +93,7 @@ public class PurchaseServiceImplTest {
     @Test
     @Transactional
     public void purchaseOverdue() {
-        String investorId  ="201630419704";
+//        String investorId  ="201630419704";
         Integer applicationId = 61;
         Purchase purchase=null;
         Boolean result = false;
@@ -95,7 +112,7 @@ public class PurchaseServiceImplTest {
     @Test
     @Transactional
     public void showAllPurchase() {
-        String investorId  ="201630419704";
+//        String investorId  ="201630419704";
         PageInfo<Purchase> purchasePageInfo =null;
         try{
             purchaseService.subscribed(investorId, 51);
@@ -126,7 +143,7 @@ public class PurchaseServiceImplTest {
     @Test
     @Transactional
     public void showPurchaseByBorrowerId() {
-        String investorId  ="201630419704";
+//        String investorId  ="201630419704";
         PageInfo<Purchase> purchasePageInfo =null;
         try{
             purchaseService.subscribed(investorId, 51);
@@ -151,7 +168,7 @@ public class PurchaseServiceImplTest {
     @Test
     @Transactional
     public void showPurchaseByInvestorId() {
-        String investorId  ="201630419704";
+//        String investorId  ="201630419704";
         PageInfo<Purchase> purchasePageInfo =null;
         try{
             purchaseService.subscribed(investorId, 51);
@@ -176,7 +193,7 @@ public class PurchaseServiceImplTest {
     @Test
     @Transactional
     public void accomplishPurchase() {
-        String investorId  ="201630419704";
+//        String investorId  ="201630419704";
         Integer applicationId = 61;
         Purchase purchase=null;
         Boolean result = false;

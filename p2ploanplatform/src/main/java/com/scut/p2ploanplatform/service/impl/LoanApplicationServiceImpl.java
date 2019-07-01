@@ -8,6 +8,8 @@ import com.scut.p2ploanplatform.dto.UserHistory;
 import com.scut.p2ploanplatform.entity.LoanApplication;
 import com.scut.p2ploanplatform.entity.Purchase;
 import com.scut.p2ploanplatform.enums.LoanStatus;
+import com.scut.p2ploanplatform.enums.ResultEnum;
+import com.scut.p2ploanplatform.exception.LoanStatusException;
 import com.scut.p2ploanplatform.service.LoanApplicationService;
 import com.scut.p2ploanplatform.service.PurchaseService;
 import com.scut.p2ploanplatform.service.UserService;
@@ -62,20 +64,35 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
 
     @Override
     public Boolean reviewPass(Integer id, String guarantorId) throws SQLException, IllegalArgumentException {
-        LoanStatus loanStatus = LoanStatus.REVIEWED_PASSED;
-        return changeStatusById(id,guarantorId, loanStatus);
+        LoanApplication application = getApplicationById(id);
+        if(application.getStatus().equals(LoanStatus.UNREVIEWED.getStatus())){
+            LoanStatus loanStatus = LoanStatus.REVIEWED_PASSED;
+            return changeStatusById(id,guarantorId, loanStatus);
+        }else {
+            throw new LoanStatusException(ResultEnum.ILLEGAL_OPERATION);
+        }
     }
 
     @Override
     public Boolean reviewReject(Integer id, String guarantorId) throws SQLException, IllegalArgumentException {
-        LoanStatus loanStatus = LoanStatus.REVIEWED_REJECTED;
-        return changeStatusById(id, guarantorId, loanStatus);
+        LoanApplication application = getApplicationById(id);
+        if(application.getStatus().equals(LoanStatus.UNREVIEWED.getStatus())){
+            LoanStatus loanStatus = LoanStatus.REVIEWED_REJECTED;
+            return changeStatusById(id, guarantorId, loanStatus);
+        }else {
+            throw new LoanStatusException(ResultEnum.ILLEGAL_OPERATION);
+        }
     }
 
     @Override
     public Boolean subscribe(Integer id) throws SQLException, IllegalArgumentException {
-        LoanStatus loanStatus = LoanStatus.SUBSCRIBED;
-        return changeStatusById(id,loanStatus);
+        LoanApplication application = getApplicationById(id);
+        if(application.getStatus().equals(LoanStatus.REVIEWED_PASSED.getStatus())){
+            LoanStatus loanStatus = LoanStatus.SUBSCRIBED;
+            return changeStatusById(id,loanStatus);
+        }else {
+            throw new LoanStatusException(ResultEnum.APPLICATION_NOT_PASS_REVIEWED);
+        }
     }
 
     @Override

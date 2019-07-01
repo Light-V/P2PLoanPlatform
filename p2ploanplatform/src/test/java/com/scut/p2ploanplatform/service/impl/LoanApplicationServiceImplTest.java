@@ -36,8 +36,7 @@ public class LoanApplicationServiceImplTest {
 
     @Before
     public void newApplication(){
-        application.setBorrowerId("201630664195");
-//        application.setGuarantorId("201630219652");
+        application.setBorrowerId("201601000000");
         application.setTitle("撒娇打滚求借钱");
         application.setStatus(LoanStatus.UNREVIEWED.getStatus());
         application.setAmount(new BigDecimal(1000000));
@@ -63,7 +62,7 @@ public class LoanApplicationServiceImplTest {
     @Transactional
     public void reviewPass() {
         Boolean result;
-        String guarantorId = "201623016845";
+        String guarantorId = "201602000000";
         try{
             applicationService.addApplication(application);
         }catch (Exception e){
