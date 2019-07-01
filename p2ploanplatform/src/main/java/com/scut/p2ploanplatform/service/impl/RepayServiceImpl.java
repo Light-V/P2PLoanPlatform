@@ -110,4 +110,18 @@ public class RepayServiceImpl implements RepayService {
         }
     }
 
+    @Override
+    public Boolean isRepayCompleted(Integer purchaseId) throws SQLException, IllegalArgumentException {
+        List<RepayPlan> repayPlans = findPlanByPurchaseId(purchaseId);
+        if (repayPlans.size() == 0)
+            return null;
+        boolean completed = true;
+
+        for (RepayPlan plan : repayPlans) {
+            completed = completed && (plan.getStatus() == RepayPlanStatus.SUCCEEDED.getStatus() ||
+                    plan.getStatus() == RepayPlanStatus.OVERDUE_SUCCEEDED.getStatus());
+        }
+
+        return completed;
+    }
 }

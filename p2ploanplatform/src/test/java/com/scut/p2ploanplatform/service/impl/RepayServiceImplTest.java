@@ -1,11 +1,8 @@
 package com.scut.p2ploanplatform.service.impl;
 
-import com.scut.p2ploanplatform.entity.LoanApplication;
-import com.scut.p2ploanplatform.entity.Purchase;
 import com.scut.p2ploanplatform.entity.RepayPlan;
-import com.scut.p2ploanplatform.enums.LoanStatus;
 import com.scut.p2ploanplatform.enums.RepayPlanStatus;
-import com.scut.p2ploanplatform.service.*;
+import com.scut.p2ploanplatform.service.RepayService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.lang.reflect.Field;
 import java.math.BigDecimal;
-import java.sql.SQLException;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -154,13 +148,16 @@ public class RepayServiceImplTest {
         }
     }
 
-    @Autowired
-    private PurchaseService purchaseService;
+    @Test
+    @Transactional
+    public void isRepayCompletedTest() throws Exception {
+        assertNull(repayService.isRepayCompleted(98123791));
+        RepayPlan plan1 = repayService.insertPlan(12345, new Date(new Date().getTime() + 86400000), BigDecimal.valueOf(12345.67));
+        assertFalse(repayService.isRepayCompleted(12345));
 
-    @Autowired
-    private LoanApplicationService loanApplicationService;
-
-    @Autowired
-    private UserService userService;
-
+        RepayPlan plan2 = repayService.insertPlan(12345, new Date(new Date().getTime() - 86400000), BigDecimal.valueOf(12345.67));
+        repayService.updateRepayPlan(plan1.getPlanId(), RepayPlanStatus.SUCCEEDED, new Date());
+        repayService.updateRepayPlan(plan2.getPlanId(), RepayPlanStatus.OVERDUE_SUCCEEDED, new Date());
+        assertTrue(repayService.isRepayCompleted(12345));
+    }
 }
