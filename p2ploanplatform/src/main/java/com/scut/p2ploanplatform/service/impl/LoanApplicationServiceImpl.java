@@ -16,6 +16,7 @@ import com.scut.p2ploanplatform.service.PurchaseService;
 import com.scut.p2ploanplatform.service.UserService;
 import com.scut.p2ploanplatform.utils.AutoTrigger;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -188,6 +189,8 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
         try {
             applicationList = loanApplicationDao.getApplicationByBorrowerId(borrowerId);
             applicationList =setUserName(applicationList);
+            applicationList.sort(Comparator.comparing(LoanApplication::getUpdateTime));
+            Collections.reverse(applicationList);
         }
         catch (Exception e) {
             throw new SQLException(e);
@@ -205,6 +208,8 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
         try {
             applicationList = loanApplicationDao.getApplicationByGuarantorId(guarantorId);
             applicationList =setUserName(applicationList);
+            applicationList.sort(Comparator.comparing(LoanApplication::getUpdateTime));
+            Collections.reverse(applicationList);
         }
         catch (Exception e) {
             throw new SQLException(e);
@@ -233,6 +238,8 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
         try {
             applicationList = loanApplicationDao.getApplicationByBorrowerIdAndStatus(borrowerId,status);
             applicationList =setUserName(applicationList);
+            applicationList.sort(Comparator.comparing(LoanApplication::getUpdateTime));
+            Collections.reverse(applicationList);
         }
         catch (Exception e) {
             throw new SQLException(e);
@@ -261,6 +268,8 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
         try {
             applicationList = loanApplicationDao.getApplicationByGuarantorIdAndStatus(guarantorId, status);
             applicationList =setUserName(applicationList);
+            applicationList.sort(Comparator.comparing(LoanApplication::getUpdateTime));
+            Collections.reverse(applicationList);
         }
         catch (Exception e) {
             throw new SQLException(e);
@@ -275,6 +284,8 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
         try {
             applicationList = loanApplicationDao.getApplicationReviewedPassed();
             applicationList = setUserName(applicationList);
+            applicationList.sort(Comparator.comparing(LoanApplication::getUpdateTime));
+            Collections.reverse(applicationList);
         }
         catch (Exception e) {
             throw new SQLException(e);
@@ -289,6 +300,8 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
         try {
             applicationList = loanApplicationDao.getApplicationUnReviewed();
             applicationList =setUserName(applicationList);
+            applicationList.sort(Comparator.comparing(LoanApplication::getUpdateTime));
+            Collections.reverse(applicationList);
         }
         catch (Exception e) {
             throw new SQLException(e);
@@ -330,6 +343,8 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
         try {
             applicationList = loanApplicationDao.getApplicationReviewedRejected();
             applicationList = setUserName(applicationList);
+            applicationList.sort(Comparator.comparing(LoanApplication::getUpdateTime));
+            Collections.reverse(applicationList);
         }
         catch (Exception e) {
             throw new SQLException(e);
@@ -363,6 +378,8 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
         try {
             applicationList = loanApplicationDao.getOverdueApplicationById(userId);
             applicationList = setUserName(applicationList);
+            applicationList.sort(Comparator.comparing(LoanApplication::getUpdateTime));
+            Collections.reverse(applicationList);
         }
         catch (Exception e) {
             throw new SQLException(e);
@@ -377,12 +394,16 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
         List<Purchase> purchaseList;
         try {
             purchaseList = purchaseDao.getPurchaseByBorrowerId(userId);
+            PageInfo purchasePageInfo = new PageInfo<>(purchaseList);
+            PageInfo<UserHistory> userHistoryPageInfo = new PageInfo<>();
+            BeanUtils.copyProperties(purchasePageInfo, userHistoryPageInfo);
             userHistoryList = setUserNameAndConvert(purchaseList);
+            userHistoryPageInfo.setList(userHistoryList);
+            return userHistoryPageInfo;
         }
         catch (Exception e){
             throw new SQLException(e);
         }
-        return new PageInfo<>(userHistoryList);
     }
 
 

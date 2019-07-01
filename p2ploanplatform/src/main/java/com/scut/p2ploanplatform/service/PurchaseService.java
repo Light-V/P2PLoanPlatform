@@ -19,7 +19,7 @@ public interface PurchaseService {
      * @param applicationId 投资人投资的借款申请Id
      * @return 操作状态（成功/失败)
      */
-    Purchase subscribed(String investorId, Integer applicationId) throws SQLException,IllegalArgumentException, LoanStatusException;
+    Purchase subscribed(String investorId, Integer applicationId, String password) throws Exception;
 
     /**
      * 订单逾期（修改订单状态）

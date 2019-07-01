@@ -26,15 +26,16 @@ public class PurchaseController {
     @RequestMapping("/subscribe")
     @PostMapping
     public ResultVo subscribe(@RequestParam(value = "application_id") Integer applicationId,
+                              @RequestParam(value = "payment_password") String password,
                               @SessionAttribute(value = "user") String userId){
         try{
-            purchaseService.subscribed(userId, applicationId);
+            purchaseService.subscribed(userId, applicationId,password);
         }catch (IllegalArgumentException e){
             return ResultVoUtil.error(ResultEnum.PARAM_IS_INVALID.getCode(), e.getMessage());
         }catch (LoanStatusException e){
             return ResultVoUtil.error(ResultEnum.APPLICATION_NOT_PASS_REVIEWED);
-        }catch (SQLException e){
-            return ResultVoUtil.error(ResultEnum.UNHANDLED_EXCEPTION);
+        }catch (Exception e){
+            return ResultVoUtil.error(ResultEnum.ILLEGAL_OPERATION.getCode(),e.getMessage());
         }
         return ResultVoUtil.success();
     }

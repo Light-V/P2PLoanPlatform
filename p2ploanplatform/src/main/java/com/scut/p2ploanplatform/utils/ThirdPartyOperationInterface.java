@@ -79,4 +79,28 @@ public class ThirdPartyOperationInterface {
             return result;
         }
     }
+
+    public static ResultVo purchase(String payerId, String payeeId, BigDecimal amount, String paymentPassword)throws Exception{
+        String url = THIRD_PARTY_API_URL + "purchase";
+        List<NameValuePair> queryParams = new LinkedList<>();
+        queryParams.add(new BasicNameValuePair("payer_id", payerId));
+        queryParams.add(new BasicNameValuePair("payee_id", payeeId));
+        queryParams.add(new BasicNameValuePair("amount", amount.toString()));
+        queryParams.add(new BasicNameValuePair("payment_password", paymentPassword));
+        queryParams.add(new BasicNameValuePair("api_key", API_KEY));
+        queryParams.add(new BasicNameValuePair("signature", computeThirdPartyParamSign(payerId + payeeId + amount.toString() + API_KEY)));
+
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        URI uri = new URIBuilder(url).addParameters(queryParams).build();
+
+        HttpPut httpPut = new HttpPut(uri);
+        try (CloseableHttpResponse httpResponse = httpClient.execute(httpPut)) {
+            HttpEntity entity = httpResponse.getEntity();
+            String content = EntityUtils.toString(entity);
+            ObjectMapper objectMapper = new ObjectMapper();
+            ResultVo result = objectMapper.readValue(content, ResultVo.class);
+            log.info(content);
+            return result;
+        }
+    }
 }

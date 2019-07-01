@@ -366,11 +366,21 @@ public class LoanApplicationServiceImplTest {
 //                fail();
 //            }
 //        }
+        applicationService.reviewPass(1, "201602000000");
+        sleep(500);
+        applicationService.reviewPass(3, "201602000000");
+        sleep(500);
         applicationService.reviewPass(5, "201602000000");
-        sleep(5);
+        sleep(500);
+        applicationService.reviewReject(8, "201602000000");
+        sleep(500);
+        applicationService.reviewReject(6, "201602000000");
+        sleep(500);
+        applicationService.reviewReject(4, "201602000000");
+        sleep(500);
         PageInfo<LoanApplication> applicationPageInfo = null;
         try{
-            applicationPageInfo= applicationService.getAllApplication(3,10);
+            applicationPageInfo= applicationService.getAllApplication(1,10);
         }catch (Exception e){
             e.printStackTrace();
             fail();

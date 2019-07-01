@@ -12,6 +12,8 @@ import com.scut.p2ploanplatform.enums.ResultEnum;
 import com.scut.p2ploanplatform.exception.CustomException;
 import com.scut.p2ploanplatform.exception.LoanStatusException;
 import com.scut.p2ploanplatform.service.*;
+import com.scut.p2ploanplatform.utils.ThirdPartyOperationInterface;
+import com.scut.p2ploanplatform.vo.ResultVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,7 +55,7 @@ public class PurchaseServiceImpl implements PurchaseService {
 
     @Override
     @Transactional
-    public Purchase subscribed(String investorId, Integer applicationId) throws SQLException, IllegalArgumentException, LoanStatusException {
+    public Purchase subscribed(String investorId, Integer applicationId,String password) throws Exception{
         //获取借款申请信息
         LoanApplication application = applicationService.getApplicationById(applicationId);
 
@@ -70,8 +72,11 @@ public class PurchaseServiceImpl implements PurchaseService {
         User investor = userService.findUser(investorId);
 
         //执行转账
-        if(!p2pAccountService.transfer(investor.getThirdPartyId(),borrower.getThirdPartyId(), application.getAmount())){
-            throw new CustomException("操作失败：账号余额不足", ResultEnum.ILLEGAL_OPERATION.getCode());
+        ResultVo purchaseResult;
+        purchaseResult = ThirdPartyOperationInterface.purchase(investor.getThirdPartyId(),
+                borrower.getThirdPartyId(),application.getAmount(),password);
+        if (purchaseResult.getCode()==1){
+            throw new RuntimeException(purchaseResult.getMsg());
         }
 
         //更新数据库中的订单和还款计划表单
@@ -147,7 +152,7 @@ public class PurchaseServiceImpl implements PurchaseService {
             purchase.setRepayPlans(repayPlans);
             purchase.setBorrowerName(userService.findUser(purchase.getBorrowerId()).getName());
             purchase.setInvestorName(userService.findUser(purchase.getInvestorId()).getName());
-            purchase.setGuarantorName(userService.findUser(purchase.getGuarantorId()).getName());
+            purchase.setGuarantorName(guarantorService.findGuarantor(purchase.getGuarantorId()).getName());
         }
         catch (Exception e){
             throw new SQLException(e);
