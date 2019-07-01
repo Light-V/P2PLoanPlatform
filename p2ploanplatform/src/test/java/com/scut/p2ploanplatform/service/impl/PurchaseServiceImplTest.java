@@ -65,7 +65,7 @@ public class PurchaseServiceImplTest {
         Purchase purchase=null;
         LoanApplication application = null;
         try{
-            purchase = purchaseService.subscribed(investorId, applicationId);
+            purchase = purchaseService.subscribed(investorId, applicationId,"123456");
             application = applicationService.getApplicationById(applicationId);
         }catch (Exception e){
             e.printStackTrace();
@@ -81,13 +81,13 @@ public class PurchaseServiceImplTest {
 
     @Test
     @Transactional
-    public void subscribed_fail() throws SQLException, LoanStatusException {
+    public void subscribed_fail() throws Exception{
 //        String investorId  ="201630419704";
         applicationService.expire(application.getApplicationId());
         Integer applicationId = application.getApplicationId();
         expectedEx.expect(LoanStatusException.class);
         expectedEx.expectMessage("借款申请未发布");
-        purchaseService.subscribed(investorId, applicationId);
+        purchaseService.subscribed(investorId, applicationId,"123456");
     }
 
     @Test
@@ -98,7 +98,7 @@ public class PurchaseServiceImplTest {
         Purchase purchase=null;
         Boolean result = false;
         try{
-            purchase = purchaseService.subscribed(investorId, applicationId);
+            purchase = purchaseService.subscribed(investorId, applicationId,"123456");
             result = purchaseService.purchaseOverdue(purchase.getPurchaseId());
             purchase = purchaseService.showPurchaseById(purchase.getPurchaseId());
         }catch (Exception e){
@@ -115,9 +115,9 @@ public class PurchaseServiceImplTest {
 //        String investorId  ="201630419704";
         PageInfo<Purchase> purchasePageInfo =null;
         try{
-            purchaseService.subscribed(investorId, 51);
-            purchaseService.subscribed(investorId, 61);
-            purchaseService.subscribed(investorId, 72);
+            purchaseService.subscribed(investorId, 51,"123456");
+            purchaseService.subscribed(investorId, 61,"123456");
+            purchaseService.subscribed(investorId, 72,"123456");
         }catch (Exception e){
             e.printStackTrace();
             fail();
@@ -146,9 +146,9 @@ public class PurchaseServiceImplTest {
 //        String investorId  ="201630419704";
         PageInfo<Purchase> purchasePageInfo =null;
         try{
-            purchaseService.subscribed(investorId, 51);
-            purchaseService.subscribed(investorId, 61);
-            purchaseService.subscribed(investorId, 72);
+            purchaseService.subscribed(investorId, 51,"123456");
+            purchaseService.subscribed(investorId, 61,"123456");
+            purchaseService.subscribed(investorId, 72,"123456");
         }catch (Exception e){
             e.printStackTrace();
             fail();
@@ -171,9 +171,9 @@ public class PurchaseServiceImplTest {
 //        String investorId  ="201630419704";
         PageInfo<Purchase> purchasePageInfo =null;
         try{
-            purchaseService.subscribed(investorId, 51);
-            purchaseService.subscribed(investorId, 61);
-            purchaseService.subscribed(investorId, 72);
+            purchaseService.subscribed(investorId, 51,"123456");
+            purchaseService.subscribed(investorId, 61,"123456");
+            purchaseService.subscribed(investorId, 72,"123456");
         }catch (Exception e){
             e.printStackTrace();
             fail();
@@ -198,7 +198,7 @@ public class PurchaseServiceImplTest {
         Purchase purchase=null;
         Boolean result = false;
         try{
-            purchase = purchaseService.subscribed(investorId, applicationId);
+            purchase = purchaseService.subscribed(investorId, applicationId,"123456");
             result = purchaseService.accomplishPurchase(purchase.getPurchaseId());
             purchase = purchaseService.showPurchaseById(purchase.getPurchaseId());
         }catch (Exception e){
