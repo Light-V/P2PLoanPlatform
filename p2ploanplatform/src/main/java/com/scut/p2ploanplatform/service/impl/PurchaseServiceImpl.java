@@ -35,17 +35,20 @@ public class PurchaseServiceImpl implements PurchaseService {
     private final RepayService repayService;
     private final P2pAccountService p2pAccountService;
     private final NoticeService noticeService;
+    private final GuarantorService guarantorService;
 
     @Autowired
     public PurchaseServiceImpl(PurchaseDao purchaseDao, UserService userService,
                                LoanApplicationService applicationService, RepayService repayService,
-                               P2pAccountService p2pAccountService, NoticeService noticeService) {
+                               P2pAccountService p2pAccountService, NoticeService noticeService,
+                               GuarantorService guarantorService) {
         this.purchaseDao = purchaseDao;
         this.userService = userService;
         this.applicationService = applicationService;
         this.repayService = repayService;
         this.p2pAccountService = p2pAccountService;
         this.noticeService = noticeService;
+        this.guarantorService = guarantorService;
     }
 
     @Override
@@ -98,14 +101,16 @@ public class PurchaseServiceImpl implements PurchaseService {
     protected void setRepayPlan(Purchase purchase)throws SQLException{
         Date nextRepayDate = purchase.getPurchaseTime();
         Integer months = purchase.getLoanMonth();
-        BigDecimal totalAmount = purchase.getAmount();
-        BigDecimal perAmout = totalAmount.divide(new BigDecimal(months),8,BigDecimal.ROUND_HALF_UP);
+        BigDecimal amount = purchase.getAmount();
+        BigDecimal interestRate = purchase.getInterestRate();
+        BigDecimal interest = amount.multiply(interestRate);
+        BigDecimal perAmount = amount.divide(new BigDecimal(months),8,BigDecimal.ROUND_HALF_UP).add(interest);
         for(int i = 0;i<months;i++){
             Calendar nextRepay = Calendar.getInstance();
             nextRepay.setTime(nextRepayDate);
             nextRepay.add(Calendar.MONTH, 1);
             nextRepayDate = nextRepay.getTime();
-            repayService.insertPlan(purchase.getPurchaseId(),nextRepayDate,perAmout);
+            repayService.insertPlan(purchase.getPurchaseId(),nextRepayDate,perAmount);
         }
     }
 
@@ -134,7 +139,7 @@ public class PurchaseServiceImpl implements PurchaseService {
 
     @Override
     public Purchase showPurchaseById(Integer purchaseId) throws SQLException, IllegalArgumentException {
-        Purchase purchase = null;
+        Purchase purchase;
         try{
             purchase = purchaseDao.getPurchaseByPurchaseId(purchaseId);
             List<RepayPlan> repayPlans = repayService.findPlanByPurchaseId(purchaseId);
@@ -225,7 +230,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         for(Purchase purchase:list){
             purchase.setBorrowerName(userService.findUser(purchase.getBorrowerId()).getName());
             purchase.setInvestorName(userService.findUser(purchase.getInvestorId()).getName());
-            purchase.setGuarantorName(userService.findUser(purchase.getGuarantorId()).getName());
+            purchase.setGuarantorName(guarantorService.findGuarantor(purchase.getGuarantorId()).getName());
         }
         return list;
     }

@@ -7,6 +7,7 @@ import com.scut.p2ploanplatform.dao.PurchaseDao;
 import com.scut.p2ploanplatform.dto.UserHistory;
 import com.scut.p2ploanplatform.entity.LoanApplication;
 import com.scut.p2ploanplatform.entity.Purchase;
+import com.scut.p2ploanplatform.entity.RepayPlan;
 import com.scut.p2ploanplatform.enums.LoanStatus;
 import com.scut.p2ploanplatform.enums.ResultEnum;
 import com.scut.p2ploanplatform.exception.LoanStatusException;
@@ -21,10 +22,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author FatCat
@@ -172,6 +170,8 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
         try {
             applicationList = loanApplicationDao.getAllApplication();
             applicationList =setUserName(applicationList);
+            applicationList.sort(Comparator.comparing(LoanApplication::getUpdateTime));
+            Collections.reverse(applicationList);
         }
         catch (Exception e) {
             throw new SQLException(e);
