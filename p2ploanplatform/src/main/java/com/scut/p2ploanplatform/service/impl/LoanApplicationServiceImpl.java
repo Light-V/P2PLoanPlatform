@@ -390,9 +390,6 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
     {
         ArrayList<UserHistory> userHistoryList = new ArrayList<>();
         for(Purchase purchase:list){
-            purchase.setBorrowerName(userService.findUser(purchase.getBorrowerId()).getName());
-            purchase.setInvestorName(userService.findUser(purchase.getInvestorId()).getName());
-            purchase.setGuarantorName(userService.findUser(purchase.getGuarantorId()).getName());
             userHistoryList.add(new UserHistory(purchase));
         }
 
