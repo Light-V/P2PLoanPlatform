@@ -55,6 +55,7 @@ public class PurchaseServiceImplTest {
         application.setInterestRate(new BigDecimal(0.0618));
         application.setLoanMonth(6);
         application.setPurchaseDeadline(Calendar.getInstance().getTime());
+        applicationService.addApplication(application);
         applicationService.reviewPass(application.getApplicationId(), "201602000000");
     }
 
@@ -81,7 +82,7 @@ public class PurchaseServiceImplTest {
 
     @Test
     @Transactional
-    public void subscribed_fail() throws SQLException, LoanStatusException {
+    public void subscribed_fail() throws Exception{
 //        String investorId  ="201630419704";
         applicationService.expire(application.getApplicationId());
         Integer applicationId = application.getApplicationId();

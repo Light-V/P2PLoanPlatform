@@ -26,10 +26,9 @@ public class PurchaseController {
     @RequestMapping("/subscribe")
     @PostMapping
     public ResultVo subscribe(@RequestParam(value = "application_id") Integer applicationId,
-                              @RequestParam(value = "payment_password") String password,
                               @SessionAttribute(value = "user") String userId){
         try{
-            purchaseService.subscribed(userId, applicationId,password);
+            purchaseService.subscribed(userId, applicationId);
         }catch (IllegalArgumentException e){
             return ResultVoUtil.error(ResultEnum.PARAM_IS_INVALID.getCode(), e.getMessage());
         }catch (LoanStatusException e){

@@ -35,7 +35,6 @@ public class PurchaseServiceImpl implements PurchaseService {
     private final UserService userService;
     private final LoanApplicationService applicationService;
     private final RepayService repayService;
-    private final P2pAccountService p2pAccountService;
     private final NoticeService noticeService;
     private final GuarantorService guarantorService;
 
@@ -48,14 +47,13 @@ public class PurchaseServiceImpl implements PurchaseService {
         this.userService = userService;
         this.applicationService = applicationService;
         this.repayService = repayService;
-        this.p2pAccountService = p2pAccountService;
         this.noticeService = noticeService;
         this.guarantorService = guarantorService;
     }
 
     @Override
     @Transactional
-    public Purchase subscribed(String investorId, Integer applicationId,String password) throws Exception{
+    public Purchase subscribed(String investorId, Integer applicationId) throws Exception{
         //获取借款申请信息
         LoanApplication application = applicationService.getApplicationById(applicationId);
 
@@ -73,8 +71,8 @@ public class PurchaseServiceImpl implements PurchaseService {
 
         //执行转账
         ResultVo purchaseResult;
-        purchaseResult = ThirdPartyOperationInterface.purchase(investor.getThirdPartyId(),
-                borrower.getThirdPartyId(),application.getAmount(),password);
+        purchaseResult = ThirdPartyOperationInterface.transfer(investor.getThirdPartyId(),
+                borrower.getThirdPartyId(),application.getAmount());
         if (purchaseResult.getCode()==1){
             throw new RuntimeException(purchaseResult.getMsg());
         }
@@ -120,7 +118,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
-    public Boolean purchaseOverdue(Integer purchaseId) throws SQLException, IllegalArgumentException {
+    public Boolean purchaseOverdue(Integer purchaseId) throws IllegalArgumentException {
         if(purchaseDao.updatePurchaseStatus(purchaseId,LoanStatus.OVERDUE.getStatus())){
             return true;
         }else {
