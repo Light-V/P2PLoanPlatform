@@ -17,16 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.stereotype.Repository;
-import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.context.transaction.TestTransaction;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -55,8 +49,9 @@ public class RepayExecutionServiceImplTest {
     @Autowired
     private P2pAccountServiceImpl p2pAccountService;
 
-    private Purchase purchase;
-    private LoanApplication application;
+    private List<Purchase> purchases = new LinkedList<>();
+    private List<LoanApplication> applications = new LinkedList<>();
+    private List<RepayExecutionResultVo> repayResults = new LinkedList<>();
 
     @Test
     public void doRepayTest() throws Exception {
@@ -64,77 +59,188 @@ public class RepayExecutionServiceImplTest {
         assertEquals(1, userService.insertUser("12345", 1, "123456", "13000000000", "440000000000000000", "111111111123", "郑优秀", "滑稽理工大学养猪场"));
         assertEquals(1, userService.insertUser("12346", 1, "123456", "13000000001", "440000000000000001", "111111111124", "郑成功", "双鸭山大学"));
         assertEquals(1, userService.insertUser("12347", 1, "123456", "13000000002", "440000000000000002", "111111111125", "郑龟龟", "滑稽理工大学养猪场"));
+        assertEquals(1, userService.insertUser("12348", 1, "123456", "13000000003", "440000000000000003", "111111111126", "郑和", "滑稽理工老年大学"));
+        assertEquals(1, userService.insertUser("12349", 1, "123456", "13000000003", "440000000000000003", "111111111126", "桥本环奈", "立本"));
         assertEquals(1, p2pAccountService.addP2pAccount("111111111123", "123456", BigDecimal.valueOf(1000000, 2), P2pAccountStatusEnum.ACTIVE.getCode(), AccountTypeEnum.NORMAL.getCode()));
         assertEquals(1, p2pAccountService.addP2pAccount("111111111124", "123456", BigDecimal.valueOf(1000000, 2), P2pAccountStatusEnum.ACTIVE.getCode(), AccountTypeEnum.NORMAL.getCode()));
         assertEquals(1, p2pAccountService.addP2pAccount("111111111125", "123456", BigDecimal.valueOf(1000000, 2), P2pAccountStatusEnum.ACTIVE.getCode(), AccountTypeEnum.NORMAL.getCode()));
+        assertEquals(1, p2pAccountService.addP2pAccount("111111111126", "123456", BigDecimal.ONE, P2pAccountStatusEnum.ACTIVE.getCode(), AccountTypeEnum.NORMAL.getCode()));
         databaseHelper.cleanRepayPlanTable();
 
         // fill loan application
-        application = new LoanApplication();
-        application.setAmount(BigDecimal.valueOf(1234.56));
-        application.setBorrowerId("12345");
-        application.setInterestRate(BigDecimal.valueOf(0.1234));
-        application.setLoanMonth(12);
-        application.setPurchaseDeadline(new Date(new Date().getTime() + 86400000));
-        application.setTitle("在这无情的社会，只有金钱还有点温度");
-        application.setStatus(0);
-        assertTrue(loanApplicationService.addApplication(application));
-        assertTrue(loanApplicationService.reviewPass(application.getApplicationId(), "12346"));
+        // 正常: 贷款人 -> 投资者
+        LoanApplication application1 = new LoanApplication();
+        // 贷款人划扣失败，由担保人划扣：担保人 -> 投资者
+        LoanApplication application2 = new LoanApplication();
+        // 担保人预垫付： 贷款人 -> 担保人
+        LoanApplication application3 = new LoanApplication();
+        // 谁都没钱，投资者难受的一匹
+        LoanApplication application4 = new LoanApplication();
+        application1.setAmount(BigDecimal.valueOf(1234.56));
+        application2.setAmount(BigDecimal.valueOf(0.12));
+        application3.setAmount(BigDecimal.valueOf(1234.56));
+        application4.setAmount(BigDecimal.valueOf(1.23));
+
+        application1.setBorrowerId("12345");
+        application2.setBorrowerId("12348");
+        application3.setBorrowerId("12345");
+        application4.setBorrowerId("12348");
+
+        application1.setInterestRate(BigDecimal.valueOf(0.1234));
+        application2.setInterestRate(BigDecimal.valueOf(0.1234));
+        application3.setInterestRate(BigDecimal.valueOf(0.1234));
+        application4.setInterestRate(BigDecimal.valueOf(0.1234));
+
+        application1.setLoanMonth(12);
+        application2.setLoanMonth(1);
+        application3.setLoanMonth(2);
+        application4.setLoanMonth(6);
+
+        application1.setPurchaseDeadline(new Date(new Date().getTime() + 86400000));
+        application2.setPurchaseDeadline(new Date(new Date().getTime() + 86400000));
+        application3.setPurchaseDeadline(new Date(new Date().getTime() + 86400000));
+        application4.setPurchaseDeadline(new Date(new Date().getTime() + 86400000));
+
+        application1.setTitle("在这无情的社会，只有金钱还有点温度");
+        application2.setTitle("没钱也快活");
+        application3.setTitle("我很可爱，给我打钱");
+        application4.setTitle("打工是不可能打工的");
+
+        application1.setStatus(0);
+        application2.setStatus(0);
+        application3.setStatus(0);
+        application4.setStatus(0);
+
+        assertTrue(loanApplicationService.addApplication(application1));
+        assertTrue(loanApplicationService.addApplication(application2));
+        assertTrue(loanApplicationService.addApplication(application3));
+        assertTrue(loanApplicationService.addApplication(application4));
+
+        assertTrue(loanApplicationService.reviewPass(application1.getApplicationId(), "12346"));
+        assertTrue(loanApplicationService.reviewPass(application2.getApplicationId(), "12346"));
+        assertTrue(loanApplicationService.reviewPass(application3.getApplicationId(), "12346"));
+        assertTrue(loanApplicationService.reviewPass(application4.getApplicationId(), "12349"));
+
+        applications.add(application1);
+        applications.add(application2);
+        applications.add(application3);
+        applications.add(application4);
+
         // product subscribe
-        purchase = purchaseService.subscribed("12347", application.getApplicationId());
-        assertNotNull(purchase);
-        List<RepayPlan> autoInsertPlans = repayService.findPlanByPurchaseId(purchase.getPurchaseId());
+        Purchase purchase1 = purchaseService.subscribed("12347", application1.getApplicationId());
+        Purchase purchase2 = purchaseService.subscribed("12347", application2.getApplicationId());
+        Purchase purchase3 = purchaseService.subscribed("12347", application3.getApplicationId());
+        Purchase purchase4 = purchaseService.subscribed("12347", application4.getApplicationId());
+        assertNotNull(purchase1);
+        assertNotNull(purchase2);
+        assertNotNull(purchase3);
+        assertNotNull(purchase4);
+        // checking auto-insert plans
+        List<RepayPlan> autoInsertPlans = repayService.findPlanByPurchaseId(purchase1.getPurchaseId());
         assertEquals(12, autoInsertPlans.size());
         Date today = new Date(new Date().getTime() / 86400000 * 86400000);
         for (int i = 0; i < 12; i++) {
             Calendar c = Calendar.getInstance();
             c.setTime(today);
-            c.add(Calendar.MONTH, i+1);
+            c.add(Calendar.MONTH, i + 1);
             Date expectedDate = c.getTime();
             assertEquals(expectedDate, autoInsertPlans.get(i).getRepayDate());
             assertNull(autoInsertPlans.get(i).getRealRepayDate());
             assertEquals(RepayPlanStatus.SCHEDULED.getStatus().intValue(), autoInsertPlans.get(i).getStatus());
-            // todo: fix this error : czy
 //            assertEquals(BigDecimal.valueOf(115.58), autoInsertPlans.get(i).getAmount());
         }
         // deleting auto-insert plans
-        assertEquals(12, databaseHelper.deleteRepayPlanByPurchaseId(purchase.getPurchaseId()));
+        assertEquals(12, databaseHelper.deleteRepayPlanByPurchaseId(purchase1.getPurchaseId()));
+        databaseHelper.cleanRepayPlanTable();
+        purchases.add(purchase1);
+        purchases.add(purchase2);
+        purchases.add(purchase3);
+        purchases.add(purchase4);
         List<RepayPlan> repayPlans = new LinkedList<>();
         for (int i = -1; i <= 1; i++) {
             Calendar c = Calendar.getInstance();
             c.setTime(today);
             c.add(Calendar.MONTH, i);
             Date newDate = c.getTime();
-            RepayPlan plan = repayService.insertPlan(purchase.getPurchaseId(), newDate, BigDecimal.valueOf(233.33));
+            RepayPlan plan = repayService.insertPlan(purchase1.getPurchaseId(), newDate, BigDecimal.valueOf(233.33));
             assertNotNull(plan);
             repayPlans.add(plan);
         }
+        repayPlans.add(repayService.insertPlan(purchase2.getPurchaseId(), today, BigDecimal.valueOf(123.45)));
+        // set guarantor paid for application3
+        RepayPlan plan = repayService.insertPlan(purchase3.getPurchaseId(), today, BigDecimal.valueOf(123.45));
+        repayService.updateRepayPlan(plan.getPlanId(), RepayPlanStatus.GUARANTOR_PAID_ADVANCE, null);
+        repayPlans.add(repayService.findPlanById(plan.getPlanId()));
+        repayPlans.add(repayService.insertPlan(purchase4.getPurchaseId(), today, BigDecimal.valueOf(543.21)));
+
+        assertEquals(6, repayPlans.size());
 
         if (p2pAccountService.getApiKey() == null) {
             p2pAccountService.generateApiKey();
         }
         ThirdPartyOperationInterface.setApiKey(p2pAccountService.getApiKey());
         ThirdPartyOperationInterface.setThirdPartyApiUrl("http://localhost:" + port + "/third_party/");
-        List<RepayExecutionResultVo> repayResult = repayExecutionService.doRepay();
-        assertEquals(2, repayResult.size());
 
-        RepayExecutionResultVo overdueResult, normalResult;
-        if (repayResult.get(0).getRepayPlanOld().getPlanId().equals(repayPlans.get(0).getPlanId())) {
-            overdueResult = repayResult.get(0);
-            normalResult = repayResult.get(1);
-        } else {
-            overdueResult = repayResult.get(1);
-            normalResult = repayResult.get(0);
+        // ***** DO REPAY HERE *****
+        repayResults = repayExecutionService.doRepay();
+
+        assertEquals(5, repayResults.size());
+
+        Map<RepayPlan, RepayExecutionResultVo> results = new HashMap<>();
+        for (RepayPlan repayPlan : repayPlans) {
+            for (RepayExecutionResultVo repayExecutionResultVo : repayResults) {
+                if (repayPlan.getPlanId().equals(repayExecutionResultVo.getRepayPlanOld().getPlanId())) {
+                    results.put(repayPlan, repayExecutionResultVo);
+                    break;
+                }
+            }
         }
 
+        // VALIDATING RESULTS
+        RepayExecutionResultVo overdueResult = results.get(repayPlans.get(0));
+        RepayExecutionResultVo normalResult = results.get(repayPlans.get(1));
+        RepayExecutionResultVo guarantorPaidResult = results.get(repayPlans.get(3));
+        RepayExecutionResultVo borrowerPaidToGuarantorResult = results.get(repayPlans.get(4));
+        RepayExecutionResultVo ggResult = results.get(repayPlans.get(5));
+
         assertEquals(RepayPlanStatus.OVERDUE_SUCCEEDED.getStatus().intValue(), overdueResult.getRepayPlanNew().getStatus());
-        assertEquals(RepayPlanStatus.SUCCEEDED.getStatus().intValue(), normalResult.getRepayPlanNew().getStatus());
-        assertEquals(RepayPlanStatus.SCHEDULED.getStatus().intValue(), normalResult.getRepayPlanOld().getStatus());
         assertEquals(RepayPlanStatus.OVERDUE.getStatus().intValue(), overdueResult.getRepayPlanOld().getStatus());
         assertEquals(BigDecimal.valueOf(233.33), overdueResult.getRepayPlanNew().getAmount());
         assertEquals(BigDecimal.valueOf(233.33), overdueResult.getRepayPlanOld().getAmount());
-        assertEquals(BigDecimal.valueOf(233.33), normalResult.getRepayPlanNew().getAmount());
-        assertEquals(BigDecimal.valueOf(233.33), normalResult.getRepayPlanOld().getAmount());
+        assertEquals(0, overdueResult.getBorrowerTransferResult().getCode());
+        assertNull(overdueResult.getGuarantorTransferResult());
+        assertNull(overdueResult.getRepayPlanOld().getRealRepayDate());
+        assertNotNull(overdueResult.getRepayPlanNew().getRealRepayDate());
+        assertEquals(new Date(new Date().getTime() / 86400000 * 86400000), overdueResult.getRepayPlanNew().getRealRepayDate());
+
+        assertEquals(RepayPlanStatus.SUCCEEDED.getStatus().intValue(), normalResult.getRepayPlanNew().getStatus());
+        assertEquals(RepayPlanStatus.SCHEDULED.getStatus().intValue(), normalResult.getRepayPlanOld().getStatus());
+        assertEquals(0, normalResult.getBorrowerTransferResult().getCode());
+        assertNull(normalResult.getGuarantorTransferResult());
+        assertNull(overdueResult.getRepayPlanOld().getRealRepayDate());
+        assertNotNull(overdueResult.getRepayPlanNew().getRealRepayDate());
+
+        assertEquals(RepayPlanStatus.SCHEDULED.getStatus().intValue(), guarantorPaidResult.getRepayPlanOld().getStatus());
+        assertEquals(RepayPlanStatus.GUARANTOR_PAID_ADVANCE.getStatus().intValue(), guarantorPaidResult.getRepayPlanNew().getStatus());
+        assertEquals(0, guarantorPaidResult.getGuarantorTransferResult().getCode());
+        assertNotEquals(0, guarantorPaidResult.getBorrowerTransferResult().getCode());
+        assertNull(guarantorPaidResult.getRepayPlanOld().getRealRepayDate());
+        assertNull(guarantorPaidResult.getRepayPlanNew().getRealRepayDate());
+
+        assertEquals(RepayPlanStatus.GUARANTOR_PAID_ADVANCE.getStatus().intValue(), borrowerPaidToGuarantorResult.getRepayPlanOld().getStatus());
+        assertEquals(RepayPlanStatus.OVERDUE_SUCCEEDED.getStatus().intValue(), borrowerPaidToGuarantorResult.getRepayPlanNew().getStatus());
+        assertEquals(0, borrowerPaidToGuarantorResult.getBorrowerTransferResult().getCode());
+        assertNull(borrowerPaidToGuarantorResult.getGuarantorTransferResult());
+        assertNull(borrowerPaidToGuarantorResult.getRepayPlanOld().getRealRepayDate());
+        assertNotNull(borrowerPaidToGuarantorResult.getRepayPlanNew().getRealRepayDate());
+
+        assertEquals(RepayPlanStatus.SCHEDULED.getStatus().intValue(), ggResult.getRepayPlanOld().getStatus());
+        assertEquals(RepayPlanStatus.OVERDUE.getStatus().intValue(), ggResult.getRepayPlanNew().getStatus());
+        assertNotEquals(0, ggResult.getBorrowerTransferResult().getCode());
+        assertNotEquals(0, ggResult.getGuarantorTransferResult().getCode());
+        assertNull(ggResult.getRepayPlanOld().getRealRepayDate());
+        assertNull(ggResult.getRepayPlanNew().getRealRepayDate());
+
     }
 
     @Autowired
@@ -145,15 +251,30 @@ public class RepayExecutionServiceImplTest {
         userService.deleteUser("12345");
         userService.deleteUser("12346");
         userService.deleteUser("12347");
+        userService.deleteUser("12348");
+        userService.deleteUser("12349");
         databaseHelper.deleteP2pAccount("111111111123");
         databaseHelper.deleteP2pAccount("111111111124");
         databaseHelper.deleteP2pAccount("111111111125");
-        if (application != null) {
-            loanApplicationService.deleteApplicationById(application.getApplicationId());
-        }
-        if (purchase != null) {
-            databaseHelper.deletePurchase(purchase.getPurchaseId());
-            databaseHelper.deleteRepayPlanByPurchaseId(purchase.getPurchaseId());
+        databaseHelper.deleteP2pAccount("111111111126");
+        for (LoanApplication application : applications)
+            if (application != null) {
+                loanApplicationService.deleteApplicationById(application.getApplicationId());
+            }
+        for (Purchase purchase : purchases)
+            if (purchase != null) {
+                databaseHelper.deletePurchase(purchase.getPurchaseId());
+                databaseHelper.deleteRepayPlanByPurchaseId(purchase.getPurchaseId());
+            }
+        if (repayResults != null) {
+            for (RepayExecutionResultVo plan : repayResults) {
+                if (plan.getBorrowerNotice() != null)
+                    databaseHelper.deleteNotice(plan.getBorrowerNotice().getNoticeId());
+                if (plan.getGuarantorNotice() != null)
+                    databaseHelper.deleteNotice(plan.getGuarantorNotice().getNoticeId());
+                if (plan.getInvestorNotice() != null)
+                    databaseHelper.deleteNotice(plan.getInvestorNotice().getNoticeId());
+            }
         }
     }
 
@@ -164,13 +285,17 @@ public class RepayExecutionServiceImplTest {
     public interface DatabaseHelper {
         @Delete("DELETE FROM `p2p`.`p2p_account` WHERE `third_party_id` = #{value}")
         int deleteP2pAccount(String id);
+
         @Delete("DELETE FROM `p2p`.`purchase` WHERE `purchase_id` = #{value}")
         int deletePurchase(Integer id);
+
         @Delete("DELETE FROM `p2p`.`repay_plan`")
         void cleanRepayPlanTable();
+
         @Delete("DELETE FROM `p2p`.`repay_plan` WHERE `purchase_id` = #{value}")
         int deleteRepayPlanByPurchaseId(Integer id);
-        @Delete("DELETE FROM `p2p`.`notice` WHERE `notice_id` = #{value}..")
+
+        @Delete("DELETE FROM `p2p`.`notice` WHERE `notice_id` = #{value}")
         void deleteNotice(Integer id);
     }
 }

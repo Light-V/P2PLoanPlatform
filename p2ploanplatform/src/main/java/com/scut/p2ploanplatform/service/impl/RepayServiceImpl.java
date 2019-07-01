@@ -101,7 +101,8 @@ public class RepayServiceImpl implements RepayService {
 
             // optional: add expire check here
             plan.setStatus(status.getStatus());
-            plan.setRealRepayDate(realRepayDate);
+            if (realRepayDate != null)
+                plan.setRealRepayDate(getDate(realRepayDate));
             repayPlanDao.updatePlan(plan);
         } catch (IllegalArgumentException e) {
             throw e;
