@@ -292,7 +292,7 @@ public class GuarantorController {
         try{
             applicationPageInfo = applicationService.getUserHistory(pageNum, pageSize, userId);
             if(applicationPageInfo == null||applicationPageInfo.getTotal()==0){
-                return ResultVoUtil.error(ResultEnum.APPLICATION_NOT_EXIST);
+                return ResultVoUtil.success(applicationPageInfo);
             }
             return ResultVoUtil.success(applicationPageInfo);
         }
@@ -315,7 +315,7 @@ public class GuarantorController {
         try{
             applicationPageInfo = applicationService.getOverdueApplicationById(pageNum, pageSize, userId);
             if(applicationPageInfo == null||applicationPageInfo.getTotal()==0){
-                return ResultVoUtil.error(ResultEnum.APPLICATION_NOT_EXIST);
+                return ResultVoUtil.success(applicationPageInfo);
             }
             return ResultVoUtil.success(applicationPageInfo);
         }
