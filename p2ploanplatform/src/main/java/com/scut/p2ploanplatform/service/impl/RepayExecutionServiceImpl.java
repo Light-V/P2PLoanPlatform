@@ -1,6 +1,7 @@
 package com.scut.p2ploanplatform.service.impl;
 
 import com.scut.p2ploanplatform.dao.RepayPlanDao;
+import com.scut.p2ploanplatform.entity.Guarantor;
 import com.scut.p2ploanplatform.entity.Purchase;
 import com.scut.p2ploanplatform.entity.RepayPlan;
 import com.scut.p2ploanplatform.entity.User;
@@ -39,6 +40,8 @@ public class RepayExecutionServiceImpl implements RepayExecutionService {
     private RepayPlanDao repayPlanDao;
     @AutowireField
     private RepayService repayService;
+    @AutowireField
+    private GuarantorService guarantorService;
 
     @Autowired
     public void setRepayPlanDao(RepayPlanDao repayPlanDao) {
@@ -70,6 +73,11 @@ public class RepayExecutionServiceImpl implements RepayExecutionService {
         this.repayService = repayService;
     }
 
+    @Autowired
+    public void setGuarantorService(GuarantorService guarantorService) {
+        this.guarantorService = guarantorService;
+    }
+
     public RepayExecutionServiceImpl() throws Exception {
         new AutoTrigger(getClass().getDeclaredMethod("doRepay"), this, 1, 0, 0, true);
     }
@@ -94,6 +102,11 @@ public class RepayExecutionServiceImpl implements RepayExecutionService {
         List<RepayPlan> plans = repayPlanDao.findAllUnpaidPlan();
         log.debug("Completed query, got " + plans.size() + " results");
 
+        if ("".equals(ThirdPartyOperationInterface.getApiKey())) {
+            log.debug("Updating third party api key");
+            ThirdPartyOperationInterface.setApiKey("f516d5a5-8380-4bd3-92d1-aff612b377a2");
+        }
+
         for (RepayPlan plan : plans) {
             // 还款流程
             try {
@@ -105,23 +118,30 @@ public class RepayExecutionServiceImpl implements RepayExecutionService {
                 // 获取用户信息
                 User borrower = userService.findUser(purchase.getBorrowerId());
                 User investor = userService.findUser(purchase.getInvestorId());
-                User guarantor = userService.findUser(purchase.getGuarantorId());
+                Guarantor guarantor = guarantorService.findGuarantor(purchase.getGuarantorId());
 
                 // 转账
                 ResultVo transferResult;
                 // 已由担保人代付，还款默认转到担保人账号，其余情况都转到投资者账号
-                User payee = (plan.getStatus() == RepayPlanStatus.GUARANTOR_PAID_ADVANCE.getStatus()) ? guarantor : investor;
-                User payer = borrower;
+//                User payee = (plan.getStatus() == RepayPlanStatus.GUARANTOR_PAID_ADVANCE.getStatus()) ? guarantor : investor;
+//                User payer = borrower;
                 String borrowerMessage = null, guarantorMessage = null, investorMessage = null;
+                boolean toGuarantor = false;
 
-                transferResult = ThirdPartyOperationInterface.transfer(payer.getThirdPartyId(), payee.getThirdPartyId(), plan.getAmount());
+                if (plan.getStatus() == RepayPlanStatus.GUARANTOR_PAID_ADVANCE.getStatus()) {
+                    transferResult = ThirdPartyOperationInterface.transfer(borrower.getThirdPartyId(), guarantor.getThirdPartyId(), plan.getAmount());
+                    toGuarantor = true;
+                }
+                else
+                    transferResult = ThirdPartyOperationInterface.transfer(borrower.getThirdPartyId(), investor.getThirdPartyId(), plan.getAmount());
+
                 result.setBorrowerTransferResult(transferResult);
 
                 if (transferResult.getCode() == 0) {
                     // 贷款人还款成功：贷款人 -> 投资者/担保人
                     plan.setRealRepayDate(new Date(new Date().getTime() / 86400000 * 86400000));
                     borrowerMessage = String.format("尊敬的 %s 用户，您本月贷款还款成功，已成功还款 %s 元", borrower.getName(), plan.getAmount().toString());
-                    if (payee == guarantor) { // WARN: weak reference equal, todo: implement equals()
+                    if (toGuarantor) {
                         plan.setStatus(RepayPlanStatus.OVERDUE_SUCCEEDED.getStatus());
                         guarantorMessage = String.format("尊敬的 %s 用户，您担保的贷款人 %s 本月已完成还款，还款金额已经转入您的第三方账号中", guarantor.getName(), borrower.getName());
                     } else {
@@ -131,8 +151,7 @@ public class RepayExecutionServiceImpl implements RepayExecutionService {
                 } else {
                     if (plan.getStatus() != RepayPlanStatus.GUARANTOR_PAID_ADVANCE.getStatus()) {
                         // 贷款人还款失败，执行垫付：担保人 -> 投资者
-                        payer = guarantor;
-                        transferResult = ThirdPartyOperationInterface.transfer(payer.getThirdPartyId(), payee.getThirdPartyId(), plan.getAmount());
+                        transferResult = ThirdPartyOperationInterface.transfer(guarantor.getThirdPartyId(), investor.getThirdPartyId(), plan.getAmount());
                         result.setGuarantorTransferResult(transferResult);
                         borrowerMessage = String.format("尊敬的 %s 用户，您的贷款本月还款失败，请检查第三方账号中金额，确保在系统重试还款前，拥有足够金额进行划扣", borrower.getName());
 
@@ -157,12 +176,12 @@ public class RepayExecutionServiceImpl implements RepayExecutionService {
                     // todo: 28 天逾期后锁定银行卡
                 }
                 repayService.updateRepayPlan(plan.getPlanId(), RepayPlanStatus.values()[plan.getStatus()], plan.getRealRepayDate());
-                waterBillService.addRepayRecord(plan.getPlanId(), plan.getPurchaseId(), payer.getUserId(), payee.getUserId(), plan.getRepayDate(), plan.getAmount());
+//                waterBillService.addRepayRecord(plan.getPlanId(), plan.getPurchaseId(), payer.getUserId(), payee.getUserId(), plan.getRepayDate(), plan.getAmount());
 
                 if (borrowerMessage != null)
                     result.setBorrowerNotice(noticeService.sendNotice(borrower.getUserId(), NOTICE_TITLE, borrowerMessage));
                 if (guarantorMessage != null)
-                    result.setGuarantorNotice(noticeService.sendNotice(guarantor.getUserId(), NOTICE_TITLE, guarantorMessage));
+                    result.setGuarantorNotice(noticeService.sendNotice(guarantor.getGuarantorId(), NOTICE_TITLE, guarantorMessage));
                 if (investorMessage != null)
                     result.setInvestorNotice(noticeService.sendNotice(investor.getUserId(), NOTICE_TITLE, investorMessage));
                 result.setRepayPlanNew(deepCopy(plan));

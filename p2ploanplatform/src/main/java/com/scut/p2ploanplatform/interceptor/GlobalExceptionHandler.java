@@ -5,6 +5,7 @@ import com.scut.p2ploanplatform.exception.AuthorizeException;
 import com.scut.p2ploanplatform.exception.CustomException;
 import com.scut.p2ploanplatform.utils.ResultVoUtil;
 import com.scut.p2ploanplatform.vo.ResultVo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
@@ -21,6 +22,8 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Set;
 
 /**
@@ -28,11 +31,21 @@ import java.util.Set;
  * Date 2019/6/20 15:41
  */
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
+    private void logException(Exception e) {
+        if (e != null) {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            String exceptionDetails = sw.toString();
+            log.error(exceptionDetails);
+        }
+    }
     // 为什么不加个通常Exception的Handler呢 手动doge脸
     @ExceptionHandler(Exception.class)
     public ResultVo globalExceptionHandler(HttpServletRequest request, Exception e) {
+        logException(e);
         return ResultVoUtil.error(500, String.format("Internal error for request %s: %s", request.getRequestURI(), e.getMessage()));
     }
 
@@ -82,6 +95,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CustomException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResultVo customExceptionHandler(CustomException e) {
+        logException(e);
         return ResultVoUtil.error(e.getCode(), e.getMessage());
     }
 
