@@ -12,12 +12,15 @@ public class UserHistory {
     private Integer purchaseId;
     private BigDecimal money;
     private Date time;
-    private Boolean isOverdue;
+    private String isOverdue;
     public UserHistory(){};
     public UserHistory(Purchase purchase){
         this.purchaseId = purchase.getPurchaseId();
         this.money = purchase.getAmount();
         this.time = purchase.getPurchaseTime();
-        this.isOverdue = (purchase.getStatus().equals(LoanStatus.OVERDUE.getStatus()));
+        if(purchase.getStatus().equals(LoanStatus.OVERDUE.getStatus())){
+            this.isOverdue = "是";
+        }
+        else this.isOverdue = "否";
     }
 }
