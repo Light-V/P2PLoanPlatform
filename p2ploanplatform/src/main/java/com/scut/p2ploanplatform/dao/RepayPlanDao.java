@@ -10,7 +10,7 @@ import java.util.List;
 @Mapper
 public interface RepayPlanDao {
 
-    @Insert("INSERT INTO `p2p`.`repay_plan`(`plan_id`, `purchase_id`, `repay_date`, `real_repay_date`, `amount`, `status`) VALUES (#{planId}, #{purchaseId}, #{repayDate}, #{realRepayDate}, #{amount}, #{status})")
+    @Insert("INSERT INTO `p2p`.`repay_plan`(`plan_id`, `purchase_id`, `repay_date`, `real_repay_date`, `amount`, `status`, `overdue_proceeded`) VALUES (#{planId}, #{purchaseId}, #{repayDate}, #{realRepayDate}, #{amount}, #{status}, #{overdueProceeded})")
     int insertPlan(RepayPlan plan);
 
     @Select("SELECT * FROM `p2p`.`repay_plan` WHERE `purchase_id` = #{value} ORDER BY `repay_date` ASC")
@@ -22,7 +22,7 @@ public interface RepayPlanDao {
     @Select("(SELECT * FROM `p2p`.`repay_plan` WHERE `repay_date` = CURRENT_DATE AND `status` = 0) UNION (SELECT * FROM `p2p`.`repay_plan` WHERE `status` = 2 OR `status` = 3)")
     List<RepayPlan> findAllUnpaidPlan();
 
-    @Update("UPDATE `p2p`.`repay_plan` SET `repay_date` = #{repayDate}, `real_repay_date` = #{realRepayDate}, `status` = #{status}, `amount` = #{amount} WHERE `plan_id` = #{planId}")
+    @Update("UPDATE `p2p`.`repay_plan` SET `repay_date` = #{repayDate}, `real_repay_date` = #{realRepayDate}, `status` = #{status}, `amount` = #{amount}, `overdue_proceeded` = #{overdueProceeded} WHERE `plan_id` = #{planId}")
     int updatePlan(RepayPlan plan);
 
     @Delete("DELETE FROM `p2p`.`repay_plan` WHERE `plan_id` = #{value}")

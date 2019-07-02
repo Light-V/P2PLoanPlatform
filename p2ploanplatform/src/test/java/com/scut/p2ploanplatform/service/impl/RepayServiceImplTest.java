@@ -33,7 +33,7 @@ public class RepayServiceImplTest {
             assertNotNull(plan);
             assertNotNull(plan.getPlanId());
             assertEquals(32, plan.getPlanId().length());
-            assertEquals(RepayPlanStatus.SCHEDULED.getStatus(), Integer.valueOf(plan.getStatus()));
+            assertEquals(RepayPlanStatus.SCHEDULED.getStatus(), plan.getStatus());
             assertEquals(Integer.valueOf(123), plan.getPurchaseId());
             assertEquals(targetDate, plan.getRepayDate());
             assertNull(plan.getRealRepayDate());
@@ -140,7 +140,7 @@ public class RepayServiceImplTest {
             repayService.updateRepayPlan(plan.getPlanId(), RepayPlanStatus.OVERDUE_SUCCEEDED, new Date());
             RepayPlan actualPlan = repayService.findPlanById(plan.getPlanId());
 
-            assertEquals(RepayPlanStatus.OVERDUE_SUCCEEDED.getStatus().intValue(), actualPlan.getStatus());
+            assertEquals(RepayPlanStatus.OVERDUE_SUCCEEDED.getStatus(), actualPlan.getStatus());
         }
         catch (Exception e) {
             e.printStackTrace();
