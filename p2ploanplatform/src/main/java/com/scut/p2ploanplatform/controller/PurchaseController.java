@@ -72,7 +72,7 @@ public class PurchaseController {
         if(purchase == null){
             return ResultVoUtil.error(ResultEnum.PURCHASE_NOT_EXITST);
         }
-        if (!purchase.getBorrowerId().equals(userId)||!purchase.getInvestorId().equals(userId)){
+        if (!purchase.getBorrowerId().equals(userId)&&!purchase.getInvestorId().equals(userId)){
             return ResultVoUtil.error(ResultEnum.ILLEGAL_OPERATION);
         }
         return  ResultVoUtil.success(purchase);

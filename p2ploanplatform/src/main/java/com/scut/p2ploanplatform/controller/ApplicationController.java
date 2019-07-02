@@ -95,7 +95,7 @@ public class ApplicationController {
         if(application == null){
             return ResultVoUtil.error(ResultEnum.APPLICATION_NOT_EXIST);
         }
-        if(!application.getBorrowerId().equals(userId)||!application.getStatus().equals(LoanStatus.REVIEWED_PASSED.getStatus())){
+        if(!application.getBorrowerId().equals(userId)&&!application.getStatus().equals(LoanStatus.REVIEWED_PASSED.getStatus())){
             return ResultVoUtil.error(ResultEnum.ILLEGAL_OPERATION);
         }
         return  ResultVoUtil.success(application);

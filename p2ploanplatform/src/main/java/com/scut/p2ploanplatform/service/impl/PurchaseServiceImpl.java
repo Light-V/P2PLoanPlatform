@@ -163,8 +163,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     @Override
     public Purchase showPurchaseByApplicationId(Integer applicationId) throws SQLException, IllegalArgumentException {
         Purchase purchase;
-        LoanApplication application=null;
-        application = applicationService.getApplicationById(applicationId);
+        LoanApplication application = applicationService.getApplicationById(applicationId);
         if(application == null){
             throw new IllegalArgumentException("未找到该借款申请");
         }
