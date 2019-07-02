@@ -125,4 +125,17 @@ public class RepayServiceImpl implements RepayService {
 
         return completed;
     }
+
+    @Override
+    public Integer getRepayOverdueDay(Integer purchaseId) throws SQLException, IllegalArgumentException {
+        List<RepayPlan> repayPlans = findPlanByPurchaseId(purchaseId);
+        if (repayPlans.size() == 0)
+            return null;
+        int maxOverdueDay = 0;
+        for (RepayPlan plan : repayPlans) {
+            Date realRepayDate = plan.getRealRepayDate() != null ? plan.getRealRepayDate() : getDate(new Date());
+            maxOverdueDay = (int)Math.max(maxOverdueDay, (realRepayDate.getTime() - plan.getRepayDate().getTime()) / 86400000);
+        }
+        return maxOverdueDay;
+    }
 }

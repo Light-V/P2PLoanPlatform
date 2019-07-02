@@ -160,4 +160,19 @@ public class RepayServiceImplTest {
         repayService.updateRepayPlan(plan2.getPlanId(), RepayPlanStatus.OVERDUE_SUCCEEDED, new Date());
         assertTrue(repayService.isRepayCompleted(12345));
     }
+
+    @Test
+    @Transactional
+    public void getRepayOverdueDayTest() throws Exception {
+        assertNull(repayService.getRepayOverdueDay(12387123));
+        repayService.insertPlan(12345, new Date(new Date().getTime() - 86400000), BigDecimal.valueOf(123.45));
+        assertEquals((Integer)1, repayService.getRepayOverdueDay(12345));
+
+        repayService.insertPlan(12346, new Date(new Date().getTime() + 86400000), BigDecimal.valueOf(123.45));
+        repayService.insertPlan(12346, new Date(), BigDecimal.valueOf(123.45));
+        assertEquals((Integer)0, repayService.getRepayOverdueDay(12346));
+
+        repayService.insertPlan(12345, new Date(new Date().getTime() - 86400000*12), BigDecimal.valueOf(123.45));
+        assertEquals((Integer)12, repayService.getRepayOverdueDay(12345));
+    }
 }
