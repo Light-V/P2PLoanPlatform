@@ -156,7 +156,7 @@ public class RepayExecutionServiceImplTest {
             Date expectedDate = c.getTime();
             assertEquals(expectedDate, autoInsertPlans.get(i).getRepayDate());
             assertNull(autoInsertPlans.get(i).getRealRepayDate());
-            assertEquals(RepayPlanStatus.SCHEDULED.getStatus().intValue(), autoInsertPlans.get(i).getStatus());
+            assertEquals(RepayPlanStatus.SCHEDULED.getStatus(), autoInsertPlans.get(i).getStatus());
 //            assertEquals(BigDecimal.valueOf(115.58), autoInsertPlans.get(i).getAmount());
         }
         // deleting auto-insert plans
@@ -208,8 +208,8 @@ public class RepayExecutionServiceImplTest {
         RepayExecutionResultVo borrowerPaidToGuarantorResult = results.get(repayPlans.get(4));
         RepayExecutionResultVo ggResult = results.get(repayPlans.get(5));
 
-        assertEquals(RepayPlanStatus.OVERDUE_SUCCEEDED.getStatus().intValue(), overdueResult.getRepayPlanNew().getStatus());
-        assertEquals(RepayPlanStatus.OVERDUE.getStatus().intValue(), overdueResult.getRepayPlanOld().getStatus());
+        assertEquals(RepayPlanStatus.OVERDUE_SUCCEEDED.getStatus(), overdueResult.getRepayPlanNew().getStatus());
+        assertEquals(RepayPlanStatus.OVERDUE.getStatus(), overdueResult.getRepayPlanOld().getStatus());
         assertEquals(BigDecimal.valueOf(233.33), overdueResult.getRepayPlanNew().getAmount());
         assertEquals(BigDecimal.valueOf(233.33), overdueResult.getRepayPlanOld().getAmount());
         assertEquals(0, overdueResult.getBorrowerTransferResult().getCode());
@@ -218,29 +218,29 @@ public class RepayExecutionServiceImplTest {
         assertNotNull(overdueResult.getRepayPlanNew().getRealRepayDate());
         assertEquals(new Date(new Date().getTime() / 86400000 * 86400000), overdueResult.getRepayPlanNew().getRealRepayDate());
 
-        assertEquals(RepayPlanStatus.SUCCEEDED.getStatus().intValue(), normalResult.getRepayPlanNew().getStatus());
-        assertEquals(RepayPlanStatus.SCHEDULED.getStatus().intValue(), normalResult.getRepayPlanOld().getStatus());
+        assertEquals(RepayPlanStatus.SUCCEEDED.getStatus(), normalResult.getRepayPlanNew().getStatus());
+        assertEquals(RepayPlanStatus.SCHEDULED.getStatus(), normalResult.getRepayPlanOld().getStatus());
         assertEquals(0, normalResult.getBorrowerTransferResult().getCode());
         assertNull(normalResult.getGuarantorTransferResult());
         assertNull(overdueResult.getRepayPlanOld().getRealRepayDate());
         assertNotNull(overdueResult.getRepayPlanNew().getRealRepayDate());
 
-        assertEquals(RepayPlanStatus.SCHEDULED.getStatus().intValue(), guarantorPaidResult.getRepayPlanOld().getStatus());
-        assertEquals(RepayPlanStatus.GUARANTOR_PAID_ADVANCE.getStatus().intValue(), guarantorPaidResult.getRepayPlanNew().getStatus());
+        assertEquals(RepayPlanStatus.SCHEDULED.getStatus(), guarantorPaidResult.getRepayPlanOld().getStatus());
+        assertEquals(RepayPlanStatus.GUARANTOR_PAID_ADVANCE.getStatus(), guarantorPaidResult.getRepayPlanNew().getStatus());
         assertEquals(0, guarantorPaidResult.getGuarantorTransferResult().getCode());
         assertNotEquals(0, guarantorPaidResult.getBorrowerTransferResult().getCode());
         assertNull(guarantorPaidResult.getRepayPlanOld().getRealRepayDate());
         assertNull(guarantorPaidResult.getRepayPlanNew().getRealRepayDate());
 
-        assertEquals(RepayPlanStatus.GUARANTOR_PAID_ADVANCE.getStatus().intValue(), borrowerPaidToGuarantorResult.getRepayPlanOld().getStatus());
-        assertEquals(RepayPlanStatus.OVERDUE_SUCCEEDED.getStatus().intValue(), borrowerPaidToGuarantorResult.getRepayPlanNew().getStatus());
+        assertEquals(RepayPlanStatus.GUARANTOR_PAID_ADVANCE.getStatus(), borrowerPaidToGuarantorResult.getRepayPlanOld().getStatus());
+        assertEquals(RepayPlanStatus.OVERDUE_SUCCEEDED.getStatus(), borrowerPaidToGuarantorResult.getRepayPlanNew().getStatus());
         assertEquals(0, borrowerPaidToGuarantorResult.getBorrowerTransferResult().getCode());
         assertNull(borrowerPaidToGuarantorResult.getGuarantorTransferResult());
         assertNull(borrowerPaidToGuarantorResult.getRepayPlanOld().getRealRepayDate());
         assertNotNull(borrowerPaidToGuarantorResult.getRepayPlanNew().getRealRepayDate());
 
-        assertEquals(RepayPlanStatus.SCHEDULED.getStatus().intValue(), ggResult.getRepayPlanOld().getStatus());
-        assertEquals(RepayPlanStatus.OVERDUE.getStatus().intValue(), ggResult.getRepayPlanNew().getStatus());
+        assertEquals(RepayPlanStatus.SCHEDULED.getStatus(), ggResult.getRepayPlanOld().getStatus());
+        assertEquals(RepayPlanStatus.OVERDUE.getStatus(), ggResult.getRepayPlanNew().getStatus());
         assertNotEquals(0, ggResult.getBorrowerTransferResult().getCode());
         assertNotEquals(0, ggResult.getGuarantorTransferResult().getCode());
         assertNull(ggResult.getRepayPlanOld().getRealRepayDate());

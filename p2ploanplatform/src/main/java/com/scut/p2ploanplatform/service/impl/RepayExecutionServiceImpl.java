@@ -82,8 +82,8 @@ public class RepayExecutionServiceImpl implements RepayExecutionService {
         new AutoTrigger(getClass().getDeclaredMethod("doRepay"), this, 1, 0, 0, true);
     }
 
-    private <T extends Serializable> T deepCopy(T object) throws Exception {
-        return (T)SerializationUtils.clone(object);
+    private <T extends Serializable> T deepCopy(T object) {
+        return SerializationUtils.clone(object);
     }
 
     @Override
@@ -128,7 +128,7 @@ public class RepayExecutionServiceImpl implements RepayExecutionService {
                 String borrowerMessage = null, guarantorMessage = null, investorMessage = null;
                 boolean toGuarantor = false;
 
-                if (plan.getStatus() == RepayPlanStatus.GUARANTOR_PAID_ADVANCE.getStatus()) {
+                if (plan.getStatus().equals(RepayPlanStatus.GUARANTOR_PAID_ADVANCE.getStatus())) {
                     transferResult = ThirdPartyOperationInterface.transfer(borrower.getThirdPartyId(), guarantor.getThirdPartyId(), plan.getAmount());
                     toGuarantor = true;
                 }
@@ -143,13 +143,15 @@ public class RepayExecutionServiceImpl implements RepayExecutionService {
                     borrowerMessage = String.format("尊敬的 %s 用户，您本月贷款还款成功，已成功还款 %s 元", borrower.getName(), plan.getAmount().toString());
                     if (toGuarantor) {
                         plan.setStatus(RepayPlanStatus.OVERDUE_SUCCEEDED.getStatus());
+                        waterBillService.addRepayRecord(plan.getPlanId(), plan.getPurchaseId(), borrower.getUserId(), guarantor.getGuarantorId(), plan.getRealRepayDate(), plan.getAmount());
                         guarantorMessage = String.format("尊敬的 %s 用户，您担保的贷款人 %s 本月已完成还款，还款金额已经转入您的第三方账号中", guarantor.getName(), borrower.getName());
                     } else {
-                        plan.setStatus((plan.getStatus() == RepayPlanStatus.SCHEDULED.getStatus()) ? RepayPlanStatus.SUCCEEDED.getStatus() : RepayPlanStatus.OVERDUE_SUCCEEDED.getStatus());
+                        plan.setStatus((plan.getStatus().equals(RepayPlanStatus.SCHEDULED.getStatus())) ? RepayPlanStatus.SUCCEEDED.getStatus() : RepayPlanStatus.OVERDUE_SUCCEEDED.getStatus());
+                        waterBillService.addRepayRecord(plan.getPlanId(), plan.getPurchaseId(), borrower.getUserId(), investor.getUserId(), plan.getRealRepayDate(), plan.getAmount());
                         investorMessage = String.format("尊敬的 %s 用户，您本月投资的贷款已完成还款，已成功收款 %s 元", investor.getName(), plan.getAmount().toString());
                     }
                 } else {
-                    if (plan.getStatus() != RepayPlanStatus.GUARANTOR_PAID_ADVANCE.getStatus()) {
+                    if (!plan.getStatus().equals(RepayPlanStatus.GUARANTOR_PAID_ADVANCE.getStatus())) {
                         // 贷款人还款失败，执行垫付：担保人 -> 投资者
                         transferResult = ThirdPartyOperationInterface.transfer(guarantor.getThirdPartyId(), investor.getThirdPartyId(), plan.getAmount());
                         result.setGuarantorTransferResult(transferResult);
@@ -158,13 +160,14 @@ public class RepayExecutionServiceImpl implements RepayExecutionService {
                         if (transferResult.getCode() == 0) {
                             // 担保人代付成功
                             plan.setStatus(RepayPlanStatus.GUARANTOR_PAID_ADVANCE.getStatus());
+                            waterBillService.addRepayRecord(plan.getPlanId(), plan.getPurchaseId(), guarantor.getGuarantorId(), investor.getUserId(), new Date(new Date().getTime() / 86400000 * 86400000), plan.getAmount());
                             guarantorMessage = String.format("尊敬的 %s 用户，您担保的贷款人 %s 未能及时还款，系统已执行担保人垫付操作", guarantor.getName(), borrower.getName());
                             investorMessage = String.format("尊敬的 %s 用户，您投资的贷款已完成本月还款，已成功收款 %s 元", borrower.getName(), plan.getAmount().toString());
                         } else {
                             guarantorMessage = String.format("尊敬的 %s 用户，您担保的贷款人 %s 未能及时还款，系统尝试进行还款但未能成功，原因为： %s，请确保第三方账号拥有足够的金额", guarantor.getName(), borrower.getName(), transferResult.getMsg());
                             // 支付失败，投资方money全部木大
                             // 只对首次失败通知投资方
-                            if (plan.getStatus() != RepayPlanStatus.OVERDUE.getStatus()) {
+                            if (!plan.getStatus().equals(RepayPlanStatus.OVERDUE.getStatus())) {
                                 investorMessage = String.format("尊敬的 %s 用户，您投资贷款本月未及时还款，系统已经为您执行逾期流程", investor.getName());
                                 plan.setStatus(RepayPlanStatus.OVERDUE.getStatus());
                                 // calling PurchaseService: set overdue status
@@ -173,10 +176,13 @@ public class RepayExecutionServiceImpl implements RepayExecutionService {
                         }
                     }
 
-                    // todo: 28 天逾期后锁定银行卡
+                    // 28天后的逾期流程
+                    if ((new Date().getTime() / 86400000) - (plan.getRepayDate().getTime() / 86400000) >= 28 && !plan.isOverdueProceeded()) {
+                        plan.setOverdueProceeded(true);
+                        // todo: 修改信用评级
+                    }
                 }
                 repayService.updateRepayPlan(plan.getPlanId(), RepayPlanStatus.values()[plan.getStatus()], plan.getRealRepayDate());
-//                waterBillService.addRepayRecord(plan.getPlanId(), plan.getPurchaseId(), payer.getUserId(), payee.getUserId(), plan.getRepayDate(), plan.getAmount());
 
                 if (borrowerMessage != null)
                     result.setBorrowerNotice(noticeService.sendNotice(borrower.getUserId(), NOTICE_TITLE, borrowerMessage));

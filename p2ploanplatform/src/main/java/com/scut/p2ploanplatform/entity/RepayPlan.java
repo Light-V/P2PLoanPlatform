@@ -13,5 +13,6 @@ public class RepayPlan implements Serializable {
     private Date repayDate;
     private Date realRepayDate;
     private BigDecimal amount;
-    private int status;
+    private Integer status;
+    private boolean overdueProceeded;
 }

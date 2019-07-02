@@ -48,6 +48,7 @@ public class RepayServiceImpl implements RepayService {
         plan.setAmount(amount);
         plan.setPlanId(UUID.randomUUID().toString().replace("-", ""));
         plan.setPurchaseId(purchaseId);
+        plan.setOverdueProceeded(false);
         if (repayDate.before(getDate(new Date()))) {
             log.warn("Trying to insert an overdue repay plan, check your code");
             plan.setStatus(RepayPlanStatus.OVERDUE.getStatus());
@@ -119,8 +120,8 @@ public class RepayServiceImpl implements RepayService {
         boolean completed = true;
 
         for (RepayPlan plan : repayPlans) {
-            completed = completed && (plan.getStatus() == RepayPlanStatus.SUCCEEDED.getStatus() ||
-                    plan.getStatus() == RepayPlanStatus.OVERDUE_SUCCEEDED.getStatus());
+            completed = completed && (plan.getStatus().equals(RepayPlanStatus.SUCCEEDED.getStatus()) ||
+                    plan.getStatus().equals(RepayPlanStatus.OVERDUE_SUCCEEDED.getStatus()));
         }
 
         return completed;
