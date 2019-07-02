@@ -43,6 +43,13 @@ public interface PurchaseService {
     Purchase showPurchaseById(Integer purchaseId) throws SQLException,IllegalArgumentException;
 
     /**
+     * 根据订单id查询订单
+     * @param applicationId 借款申请id
+     * @return 订单列表
+     */
+    Purchase showPurchaseByApplicationId(Integer applicationId) throws SQLException,IllegalArgumentException;
+
+    /**
      * 查询所有订单
      * @return 订单列表
      */

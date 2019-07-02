@@ -8,7 +8,9 @@ import com.scut.p2ploanplatform.entity.RepayPlan;
 import com.scut.p2ploanplatform.enums.LoanStatus;
 import com.scut.p2ploanplatform.exception.LoanStatusException;
 import com.scut.p2ploanplatform.service.LoanApplicationService;
+import com.scut.p2ploanplatform.service.P2pAccountService;
 import com.scut.p2ploanplatform.service.RepayService;
+import com.scut.p2ploanplatform.utils.ThirdPartyOperationInterface;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -17,6 +19,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,17 +31,20 @@ import java.util.Comparator;
 import java.util.List;
 
 import static org.junit.Assert.*;
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @RunWith(SpringRunner.class)
 public class PurchaseServiceImplTest {
-    @Autowired
-    PurchaseServiceImpl purchaseService;
+    @LocalServerPort
+    private int port;
 
     @Autowired
-    RepayService repayService;
+    private PurchaseServiceImpl purchaseService;
 
     @Autowired
-    LoanApplicationService applicationService;
+    private LoanApplicationService applicationService;
+
+    @Autowired
+    private P2pAccountServiceImpl p2pAccountService;
 
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();
@@ -55,7 +61,14 @@ public class PurchaseServiceImplTest {
         application.setInterestRate(new BigDecimal(0.0618));
         application.setLoanMonth(6);
         application.setPurchaseDeadline(Calendar.getInstance().getTime());
+        applicationService.addApplication(application);
         applicationService.reviewPass(application.getApplicationId(), "201602000000");
+
+        if (p2pAccountService.getApiKey() == null) {
+            p2pAccountService.generateApiKey();
+        }
+        ThirdPartyOperationInterface.setApiKey(p2pAccountService.getApiKey());
+        ThirdPartyOperationInterface.setThirdPartyApiUrl("http://localhost:" + port + "/third_party/");
     }
 
     @Test
@@ -207,5 +220,13 @@ public class PurchaseServiceImplTest {
         }
         Assert.assertTrue(result);
         Assert.assertEquals(LoanStatus.FINISHED.getStatus(), purchase.getStatus());
+    }
+
+    @Test
+    public void showPurchaseByApplicationId() throws Exception{
+        Purchase purchase = null;
+        purchase = purchaseService.showPurchaseByApplicationId(27);
+        Assert.assertNotNull(purchase);
+        System.out.println(purchase);
     }
 }

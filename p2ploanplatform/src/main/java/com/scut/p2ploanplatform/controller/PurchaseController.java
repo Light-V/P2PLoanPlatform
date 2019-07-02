@@ -51,7 +51,26 @@ public class PurchaseController {
             return ResultVoUtil.error(ResultEnum.PARAM_IS_INVALID.getCode(),e.getMessage());
         }
         if(purchase == null){
-            return ResultVoUtil.error(ResultEnum.APPLICATION_NOT_EXIST);
+            return ResultVoUtil.error(ResultEnum.PURCHASE_NOT_EXITST);
+        }
+        if (!purchase.getBorrowerId().equals(userId)||!purchase.getInvestorId().equals(userId)){
+            return ResultVoUtil.error(ResultEnum.ILLEGAL_OPERATION);
+        }
+        return  ResultVoUtil.success(purchase);
+    }
+
+    @RequestMapping("/detail")
+    @GetMapping
+    public ResultVo purchaseDetailByApplicationId(@RequestParam(value = "application_id") Integer applicationId,
+                                   @SessionAttribute(value = "user") String userId){
+        Purchase purchase;
+        try{
+            purchase = purchaseService.showPurchaseByApplicationId(applicationId);
+        }catch (Exception e){
+            return ResultVoUtil.error(ResultEnum.PARAM_IS_INVALID.getCode(),e.getMessage());
+        }
+        if(purchase == null){
+            return ResultVoUtil.error(ResultEnum.PURCHASE_NOT_EXITST);
         }
         if (!purchase.getBorrowerId().equals(userId)||!purchase.getInvestorId().equals(userId)){
             return ResultVoUtil.error(ResultEnum.ILLEGAL_OPERATION);

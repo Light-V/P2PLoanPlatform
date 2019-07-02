@@ -108,8 +108,8 @@ public class PurchaseServiceImpl implements PurchaseService {
         Integer months = purchase.getLoanMonth();
         BigDecimal amount = purchase.getAmount();
         BigDecimal interestRate = purchase.getInterestRate();
-        BigDecimal interest = amount.multiply(interestRate);
-        BigDecimal perAmount = amount.divide(new BigDecimal(months),8,BigDecimal.ROUND_HALF_UP).add(interest);
+        BigDecimal totalAmount = amount.multiply(interestRate).add(amount);
+        BigDecimal perAmount = totalAmount.divide(new BigDecimal(months),8,BigDecimal.ROUND_HALF_UP);
         for(int i = 0;i<months;i++){
             Calendar nextRepay = Calendar.getInstance();
             nextRepay.setTime(nextRepayDate);
@@ -148,6 +148,33 @@ public class PurchaseServiceImpl implements PurchaseService {
         try{
             purchase = purchaseDao.getPurchaseByPurchaseId(purchaseId);
             List<RepayPlan> repayPlans = repayService.findPlanByPurchaseId(purchaseId);
+            repayPlans.sort(Comparator.comparing(RepayPlan::getRepayDate));
+            purchase.setRepayPlans(repayPlans);
+            purchase.setBorrowerName(userService.findUser(purchase.getBorrowerId()).getName());
+            purchase.setInvestorName(userService.findUser(purchase.getInvestorId()).getName());
+            purchase.setGuarantorName(guarantorService.findGuarantor(purchase.getGuarantorId()).getName());
+        }
+        catch (Exception e){
+            throw new SQLException(e);
+        }
+        return purchase;
+    }
+
+    @Override
+    public Purchase showPurchaseByApplicationId(Integer applicationId) throws SQLException, IllegalArgumentException {
+        Purchase purchase;
+        LoanApplication application=null;
+        application = applicationService.getApplicationById(applicationId);
+        if(application == null){
+            throw new IllegalArgumentException("未找到该借款申请");
+        }
+        if(!application.getStatus().equals(LoanStatus.SUBSCRIBED.getStatus())){
+            throw new IllegalArgumentException("该借款申请未形成订单");
+        }
+
+        try{
+            purchase = purchaseDao.getPurchaseByApplicationId(applicationId);
+            List<RepayPlan> repayPlans = repayService.findPlanByPurchaseId(purchase.getPurchaseId());
             repayPlans.sort(Comparator.comparing(RepayPlan::getRepayDate));
             purchase.setRepayPlans(repayPlans);
             purchase.setBorrowerName(userService.findUser(purchase.getBorrowerId()).getName());
