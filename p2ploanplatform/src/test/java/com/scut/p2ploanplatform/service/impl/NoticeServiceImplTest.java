@@ -48,6 +48,10 @@ public class NoticeServiceImplTest {
         assertNotNull(noticePageInfo);
         assertEquals(1, noticePageInfo.getPageNum());
         assertEquals(9, noticePageInfo.getPageSize());
+        List<Notice> noticeList = noticePageInfo.getList();
+        for (int i = 1; i < noticeList.size(); ++i) {
+            assertTrue(noticeList.get(i - 1).getTime().getTime() >= noticePageInfo.getList().get(i).getTime().getTime());
+        }
     }
 
     @Test
@@ -62,6 +66,10 @@ public class NoticeServiceImplTest {
         assertEquals(9, noticePageInfo.getPageSize());
         for (Notice notice : noticePageInfo.getList()) {
             assertEquals(NoticeStatusEnum.UNREAD.getCode(), notice.getStatus());
+        }
+        List<Notice> noticeList = noticePageInfo.getList();
+        for (int i = 1; i < noticeList.size(); ++i) {
+            assertTrue(noticeList.get(i - 1).getTime().getTime() >= noticePageInfo.getList().get(i).getTime().getTime());
         }
     }
 
@@ -78,6 +86,10 @@ public class NoticeServiceImplTest {
         assertEquals(9, noticePageInfo.getPageSize());
         for (Notice notice : noticePageInfo.getList()) {
             assertEquals(NoticeStatusEnum.READ.getCode(), notice.getStatus());
+        }
+        List<Notice> noticeList = noticePageInfo.getList();
+        for (int i = 1; i < noticeList.size(); ++i) {
+            assertTrue(noticeList.get(i - 1).getTime().getTime() >= noticePageInfo.getList().get(i).getTime().getTime());
         }
     }
 
