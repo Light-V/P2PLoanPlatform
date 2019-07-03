@@ -111,6 +111,15 @@ public interface LoanApplicationDao {
     List<LoanApplication> getApplicationUnReviewed();
 
     /**
+     * 查询所有待审核审核通过和未通过的借款申请
+     * 产品交易平台展示内容
+     * @return 借款申请列表
+     */
+    @Select("SELECT * FROM `loan_application` WHERE `status` = 0 OR `status` = 1 or `status` = 2" )
+    List<LoanApplication> get012Application();
+
+
+    /**
      * 查询审核通过且到达认购期限的申请
      * @param now 当前时间
      * @return 申请的list
