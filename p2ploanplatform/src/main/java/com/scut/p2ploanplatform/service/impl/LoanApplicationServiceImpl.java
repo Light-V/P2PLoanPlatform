@@ -3,21 +3,27 @@ package com.scut.p2ploanplatform.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.scut.p2ploanplatform.dao.LoanApplicationDao;
+import com.scut.p2ploanplatform.dao.PurchaseDao;
+import com.scut.p2ploanplatform.dto.UserHistory;
 import com.scut.p2ploanplatform.entity.LoanApplication;
+import com.scut.p2ploanplatform.entity.Purchase;
+import com.scut.p2ploanplatform.entity.RepayPlan;
 import com.scut.p2ploanplatform.enums.LoanStatus;
+import com.scut.p2ploanplatform.enums.ResultEnum;
+import com.scut.p2ploanplatform.exception.LoanStatusException;
 import com.scut.p2ploanplatform.service.LoanApplicationService;
+import com.scut.p2ploanplatform.service.PurchaseService;
 import com.scut.p2ploanplatform.service.UserService;
 import com.scut.p2ploanplatform.utils.AutoTrigger;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author FatCat
@@ -33,6 +39,9 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private PurchaseDao purchaseDao;
 
     @Autowired
     private NoticeServiceImpl noticeService;
@@ -54,20 +63,35 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
 
     @Override
     public Boolean reviewPass(Integer id, String guarantorId) throws SQLException, IllegalArgumentException {
-        LoanStatus loanStatus = LoanStatus.REVIEWED_PASSED;
-        return changeStatusById(id,guarantorId, loanStatus);
+        LoanApplication application = getApplicationById(id);
+        if(application.getStatus().equals(LoanStatus.UNREVIEWED.getStatus())){
+            LoanStatus loanStatus = LoanStatus.REVIEWED_PASSED;
+            return changeStatusById(id,guarantorId, loanStatus);
+        }else {
+            throw new LoanStatusException(ResultEnum.ILLEGAL_OPERATION);
+        }
     }
 
     @Override
     public Boolean reviewReject(Integer id, String guarantorId) throws SQLException, IllegalArgumentException {
-        LoanStatus loanStatus = LoanStatus.REVIEWED_REJECTED;
-        return changeStatusById(id, guarantorId, loanStatus);
+        LoanApplication application = getApplicationById(id);
+        if(application.getStatus().equals(LoanStatus.UNREVIEWED.getStatus())){
+            LoanStatus loanStatus = LoanStatus.REVIEWED_REJECTED;
+            return changeStatusById(id, guarantorId, loanStatus);
+        }else {
+            throw new LoanStatusException(ResultEnum.ILLEGAL_OPERATION);
+        }
     }
 
     @Override
     public Boolean subscribe(Integer id) throws SQLException, IllegalArgumentException {
-        LoanStatus loanStatus = LoanStatus.SUBSCRIBED;
-        return changeStatusById(id,loanStatus);
+        LoanApplication application = getApplicationById(id);
+        if(application.getStatus().equals(LoanStatus.REVIEWED_PASSED.getStatus())){
+            LoanStatus loanStatus = LoanStatus.SUBSCRIBED;
+            return changeStatusById(id,loanStatus);
+        }else {
+            throw new LoanStatusException(ResultEnum.APPLICATION_NOT_PASS_REVIEWED);
+        }
     }
 
     @Override
@@ -147,6 +171,8 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
         try {
             applicationList = loanApplicationDao.getAllApplication();
             applicationList =setUserName(applicationList);
+            applicationList.sort(Comparator.comparing(LoanApplication::getUpdateTime));
+            Collections.reverse(applicationList);
         }
         catch (Exception e) {
             throw new SQLException(e);
@@ -163,6 +189,8 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
         try {
             applicationList = loanApplicationDao.getApplicationByBorrowerId(borrowerId);
             applicationList =setUserName(applicationList);
+            applicationList.sort(Comparator.comparing(LoanApplication::getUpdateTime));
+            Collections.reverse(applicationList);
         }
         catch (Exception e) {
             throw new SQLException(e);
@@ -180,6 +208,8 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
         try {
             applicationList = loanApplicationDao.getApplicationByGuarantorId(guarantorId);
             applicationList =setUserName(applicationList);
+            applicationList.sort(Comparator.comparing(LoanApplication::getUpdateTime));
+            Collections.reverse(applicationList);
         }
         catch (Exception e) {
             throw new SQLException(e);
@@ -208,6 +238,8 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
         try {
             applicationList = loanApplicationDao.getApplicationByBorrowerIdAndStatus(borrowerId,status);
             applicationList =setUserName(applicationList);
+            applicationList.sort(Comparator.comparing(LoanApplication::getUpdateTime));
+            Collections.reverse(applicationList);
         }
         catch (Exception e) {
             throw new SQLException(e);
@@ -236,6 +268,8 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
         try {
             applicationList = loanApplicationDao.getApplicationByGuarantorIdAndStatus(guarantorId, status);
             applicationList =setUserName(applicationList);
+            applicationList.sort(Comparator.comparing(LoanApplication::getUpdateTime));
+            Collections.reverse(applicationList);
         }
         catch (Exception e) {
             throw new SQLException(e);
@@ -250,6 +284,8 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
         try {
             applicationList = loanApplicationDao.getApplicationReviewedPassed();
             applicationList = setUserName(applicationList);
+            applicationList.sort(Comparator.comparing(LoanApplication::getUpdateTime));
+            Collections.reverse(applicationList);
         }
         catch (Exception e) {
             throw new SQLException(e);
@@ -264,6 +300,8 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
         try {
             applicationList = loanApplicationDao.getApplicationUnReviewed();
             applicationList =setUserName(applicationList);
+            applicationList.sort(Comparator.comparing(LoanApplication::getUpdateTime));
+            Collections.reverse(applicationList);
         }
         catch (Exception e) {
             throw new SQLException(e);
@@ -305,6 +343,8 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
         try {
             applicationList = loanApplicationDao.getApplicationReviewedRejected();
             applicationList = setUserName(applicationList);
+            applicationList.sort(Comparator.comparing(LoanApplication::getUpdateTime));
+            Collections.reverse(applicationList);
         }
         catch (Exception e) {
             throw new SQLException(e);
@@ -329,5 +369,51 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
             throw new SQLException(e);
         }
         return new PageInfo<>(applicationList);
+    }
+
+    @Override
+    public PageInfo<LoanApplication> getOverdueApplicationById(Integer pageNum, Integer pageSize, String userId) throws SQLException {
+        PageHelper.startPage(pageNum, pageSize);
+        List<LoanApplication> applicationList;
+        try {
+            applicationList = loanApplicationDao.getOverdueApplicationById(userId);
+            applicationList = setUserName(applicationList);
+            applicationList.sort(Comparator.comparing(LoanApplication::getUpdateTime));
+            Collections.reverse(applicationList);
+        }
+        catch (Exception e) {
+            throw new SQLException(e);
+        }
+        return new PageInfo<>(applicationList);
+    }
+
+    @Override
+    public PageInfo<UserHistory> getUserHistory(Integer pageNum, Integer pageSize, String userId) throws SQLException {
+        PageHelper.startPage(pageNum, pageSize);
+        List<UserHistory> userHistoryList;
+        List<Purchase> purchaseList;
+        try {
+            purchaseList = purchaseDao.getPurchaseByBorrowerId(userId);
+            PageInfo purchasePageInfo = new PageInfo<>(purchaseList);
+            PageInfo<UserHistory> userHistoryPageInfo = new PageInfo<>();
+            BeanUtils.copyProperties(purchasePageInfo, userHistoryPageInfo);
+            userHistoryList = setUserNameAndConvert(purchaseList);
+            userHistoryPageInfo.setList(userHistoryList);
+            return userHistoryPageInfo;
+        }
+        catch (Exception e){
+            throw new SQLException(e);
+        }
+    }
+
+
+    private List<UserHistory> setUserNameAndConvert(List<Purchase> list) throws Exception
+    {
+        ArrayList<UserHistory> userHistoryList = new ArrayList<>();
+        for(Purchase purchase:list){
+            userHistoryList.add(new UserHistory(purchase));
+        }
+
+        return userHistoryList;
     }
 }

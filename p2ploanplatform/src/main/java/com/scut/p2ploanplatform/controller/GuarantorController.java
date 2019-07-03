@@ -2,11 +2,15 @@ package com.scut.p2ploanplatform.controller;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
+import com.scut.p2ploanplatform.dao.AuthorityDao;
+import com.scut.p2ploanplatform.dto.UserInfoGuarantorView;
+import com.scut.p2ploanplatform.entity.CreditInfo;
+import com.scut.p2ploanplatform.entity.Guarantor;
 import com.scut.p2ploanplatform.entity.LoanApplication;
+import com.scut.p2ploanplatform.entity.User;
+import com.scut.p2ploanplatform.enums.NoticeStatusEnum;
 import com.scut.p2ploanplatform.enums.ResultEnum;
-import com.scut.p2ploanplatform.service.GuarantorService;
-import com.scut.p2ploanplatform.service.LoanApplicationService;
-import com.scut.p2ploanplatform.service.UserService;
+import com.scut.p2ploanplatform.service.*;
 import com.scut.p2ploanplatform.utils.ResultVoUtil;
 import com.scut.p2ploanplatform.vo.PageVo;
 import com.scut.p2ploanplatform.vo.ResultVo;
@@ -25,14 +29,19 @@ import static com.scut.p2ploanplatform.utils.ResultVoUtil.error;
 @RestController
 @RequestMapping("/guarantor")
 public class GuarantorController {
-    @Autowired
-    LoanApplicationService loanApplicationService;
+
     @Autowired
     UserService userService;
     @Autowired
     GuarantorService guarantorService;
     @Autowired
     LoanApplicationService applicationService;
+    @Autowired
+    CreditService creditService;
+    @Autowired
+    NoticeService noticeService;
+    @Autowired
+    AuthorityService authorityService;
 
     @RequestMapping("/guarantee/detail/{applicationId}")
     @GetMapping
@@ -212,7 +221,9 @@ public class GuarantorController {
         try {
             LoanApplication loanApplication = applicationService.getApplicationById(applicationId);
             if (loanApplication.getStatus()!=0) return ResultVoUtil.error(ResultEnum.REVIEW_PRIVILEGE_DENY);
+            if (authorityService.getAuthorityAmount(guarantorService.findGuarantor(userId).getAuthorityId()).compareTo(loanApplication.getAmount())<0) return ResultVoUtil.error(ResultEnum.REVIEW_PRIVILEGE_DENY);
             if(applicationService.reviewPass(applicationId, userId)){
+                noticeService.sendNotice(loanApplication.getBorrowerId(),"申请状态变化","您的申请被通过了");
                 return ResultVoUtil.success();
             }
             else return ResultVoUtil.error(ResultEnum.REVIEW_PRIVILEGE_DENY);
@@ -224,9 +235,9 @@ public class GuarantorController {
 
     @RequestMapping("/guarantee/reject")
     @GetMapping
-    public ResultVo rejectApllication(@RequestParam("application_id") Integer applicationId,
-                                    @SessionAttribute("user") String userId,
-                                    @SessionAttribute(value = "user_type") int userType){
+    public ResultVo rejectApplication(@RequestParam("application_id") Integer applicationId,
+                                      @SessionAttribute("user") String userId,
+                                      @SessionAttribute(value = "user_type") int userType){
         if (userType != 2) {
             return error(ResultEnum.USER_AUTHORITY_DENY);
         }
@@ -234,9 +245,91 @@ public class GuarantorController {
             LoanApplication loanApplication = applicationService.getApplicationById(applicationId);
             if (loanApplication.getStatus()!=0) return ResultVoUtil.error(ResultEnum.REVIEW_PRIVILEGE_DENY);
             if (applicationService.reviewReject(applicationId, userId)){
+                noticeService.sendNotice(loanApplication.getBorrowerId(),"申请状态变化","您的申请被拒绝了");
                 return ResultVoUtil.success();
             }
             else return ResultVoUtil.error(ResultEnum.REVIEW_PRIVILEGE_DENY);
+        }
+        catch (Exception e){
+            return error(ResultEnum.PARAM_IS_INVALID);
+        }
+    }
+
+    @RequestMapping("/guarantee/userInfo")
+    @GetMapping
+    public ResultVo getUserInfo(@RequestParam(value="user_id")String userId,
+                                @SessionAttribute(value = "user_type") int userType){
+        if (userType != 2) {
+            return error(ResultEnum.USER_AUTHORITY_DENY);
+        }
+
+        try {
+            User user = userService.findUser(userId);
+            CreditInfo creditInfo= creditService.getCreditInfo(userId);
+            if (user==null||creditInfo==null)
+                return error(ResultEnum.USER_NOT_EXITST);
+            UserInfoGuarantorView userInfoGuarantorView = new UserInfoGuarantorView(creditInfo,user);
+            return ResultVoUtil.success(userInfoGuarantorView);
+        }
+        catch (Exception e)
+        {
+            return error(ResultEnum.PARAM_IS_INVALID);
+        }
+    }
+
+    @RequestMapping("/guarantee/user_history")
+    @GetMapping
+    public ResultVo getUserHistory(@RequestParam(value="user_id")String userId,
+                                   @RequestParam(value = "page_num", defaultValue = "1") Integer pageNum,
+                                   @RequestParam(value = "page_size", required = false, defaultValue = "10") Integer pageSize,
+                                @SessionAttribute(value = "user_type") int userType){
+        if (userType != 2) {
+            return error(ResultEnum.USER_AUTHORITY_DENY);
+        }
+
+
+        PageInfo applicationPageInfo;
+        try{
+            applicationPageInfo = applicationService.getUserHistory(pageNum, pageSize, userId);
+            if(applicationPageInfo == null||applicationPageInfo.getTotal()==0){
+                return ResultVoUtil.success(applicationPageInfo);
+            }
+            return ResultVoUtil.success(new PageVo(
+                    applicationPageInfo.getPages(),
+                    applicationPageInfo.getTotal(),
+                    applicationPageInfo.getPageSize(),
+                    applicationPageInfo.getPageNum(),
+                    applicationPageInfo.getList())
+            );
+        }
+        catch (Exception e){
+            return error(ResultEnum.PARAM_IS_INVALID);
+        }
+    }
+
+    @RequestMapping("/overdue")
+    @GetMapping
+    public ResultVo getOverdue(@RequestParam(value = "page_num", defaultValue = "1") Integer pageNum,
+                               @RequestParam(value = "page_size", required = false, defaultValue = "10") Integer pageSize,
+                               @SessionAttribute(value = "user_type") int userType,
+                               @SessionAttribute(value = "user") String userId){
+        if (userType != 2) {
+            return error(ResultEnum.USER_AUTHORITY_DENY);
+        }
+
+        PageInfo applicationPageInfo;
+        try{
+            applicationPageInfo = applicationService.getOverdueApplicationById(pageNum, pageSize, userId);
+            if(applicationPageInfo == null||applicationPageInfo.getTotal()==0){
+                return ResultVoUtil.success(applicationPageInfo);
+            }
+            return ResultVoUtil.success(new PageVo(
+                    applicationPageInfo.getPages(),
+                    applicationPageInfo.getTotal(),
+                    applicationPageInfo.getPageSize(),
+                    applicationPageInfo.getPageNum(),
+                    applicationPageInfo.getList())
+            );
         }
         catch (Exception e){
             return error(ResultEnum.PARAM_IS_INVALID);

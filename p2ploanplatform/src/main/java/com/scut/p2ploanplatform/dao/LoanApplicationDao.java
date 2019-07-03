@@ -126,4 +126,12 @@ public interface LoanApplicationDao {
     @Select("SELECT * FROM `loan_application` WHERE purchase_deadline < #{now} FOR UPDATE")
     List<LoanApplication> getApplicationReviewExpired(Date now);
 
+    /**
+     * 查询担保人担保的逾期申请
+     * @param userId 担保人Id
+     * @return 申请的list
+     */
+    @Select("SELECT * FROM `loan_application` WHERE `status` = 0 AND `guarantor_id` = #{userId}")
+    List<LoanApplication> getOverdueApplicationById(String userId);
+
 }

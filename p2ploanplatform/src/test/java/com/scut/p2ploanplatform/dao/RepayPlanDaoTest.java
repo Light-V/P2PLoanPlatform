@@ -34,6 +34,8 @@ public class RepayPlanDaoTest {
         Date repayDate = offsetOneMonth(getDate(new Date()), 1);
         sampleRepayPlan.setRepayDate(repayDate);
         sampleRepayPlan.setRealRepayDate(repayDate);
+        sampleRepayPlan.setStatus(RepayPlanStatus.SCHEDULED.getStatus());
+        sampleRepayPlan.setOverdueProceeded(false);
     }
 
     @Test
@@ -69,6 +71,7 @@ public class RepayPlanDaoTest {
         assertEquals(expected.getRepayDate(), actual.getRepayDate());
         assertEquals(expected.getRealRepayDate(), actual.getRealRepayDate());
         assertEquals(expected.getStatus(), actual.getStatus());
+        assertEquals(expected.isOverdueProceeded(), actual.isOverdueProceeded());
     }
 
     private Date getDate(Date date) {
@@ -116,6 +119,7 @@ public class RepayPlanDaoTest {
         unpaidPlan.setRealRepayDate(null);
         unpaidPlan.setAmount(BigDecimal.valueOf(666.66));
         unpaidPlan.setStatus(RepayPlanStatus.SCHEDULED.getStatus());
+        unpaidPlan.setOverdueProceeded(false);
 
         // overdue plans
         RepayPlan overduePlan = new RepayPlan();
@@ -125,6 +129,7 @@ public class RepayPlanDaoTest {
         overduePlan.setRealRepayDate(null);
         overduePlan.setAmount(BigDecimal.valueOf(123, 2));
         overduePlan.setStatus(RepayPlanStatus.OVERDUE.getStatus());
+        overduePlan.setOverdueProceeded(false);
 
         // normal plans
         RepayPlan normalPlan = new RepayPlan();
@@ -134,6 +139,7 @@ public class RepayPlanDaoTest {
         normalPlan.setRealRepayDate(normalPlan.getRepayDate());
         normalPlan.setAmount(BigDecimal.valueOf(321, 2));
         normalPlan.setStatus(RepayPlanStatus.SUCCEEDED.getStatus());
+        normalPlan.setOverdueProceeded(false);
 
         // normal plans
         RepayPlan advancedPaidPlan = new RepayPlan();
@@ -143,6 +149,7 @@ public class RepayPlanDaoTest {
         advancedPaidPlan.setRealRepayDate(advancedPaidPlan.getRepayDate());
         advancedPaidPlan.setAmount(BigDecimal.valueOf(321, 2));
         advancedPaidPlan.setStatus(RepayPlanStatus.GUARANTOR_PAID_ADVANCE.getStatus());
+        advancedPaidPlan.setOverdueProceeded(false);
 
         insertPlan(unpaidPlan);
         insertPlan(overduePlan);
@@ -177,6 +184,7 @@ public class RepayPlanDaoTest {
         actualPlan.setRepayDate(offsetOneMonth(actualPlan.getRepayDate(), 1));
         actualPlan.setRealRepayDate(actualPlan.getRepayDate());
         actualPlan.setAmount(BigDecimal.valueOf(2333.45));
+        actualPlan.setOverdueProceeded(true);
 
         result = repayPlanDao.updatePlan(actualPlan);
         assertEquals(1, result);

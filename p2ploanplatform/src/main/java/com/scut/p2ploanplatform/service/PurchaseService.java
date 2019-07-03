@@ -19,7 +19,7 @@ public interface PurchaseService {
      * @param applicationId 投资人投资的借款申请Id
      * @return 操作状态（成功/失败)
      */
-    Purchase subscribed(String investorId, Integer applicationId) throws SQLException,IllegalArgumentException, LoanStatusException;
+    Purchase subscribed(String investorId, Integer applicationId, String password) throws Exception;
 
     /**
      * 订单逾期（修改订单状态）
@@ -41,6 +41,13 @@ public interface PurchaseService {
      * @return 订单列表
      */
     Purchase showPurchaseById(Integer purchaseId) throws SQLException,IllegalArgumentException;
+
+    /**
+     * 根据订单id查询订单
+     * @param applicationId 借款申请id
+     * @return 订单列表
+     */
+    Purchase showPurchaseByApplicationId(Integer applicationId) throws SQLException,IllegalArgumentException;
 
     /**
      * 查询所有订单

@@ -44,6 +44,14 @@ public interface PurchaseDao {
     Purchase getPurchaseByPurchaseId(Integer purchaseId);
 
     /**
+     * 根据订单ID查询订单
+     * @param applicationId 借款申请Id
+     * @return 订单列表
+     */
+    @Select("SELECT * FROM `purchase` WHERE `application_id` = #{applicationId}")
+    Purchase getPurchaseByApplicationId(Integer applicationId);
+
+    /**
      * 查询特定投资人的所有订单
      * @param investorId 投资人Id
      * @return 订单列表

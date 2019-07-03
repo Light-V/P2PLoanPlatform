@@ -8,48 +8,77 @@ import com.scut.p2ploanplatform.entity.RepayPlan;
 import com.scut.p2ploanplatform.enums.LoanStatus;
 import com.scut.p2ploanplatform.exception.LoanStatusException;
 import com.scut.p2ploanplatform.service.LoanApplicationService;
+import com.scut.p2ploanplatform.service.P2pAccountService;
 import com.scut.p2ploanplatform.service.RepayService;
+import com.scut.p2ploanplatform.utils.ThirdPartyOperationInterface;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.xml.crypto.Data;
+import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.util.Calendar;
 import java.util.Comparator;
 import java.util.List;
 
 import static org.junit.Assert.*;
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @RunWith(SpringRunner.class)
 public class PurchaseServiceImplTest {
-    @Autowired
-    PurchaseServiceImpl purchaseService;
+    @LocalServerPort
+    private int port;
 
     @Autowired
-    RepayService repayService;
+    private PurchaseServiceImpl purchaseService;
 
     @Autowired
-    LoanApplicationService applicationService;
+    private LoanApplicationService applicationService;
+
+    @Autowired
+    private P2pAccountServiceImpl p2pAccountService;
 
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();
 
+    private LoanApplication application = new LoanApplication();
+    private String investorId = "201603000000";
+
+    @Before
+    public void newApplication() throws Exception{
+        application.setBorrowerId("201601000000");
+        application.setTitle("测试");
+        application.setStatus(LoanStatus.UNREVIEWED.getStatus());
+        application.setAmount(new BigDecimal(1000000));
+        application.setInterestRate(new BigDecimal(0.0618));
+        application.setLoanMonth(6);
+        application.setPurchaseDeadline(Calendar.getInstance().getTime());
+        applicationService.addApplication(application);
+        applicationService.reviewPass(application.getApplicationId(), "201602000000");
+
+        if (p2pAccountService.getApiKey() == null) {
+            p2pAccountService.generateApiKey();
+        }
+        ThirdPartyOperationInterface.setApiKey(p2pAccountService.getApiKey());
+        ThirdPartyOperationInterface.setThirdPartyApiUrl("http://localhost:" + port + "/third_party/");
+    }
+
     @Test
-    @Transactional
+//    @Transactional
     public void subscribed_success() {
-        String investorId  ="201630419704";
-        Integer applicationId = 61;
+        Integer applicationId = application.getApplicationId();
         Purchase purchase=null;
         LoanApplication application = null;
-
         try{
-            purchase = purchaseService.subscribed(investorId, applicationId);
+            purchase = purchaseService.subscribed(investorId, applicationId,"123456");
             application = applicationService.getApplicationById(applicationId);
         }catch (Exception e){
             e.printStackTrace();
@@ -65,23 +94,24 @@ public class PurchaseServiceImplTest {
 
     @Test
     @Transactional
-    public void subscribed_fail() throws SQLException, LoanStatusException {
-        String investorId  ="201630419704";
-        Integer applicationId = 26;
+    public void subscribed_fail() throws Exception{
+//        String investorId  ="201630419704";
+        applicationService.expire(application.getApplicationId());
+        Integer applicationId = application.getApplicationId();
         expectedEx.expect(LoanStatusException.class);
         expectedEx.expectMessage("借款申请未发布");
-        purchaseService.subscribed(investorId, applicationId);
+        purchaseService.subscribed(investorId, applicationId,"123456");
     }
 
     @Test
     @Transactional
     public void purchaseOverdue() {
-        String investorId  ="201630419704";
+//        String investorId  ="201630419704";
         Integer applicationId = 61;
         Purchase purchase=null;
         Boolean result = false;
         try{
-            purchase = purchaseService.subscribed(investorId, applicationId);
+            purchase = purchaseService.subscribed(investorId, applicationId,"123456");
             result = purchaseService.purchaseOverdue(purchase.getPurchaseId());
             purchase = purchaseService.showPurchaseById(purchase.getPurchaseId());
         }catch (Exception e){
@@ -95,12 +125,12 @@ public class PurchaseServiceImplTest {
     @Test
     @Transactional
     public void showAllPurchase() {
-        String investorId  ="201630419704";
+//        String investorId  ="201630419704";
         PageInfo<Purchase> purchasePageInfo =null;
         try{
-            purchaseService.subscribed(investorId, 51);
-            purchaseService.subscribed(investorId, 61);
-            purchaseService.subscribed(investorId, 72);
+            purchaseService.subscribed(investorId, 51,"123456");
+            purchaseService.subscribed(investorId, 61,"123456");
+            purchaseService.subscribed(investorId, 72,"123456");
         }catch (Exception e){
             e.printStackTrace();
             fail();
@@ -126,12 +156,12 @@ public class PurchaseServiceImplTest {
     @Test
     @Transactional
     public void showPurchaseByBorrowerId() {
-        String investorId  ="201630419704";
+//        String investorId  ="201630419704";
         PageInfo<Purchase> purchasePageInfo =null;
         try{
-            purchaseService.subscribed(investorId, 51);
-            purchaseService.subscribed(investorId, 61);
-            purchaseService.subscribed(investorId, 72);
+            purchaseService.subscribed(investorId, 51,"123456");
+            purchaseService.subscribed(investorId, 61,"123456");
+            purchaseService.subscribed(investorId, 72,"123456");
         }catch (Exception e){
             e.printStackTrace();
             fail();
@@ -151,12 +181,12 @@ public class PurchaseServiceImplTest {
     @Test
     @Transactional
     public void showPurchaseByInvestorId() {
-        String investorId  ="201630419704";
+//        String investorId  ="201630419704";
         PageInfo<Purchase> purchasePageInfo =null;
         try{
-            purchaseService.subscribed(investorId, 51);
-            purchaseService.subscribed(investorId, 61);
-            purchaseService.subscribed(investorId, 72);
+            purchaseService.subscribed(investorId, 51,"123456");
+            purchaseService.subscribed(investorId, 61,"123456");
+            purchaseService.subscribed(investorId, 72,"123456");
         }catch (Exception e){
             e.printStackTrace();
             fail();
@@ -176,12 +206,12 @@ public class PurchaseServiceImplTest {
     @Test
     @Transactional
     public void accomplishPurchase() {
-        String investorId  ="201630419704";
+//        String investorId  ="201630419704";
         Integer applicationId = 61;
         Purchase purchase=null;
         Boolean result = false;
         try{
-            purchase = purchaseService.subscribed(investorId, applicationId);
+            purchase = purchaseService.subscribed(investorId, applicationId,"123456");
             result = purchaseService.accomplishPurchase(purchase.getPurchaseId());
             purchase = purchaseService.showPurchaseById(purchase.getPurchaseId());
         }catch (Exception e){
@@ -190,5 +220,13 @@ public class PurchaseServiceImplTest {
         }
         Assert.assertTrue(result);
         Assert.assertEquals(LoanStatus.FINISHED.getStatus(), purchase.getStatus());
+    }
+
+    @Test
+    public void showPurchaseByApplicationId() throws Exception{
+        Purchase purchase = null;
+        purchase = purchaseService.showPurchaseByApplicationId(27);
+        Assert.assertNotNull(purchase);
+        System.out.println(purchase);
     }
 }

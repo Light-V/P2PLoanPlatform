@@ -1,6 +1,7 @@
 package com.scut.p2ploanplatform.service;
 
 import com.github.pagehelper.PageInfo;
+import com.scut.p2ploanplatform.dto.UserHistory;
 import com.scut.p2ploanplatform.enums.LoanStatus;
 import com.scut.p2ploanplatform.entity.LoanApplication;
 
@@ -180,4 +181,29 @@ public interface LoanApplicationService {
      * @throws IllegalArgumentException 非法参数错误
      */
     PageInfo<LoanApplication> getApplicationUnReviewed(Integer pageNum, Integer pageSize) throws SQLException;
+
+    /**
+     * 查询所有审核通过逾期的申请
+     * 产品交易平台展示内容
+     * @param pageNum 请求页码
+     * @param pageSize 每页包含的字段数
+     * @param userId 审核人Id
+     * @return 借款申请列表
+     * @throws SQLException sql错误
+     * @throws IllegalArgumentException 非法参数错误
+     */
+    PageInfo<LoanApplication> getOverdueApplicationById(Integer pageNum, Integer pageSize, String userId) throws SQLException;
+
+
+    /**
+     * 查询用户借款记录
+     * 产品交易平台展示内容
+     * @param pageNum 请求页码
+     * @param pageSize 每页包含的字段数
+     * @param userId 用户Id
+     * @return 借款申请列表
+     * @throws SQLException sql错误
+     * @throws IllegalArgumentException 非法参数错误
+     */
+    PageInfo<UserHistory> getUserHistory(Integer pageNum, Integer pageSize, String userId) throws SQLException;
 }

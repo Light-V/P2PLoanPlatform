@@ -24,6 +24,8 @@ public class NoticeServiceImpl implements NoticeService {
     @Autowired
     private NoticeDao noticeDao;
 
+    private final String ORDER_BY = "time desc";
+
     @Override
     public Notice sendNotice(String receiverId, String title, String content) {
         Notice notice = new Notice();
@@ -38,21 +40,21 @@ public class NoticeServiceImpl implements NoticeService {
 
     @Override
     public PageInfo<Notice> getNotices(String userId, Integer pageNum, Integer pageSize) {
-        PageHelper.startPage(pageNum, pageSize);
+        PageHelper.startPage(pageNum, pageSize, ORDER_BY);
         List<Notice> noticeList = noticeDao.findByUserId(userId);
         return new PageInfo<>(noticeList);
     }
 
     @Override
     public PageInfo<Notice> getUnreadNotices(String userId, Integer pageNum, Integer pageSize) {
-        PageHelper.startPage(pageNum, pageSize);
+        PageHelper.startPage(pageNum, pageSize, ORDER_BY);
         List<Notice> noticeList = noticeDao.findByUserIdAndStatus(userId, NoticeStatusEnum.UNREAD.getCode());
         return new PageInfo<>(noticeList);
     }
 
     @Override
     public PageInfo<Notice> getReadNotices(String userId, Integer pageNum, Integer pageSize) {
-        PageHelper.startPage(pageNum, pageSize);
+        PageHelper.startPage(pageNum, pageSize, ORDER_BY);
         List<Notice> noticeList = noticeDao.findByUserIdAndStatus(userId, NoticeStatusEnum.READ.getCode());
         return new PageInfo<>(noticeList);
     }

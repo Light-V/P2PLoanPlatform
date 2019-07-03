@@ -48,4 +48,21 @@ public interface RepayService {
      */
     void updateRepayPlan(String id, RepayPlanStatus status, Date realRepayDate) throws SQLException, IllegalArgumentException;
 
+    /**
+     * 根据认购ID查询该ID下所有的还款计划是否已完成还款
+     * @param purchaseId 认购ID
+     * @throws SQLException SQL错误
+     * @throws IllegalArgumentException 参数错误
+     * @return 还款计划的状态，查询不到该认购ID则返回null
+     */
+    Boolean isRepayCompleted(Integer purchaseId) throws SQLException, IllegalArgumentException;
+
+    /**
+     * 查询认购ID下所有还款计划的最大逾期天数
+     * @param purchaseId 认购ID
+     * @return 若无该ID则返回空，否则返回逾期天数（无逾期则返回0）
+     * @throws SQLException SQL错误
+     * @throws IllegalArgumentException 参数错误
+     */
+    Integer getRepayOverdueDay(Integer purchaseId) throws SQLException, IllegalArgumentException;
 }

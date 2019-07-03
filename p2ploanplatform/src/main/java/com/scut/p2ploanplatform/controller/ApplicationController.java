@@ -66,7 +66,7 @@ public class ApplicationController {
         LoanApplication application;
         try{
             application = applicationService.getApplicationById(applicationId);
-            if(userId.equals(application.getBorrowerId())){
+            if(!userId.equals(application.getBorrowerId())){
                 return ResultVoUtil.error(ResultEnum.ILLEGAL_OPERATION.getCode(), "你不是该订单的发起人，不能对该订单进行操作");
             }
         }catch (SQLException e){
@@ -94,6 +94,9 @@ public class ApplicationController {
         }
         if(application == null){
             return ResultVoUtil.error(ResultEnum.APPLICATION_NOT_EXIST);
+        }
+        if(!application.getBorrowerId().equals(userId)&&!application.getStatus().equals(LoanStatus.REVIEWED_PASSED.getStatus())){
+            return ResultVoUtil.error(ResultEnum.ILLEGAL_OPERATION);
         }
         return  ResultVoUtil.success(application);
     }

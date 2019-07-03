@@ -12,6 +12,8 @@ import com.scut.p2ploanplatform.enums.ResultEnum;
 import com.scut.p2ploanplatform.exception.CustomException;
 import com.scut.p2ploanplatform.exception.LoanStatusException;
 import com.scut.p2ploanplatform.service.*;
+import com.scut.p2ploanplatform.utils.ThirdPartyOperationInterface;
+import com.scut.p2ploanplatform.vo.ResultVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,22 +37,25 @@ public class PurchaseServiceImpl implements PurchaseService {
     private final RepayService repayService;
     private final P2pAccountService p2pAccountService;
     private final NoticeService noticeService;
+    private final GuarantorService guarantorService;
 
     @Autowired
     public PurchaseServiceImpl(PurchaseDao purchaseDao, UserService userService,
                                LoanApplicationService applicationService, RepayService repayService,
-                               P2pAccountService p2pAccountService, NoticeService noticeService) {
+                               P2pAccountService p2pAccountService, NoticeService noticeService,
+                               GuarantorService guarantorService) {
         this.purchaseDao = purchaseDao;
         this.userService = userService;
         this.applicationService = applicationService;
         this.repayService = repayService;
         this.p2pAccountService = p2pAccountService;
         this.noticeService = noticeService;
+        this.guarantorService = guarantorService;
     }
 
     @Override
     @Transactional
-    public Purchase subscribed(String investorId, Integer applicationId) throws SQLException, IllegalArgumentException, LoanStatusException {
+    public Purchase subscribed(String investorId, Integer applicationId,String password) throws Exception{
         //获取借款申请信息
         LoanApplication application = applicationService.getApplicationById(applicationId);
 
@@ -67,8 +72,11 @@ public class PurchaseServiceImpl implements PurchaseService {
         User investor = userService.findUser(investorId);
 
         //执行转账
-        if(!p2pAccountService.transfer(investor.getThirdPartyId(),borrower.getThirdPartyId(), application.getAmount())){
-            throw new CustomException("操作失败：账号余额不足", ResultEnum.ILLEGAL_OPERATION.getCode());
+        ResultVo purchaseResult;
+        purchaseResult = ThirdPartyOperationInterface.purchase(investor.getThirdPartyId(),
+                borrower.getThirdPartyId(),application.getAmount(),password);
+        if (purchaseResult.getCode()==1){
+            throw new RuntimeException(purchaseResult.getMsg());
         }
 
         //更新数据库中的订单和还款计划表单
@@ -98,14 +106,16 @@ public class PurchaseServiceImpl implements PurchaseService {
     protected void setRepayPlan(Purchase purchase)throws SQLException{
         Date nextRepayDate = purchase.getPurchaseTime();
         Integer months = purchase.getLoanMonth();
-        BigDecimal totalAmount = purchase.getAmount();
-        BigDecimal perAmout = totalAmount.divide(new BigDecimal(months),8,BigDecimal.ROUND_HALF_UP);
+        BigDecimal amount = purchase.getAmount();
+        BigDecimal interestRate = purchase.getInterestRate();
+        BigDecimal totalAmount = amount.multiply(interestRate).add(amount);
+        BigDecimal perAmount = totalAmount.divide(new BigDecimal(months),8,BigDecimal.ROUND_HALF_UP);
         for(int i = 0;i<months;i++){
             Calendar nextRepay = Calendar.getInstance();
             nextRepay.setTime(nextRepayDate);
             nextRepay.add(Calendar.MONTH, 1);
             nextRepayDate = nextRepay.getTime();
-            repayService.insertPlan(purchase.getPurchaseId(),nextRepayDate,perAmout);
+            repayService.insertPlan(purchase.getPurchaseId(),nextRepayDate,perAmount);
         }
     }
 
@@ -134,7 +144,7 @@ public class PurchaseServiceImpl implements PurchaseService {
 
     @Override
     public Purchase showPurchaseById(Integer purchaseId) throws SQLException, IllegalArgumentException {
-        Purchase purchase = null;
+        Purchase purchase;
         try{
             purchase = purchaseDao.getPurchaseByPurchaseId(purchaseId);
             List<RepayPlan> repayPlans = repayService.findPlanByPurchaseId(purchaseId);
@@ -142,7 +152,33 @@ public class PurchaseServiceImpl implements PurchaseService {
             purchase.setRepayPlans(repayPlans);
             purchase.setBorrowerName(userService.findUser(purchase.getBorrowerId()).getName());
             purchase.setInvestorName(userService.findUser(purchase.getInvestorId()).getName());
-            purchase.setGuarantorName(userService.findUser(purchase.getGuarantorId()).getName());
+            purchase.setGuarantorName(guarantorService.findGuarantor(purchase.getGuarantorId()).getName());
+        }
+        catch (Exception e){
+            throw new SQLException(e);
+        }
+        return purchase;
+    }
+
+    @Override
+    public Purchase showPurchaseByApplicationId(Integer applicationId) throws SQLException, IllegalArgumentException {
+        Purchase purchase;
+        LoanApplication application = applicationService.getApplicationById(applicationId);
+        if(application == null){
+            throw new IllegalArgumentException("未找到该借款申请");
+        }
+        if(!application.getStatus().equals(LoanStatus.SUBSCRIBED.getStatus())){
+            throw new IllegalArgumentException("该借款申请未形成订单");
+        }
+
+        try{
+            purchase = purchaseDao.getPurchaseByApplicationId(applicationId);
+            List<RepayPlan> repayPlans = repayService.findPlanByPurchaseId(purchase.getPurchaseId());
+            repayPlans.sort(Comparator.comparing(RepayPlan::getRepayDate));
+            purchase.setRepayPlans(repayPlans);
+            purchase.setBorrowerName(userService.findUser(purchase.getBorrowerId()).getName());
+            purchase.setInvestorName(userService.findUser(purchase.getInvestorId()).getName());
+            purchase.setGuarantorName(guarantorService.findGuarantor(purchase.getGuarantorId()).getName());
         }
         catch (Exception e){
             throw new SQLException(e);
@@ -225,7 +261,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         for(Purchase purchase:list){
             purchase.setBorrowerName(userService.findUser(purchase.getBorrowerId()).getName());
             purchase.setInvestorName(userService.findUser(purchase.getInvestorId()).getName());
-            purchase.setGuarantorName(userService.findUser(purchase.getGuarantorId()).getName());
+            purchase.setGuarantorName(guarantorService.findGuarantor(purchase.getGuarantorId()).getName());
         }
         return list;
     }

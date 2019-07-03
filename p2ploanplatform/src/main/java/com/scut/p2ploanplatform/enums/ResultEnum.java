@@ -22,6 +22,7 @@ public enum  ResultEnum {
     NOTICE_NOT_EXIST(30001, "通知不存在"),
     APPLICATION_NOT_EXIST(30002,"借款申请不存在"),
     PURCHASE_NOT_EXITST(30003,"订单不存在"),
+    USER_NOT_EXITST(30004,"用户不存在"),
 
     /*借款申请、订单错误：40001-49999*/
     APPLICATION_NOT_REVIEWED(40001,"借款申请未审核"),

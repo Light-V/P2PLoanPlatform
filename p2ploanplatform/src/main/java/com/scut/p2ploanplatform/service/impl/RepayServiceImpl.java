@@ -48,7 +48,8 @@ public class RepayServiceImpl implements RepayService {
         plan.setAmount(amount);
         plan.setPlanId(UUID.randomUUID().toString().replace("-", ""));
         plan.setPurchaseId(purchaseId);
-        if (repayDate.before(new Date())) {
+        plan.setOverdueProceeded(false);
+        if (repayDate.before(getDate(new Date()))) {
             log.warn("Trying to insert an overdue repay plan, check your code");
             plan.setStatus(RepayPlanStatus.OVERDUE.getStatus());
         } else {
@@ -101,7 +102,8 @@ public class RepayServiceImpl implements RepayService {
 
             // optional: add expire check here
             plan.setStatus(status.getStatus());
-            plan.setRealRepayDate(realRepayDate);
+            if (realRepayDate != null)
+                plan.setRealRepayDate(getDate(realRepayDate));
             repayPlanDao.updatePlan(plan);
         } catch (IllegalArgumentException e) {
             throw e;
@@ -110,4 +112,31 @@ public class RepayServiceImpl implements RepayService {
         }
     }
 
+    @Override
+    public Boolean isRepayCompleted(Integer purchaseId) throws SQLException, IllegalArgumentException {
+        List<RepayPlan> repayPlans = findPlanByPurchaseId(purchaseId);
+        if (repayPlans.size() == 0)
+            return null;
+        boolean completed = true;
+
+        for (RepayPlan plan : repayPlans) {
+            completed = completed && (plan.getStatus().equals(RepayPlanStatus.SUCCEEDED.getStatus()) ||
+                    plan.getStatus().equals(RepayPlanStatus.OVERDUE_SUCCEEDED.getStatus()));
+        }
+
+        return completed;
+    }
+
+    @Override
+    public Integer getRepayOverdueDay(Integer purchaseId) throws SQLException, IllegalArgumentException {
+        List<RepayPlan> repayPlans = findPlanByPurchaseId(purchaseId);
+        if (repayPlans.size() == 0)
+            return null;
+        int maxOverdueDay = 0;
+        for (RepayPlan plan : repayPlans) {
+            Date realRepayDate = plan.getRealRepayDate() != null ? plan.getRealRepayDate() : getDate(new Date());
+            maxOverdueDay = (int)Math.max(maxOverdueDay, (realRepayDate.getTime() - plan.getRepayDate().getTime()) / 86400000);
+        }
+        return maxOverdueDay;
+    }
 }

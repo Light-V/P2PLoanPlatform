@@ -92,4 +92,12 @@ public class PurchaseDaoTest {
         List<Purchase> purchases = purchaseDao.getPurchaseByBorrowerId("206613679426");
         Assert.assertEquals(0,purchases.size());
     }
+
+    @Test
+    @Transactional
+    public void getPurchaseByApplicationId() {
+        Purchase purchase = purchaseDao.getPurchaseByApplicationId(27);
+        System.out.println(purchase);
+        Assert.assertEquals(new Integer(27),purchase.getApplicationId());
+    }
 }
