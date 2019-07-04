@@ -92,6 +92,15 @@ public class UserController {
         return vo;
     }
 
+    @RequestMapping("/logout")
+    public ResultVo logout(HttpServletRequest request, HttpSession session) {
+        ResultVo vo = new ResultVo();
+        session.invalidate();
+        vo.setCode(0);
+        vo.setMsg("退出账号成功");
+        return vo;
+    }
+
     @RequestMapping("/signup")
     public ResultVo signup(HttpServletRequest request )throws SQLException {
         ResultVo vo = new ResultVo();
