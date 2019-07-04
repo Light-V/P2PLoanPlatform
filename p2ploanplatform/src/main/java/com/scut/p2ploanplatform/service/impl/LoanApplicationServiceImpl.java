@@ -309,6 +309,22 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
         return new PageInfo<>(applicationList);
     }
 
+    @Override
+    public PageInfo<LoanApplication> getAll012Application(Integer pageNum, Integer pageSize) throws SQLException {
+        PageHelper.startPage(pageNum, pageSize);
+        List<LoanApplication> applicationList;
+        try {
+            applicationList = loanApplicationDao.get012Application();
+            applicationList =setUserName(applicationList);
+            applicationList.sort(Comparator.comparing(LoanApplication::getUpdateTime));
+            Collections.reverse(applicationList);
+        }
+        catch (Exception e) {
+            throw new SQLException(e);
+        }
+        return new PageInfo<>(applicationList);
+    }
+
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public void manualExpire() {
         log.info("贷款申请认购期限审查");

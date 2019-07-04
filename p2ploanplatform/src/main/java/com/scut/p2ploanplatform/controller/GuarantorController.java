@@ -191,7 +191,7 @@ public class GuarantorController {
 
         PageInfo applicationPageInfo;
         try{
-            applicationPageInfo = applicationService.getAllApplication(pageNum, pageSize);
+            applicationPageInfo = applicationService.getAll012Application(pageNum, pageSize);
         }catch (Exception e){
             return error(ResultEnum.PARAM_IS_INVALID);
         }
@@ -294,13 +294,7 @@ public class GuarantorController {
             if(applicationPageInfo == null||applicationPageInfo.getTotal()==0){
                 return ResultVoUtil.success(applicationPageInfo);
             }
-            return ResultVoUtil.success(new PageVo(
-                    applicationPageInfo.getPages(),
-                    applicationPageInfo.getTotal(),
-                    applicationPageInfo.getPageSize(),
-                    applicationPageInfo.getPageNum(),
-                    applicationPageInfo.getList())
-            );
+            return ResultVoUtil.success(applicationPageInfo);
         }
         catch (Exception e){
             return error(ResultEnum.PARAM_IS_INVALID);
@@ -323,13 +317,7 @@ public class GuarantorController {
             if(applicationPageInfo == null||applicationPageInfo.getTotal()==0){
                 return ResultVoUtil.success(applicationPageInfo);
             }
-            return ResultVoUtil.success(new PageVo(
-                    applicationPageInfo.getPages(),
-                    applicationPageInfo.getTotal(),
-                    applicationPageInfo.getPageSize(),
-                    applicationPageInfo.getPageNum(),
-                    applicationPageInfo.getList())
-            );
+            return ResultVoUtil.success(applicationPageInfo);
         }
         catch (Exception e){
             return error(ResultEnum.PARAM_IS_INVALID);
