@@ -92,6 +92,15 @@ public class UserController {
         return vo;
     }
 
+    @RequestMapping("/logout")
+    public ResultVo logout(HttpServletRequest request, HttpSession session) {
+        ResultVo vo = new ResultVo();
+        session.invalidate();
+        vo.setCode(0);
+        vo.setMsg("退出账号成功");
+        return vo;
+    }
+
     @RequestMapping("/signup")
     public ResultVo signup(HttpServletRequest request )throws SQLException {
         ResultVo vo = new ResultVo();
@@ -154,7 +163,7 @@ public class UserController {
             return vo;
         } else if(thirdPartyId.length()!=12) {
             vo.setCode(1);
-            vo.setMsg("错误！第三方账号符合规范。");
+            vo.setMsg("错误！第三方账号不符合规范。");
             return vo;
         } else if(p2pAccountService.verifyIfExists(thirdPartyId))
         {
