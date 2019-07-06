@@ -163,7 +163,6 @@ public class CreditServiceImpl implements CreditService {
 
     @Override
     public Integer getCreditScore(String userId) throws SQLException, IllegalArgumentException {
-        Integer creditScore = creditInfoDao.selectCreditScore(userId);
-        return creditScore;
+        return creditInfoDao.selectCreditScore(userId);
     }
 }
