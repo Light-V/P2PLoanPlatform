@@ -75,7 +75,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         ResultVo purchaseResult;
         purchaseResult = ThirdPartyOperationInterface.purchase(investor.getThirdPartyId(),
                 borrower.getThirdPartyId(),application.getAmount(),password);
-        if (purchaseResult.getCode()==1){
+        if (purchaseResult.getCode()!=0){
             throw new RuntimeException(purchaseResult.getMsg());
         }
 

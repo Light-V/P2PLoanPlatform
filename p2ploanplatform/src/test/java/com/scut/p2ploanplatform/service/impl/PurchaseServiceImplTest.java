@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.xml.crypto.Data;
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.List;
@@ -49,20 +50,24 @@ public class PurchaseServiceImplTest {
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();
 
-    private LoanApplication application = new LoanApplication();
+    private List<LoanApplication> applications = new ArrayList<>();
     private String investorId = "201603000000";
 
     @Before
     public void newApplication() throws Exception{
-        application.setBorrowerId("201601000000");
-        application.setTitle("测试");
-        application.setStatus(LoanStatus.UNREVIEWED.getStatus());
-        application.setAmount(new BigDecimal(1000000));
-        application.setInterestRate(new BigDecimal(0.0618));
-        application.setLoanMonth(6);
-        application.setPurchaseDeadline(Calendar.getInstance().getTime());
-        applicationService.addApplication(application);
-        applicationService.reviewPass(application.getApplicationId(), "201602000000");
+        for(int i=1; i<5; i++) {
+            LoanApplication application =  new LoanApplication();
+            application.setBorrowerId("201601000000");
+            application.setTitle("测试");
+            application.setStatus(LoanStatus.UNREVIEWED.getStatus());
+            application.setAmount(new BigDecimal(i*2000));
+            application.setInterestRate(new BigDecimal(0.0527));
+            application.setLoanMonth(i*3);
+            application.setPurchaseDeadline(Calendar.getInstance().getTime());
+            applicationService.addApplication(application);
+            applicationService.reviewPass(application.getApplicationId(), "201602000000");
+            applications.add(application);
+        }
 
         if (p2pAccountService.getApiKey() == null) {
             p2pAccountService.generateApiKey();
@@ -72,9 +77,9 @@ public class PurchaseServiceImplTest {
     }
 
     @Test
-//    @Transactional
+    @Transactional
     public void subscribed_success() {
-        Integer applicationId = application.getApplicationId();
+        Integer applicationId = applications.get(1).getApplicationId();
         Purchase purchase=null;
         LoanApplication application = null;
         try{
@@ -94,20 +99,8 @@ public class PurchaseServiceImplTest {
 
     @Test
     @Transactional
-    public void subscribed_fail() throws Exception{
-//        String investorId  ="201630419704";
-        applicationService.expire(application.getApplicationId());
-        Integer applicationId = application.getApplicationId();
-        expectedEx.expect(LoanStatusException.class);
-        expectedEx.expectMessage("借款申请未发布");
-        purchaseService.subscribed(investorId, applicationId,"123456");
-    }
-
-    @Test
-    @Transactional
     public void purchaseOverdue() {
-//        String investorId  ="201630419704";
-        Integer applicationId = 61;
+        Integer applicationId = applications.get(3).getApplicationId();
         Purchase purchase=null;
         Boolean result = false;
         try{
@@ -125,12 +118,11 @@ public class PurchaseServiceImplTest {
     @Test
     @Transactional
     public void showAllPurchase() {
-//        String investorId  ="201630419704";
         PageInfo<Purchase> purchasePageInfo =null;
         try{
-            purchaseService.subscribed(investorId, 51,"123456");
-            purchaseService.subscribed(investorId, 61,"123456");
-            purchaseService.subscribed(investorId, 72,"123456");
+            purchaseService.subscribed(investorId, applications.get(0).getApplicationId(),"123456");
+            purchaseService.subscribed(investorId, applications.get(1).getApplicationId(),"123456");
+            purchaseService.subscribed(investorId, applications.get(2).getApplicationId(),"123456");
         }catch (Exception e){
             e.printStackTrace();
             fail();
@@ -149,25 +141,18 @@ public class PurchaseServiceImplTest {
 
     @Test
     @Transactional
-    public void showPurchaseById() {
-
-    }
-
-    @Test
-    @Transactional
     public void showPurchaseByBorrowerId() {
-//        String investorId  ="201630419704";
         PageInfo<Purchase> purchasePageInfo =null;
         try{
-            purchaseService.subscribed(investorId, 51,"123456");
-            purchaseService.subscribed(investorId, 61,"123456");
-            purchaseService.subscribed(investorId, 72,"123456");
+            purchaseService.subscribed(investorId, applications.get(2).getApplicationId(),"123456");
+            purchaseService.subscribed(investorId, applications.get(3).getApplicationId(),"123456");
+            purchaseService.subscribed(investorId, applications.get(1).getApplicationId(),"123456");
         }catch (Exception e){
             e.printStackTrace();
             fail();
         }
         try{
-            purchasePageInfo = purchaseService.showPurchaseByBorrowerId("201630664195",1, 10);
+            purchasePageInfo = purchaseService.showPurchaseByBorrowerId("201601000000",1, 10);
         }catch (Exception e){
             e.printStackTrace();
             fail();
@@ -181,12 +166,11 @@ public class PurchaseServiceImplTest {
     @Test
     @Transactional
     public void showPurchaseByInvestorId() {
-//        String investorId  ="201630419704";
         PageInfo<Purchase> purchasePageInfo =null;
         try{
-            purchaseService.subscribed(investorId, 51,"123456");
-            purchaseService.subscribed(investorId, 61,"123456");
-            purchaseService.subscribed(investorId, 72,"123456");
+            purchaseService.subscribed(investorId, applications.get(0).getApplicationId(),"123456");
+            purchaseService.subscribed(investorId, applications.get(2).getApplicationId(),"123456");
+            purchaseService.subscribed(investorId, applications.get(1).getApplicationId(),"123456");
         }catch (Exception e){
             e.printStackTrace();
             fail();
@@ -206,8 +190,7 @@ public class PurchaseServiceImplTest {
     @Test
     @Transactional
     public void accomplishPurchase() {
-//        String investorId  ="201630419704";
-        Integer applicationId = 61;
+        Integer applicationId = applications.get(3).getApplicationId();
         Purchase purchase=null;
         Boolean result = false;
         try{
@@ -223,9 +206,11 @@ public class PurchaseServiceImplTest {
     }
 
     @Test
+    @Transactional
     public void showPurchaseByApplicationId() throws Exception{
-        Purchase purchase = null;
-        purchase = purchaseService.showPurchaseByApplicationId(27);
+        Purchase purchase;
+        purchaseService.subscribed(investorId, applications.get(1).getApplicationId(),"123456");
+        purchase = purchaseService.showPurchaseByApplicationId(applications.get(1).getApplicationId());
         Assert.assertNotNull(purchase);
         System.out.println(purchase);
     }
