@@ -42,6 +42,8 @@ public class RepayExecutionServiceImpl implements RepayExecutionService {
     private RepayService repayService;
     @AutowireField
     private GuarantorService guarantorService;
+    @AutowireField
+    private CreditService creditService;
 
     @Autowired
     public void setRepayPlanDao(RepayPlanDao repayPlanDao) {
@@ -76,6 +78,11 @@ public class RepayExecutionServiceImpl implements RepayExecutionService {
     @Autowired
     public void setGuarantorService(GuarantorService guarantorService) {
         this.guarantorService = guarantorService;
+    }
+
+    @Autowired
+    public void setCreditService(CreditService creditService) {
+        this.creditService = creditService;
     }
 
     public RepayExecutionServiceImpl() throws Exception {
@@ -179,7 +186,10 @@ public class RepayExecutionServiceImpl implements RepayExecutionService {
                     // 28天后的逾期流程
                     if ((new Date().getTime() / 86400000) - (plan.getRepayDate().getTime() / 86400000) >= 28 && !plan.isOverdueProceeded()) {
                         plan.setOverdueProceeded(true);
-                        // todo: 修改信用评级
+                        // todo: unit test
+                        Integer creditScore = creditService.getCreditScore(borrower.getUserId());
+                        Integer reducedScore = Math.max(0, creditScore - 10);
+                        creditService.updateCreditScore(borrower.getUserId(), reducedScore);
                     }
                 }
                 repayService.updateRepayPlan(plan.getPlanId(), RepayPlanStatus.values()[plan.getStatus()], plan.getRealRepayDate());

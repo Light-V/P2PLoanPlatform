@@ -32,7 +32,7 @@ public class RepayPlanController {
             Purchase purchase = purchaseService.showPurchaseById(purchaseId);
             if (purchase == null)
                 return ResultVoUtil.error(ResultEnum.PURCHASE_NOT_EXITST);
-            if (!purchase.getBorrowerId().equals(userId))
+            if (!purchase.getInvestorId().equals(userId))
                 return ResultVoUtil.error(ResultEnum.ILLEGAL_OPERATION);
             List<RepayPlan> plans = repayService.findPlanByPurchaseId(purchaseId);
             return ResultVoUtil.success(plans);
