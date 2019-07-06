@@ -59,4 +59,23 @@ public interface CreditService {
      */
     BigDecimal getGrantInfo(String userId) throws SQLException;
 
+    /**
+     * 更新用户征信分数
+     * @param userId 更新的Id
+     * @param creditScore 征信分数
+     * @return true(信息被修改)/false(信息未修改)
+     * @throws SQLException SQL异常
+     * @throws  IllegalArgumentException 非法参数
+     */
+    boolean updateCreditScore(String userId, Integer creditScore) throws SQLException, IllegalArgumentException;
+
+    /**
+     * 获得用户征信分数
+     * @param userId 用户Id
+     * @return 用户信用分数
+     * @throws SQLException SQL异常
+     * @throws  IllegalArgumentException 非法参数
+     */
+    Integer getCreditScore(String userId) throws SQLException, IllegalArgumentException;
+
 }

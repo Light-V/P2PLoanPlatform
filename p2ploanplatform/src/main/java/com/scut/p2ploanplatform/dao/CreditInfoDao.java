@@ -30,5 +30,10 @@ public interface CreditInfoDao {
     @Delete("DELETE FROM `p2p`.`credit_info` WHERE user_id = #{userId}")
     int deleteCreditInfo(String userId);
 
+    @Select("SELECT `credit_score` FROM `p2p`.`credit_info` WHERE user_id = #{userId}")
+    int selectCreditScore(String userId);
+
+    @Update("UPDATE `p2p`.`credit_info` SET `credit_score` = #{creditScore} WHERE `user_id` = #{userId}")
+    int updateCreditScore(String userId, Integer creditScore);
 
 }

@@ -64,14 +64,14 @@ public class CreditServiceImplTest {
 
     @Test
     @Transactional
-    public void getCreditInfo() {
-        /*creditService.updateCreditInfo(creditInfo);
-        try {
-            CreditInfo actual = creditService.getCreditInfo(creditInfo.getUserId());
-            assertEquals(creditInfo, actual);
+    public void updateCreditScore() {
+
+        /*try {
+            creditService.updateCreditScore("201630000000", 99);
+            int result = creditService.getCreditScore("201630000000");
+            assertEquals(result, 99);
         }
         catch (Exception exception) {
-
         }*/
     }
 
@@ -88,4 +88,6 @@ public class CreditServiceImplTest {
 
         }*/
     }
+
+
 }

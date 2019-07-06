@@ -153,4 +153,17 @@ public class CreditServiceImpl implements CreditService {
         cal.add(Calendar.MONTH, 1);
         return cal.getTime();
     }
+
+
+    @Override
+    public boolean updateCreditScore(String userId, Integer creditScore) throws SQLException, IllegalArgumentException {
+        int result = creditInfoDao.updateCreditScore(userId, creditScore);
+        return (result == 1);
+    }
+
+    @Override
+    public Integer getCreditScore(String userId) throws SQLException, IllegalArgumentException {
+        Integer creditScore = creditInfoDao.selectCreditScore(userId);
+        return creditScore;
+    }
 }
