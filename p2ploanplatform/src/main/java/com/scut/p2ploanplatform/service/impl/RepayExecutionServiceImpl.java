@@ -159,6 +159,8 @@ public class RepayExecutionServiceImpl implements RepayExecutionService {
                     }
                 } else {
                     if (!plan.getStatus().equals(RepayPlanStatus.GUARANTOR_PAID_ADVANCE.getStatus())) {
+                        // calling PurchaseService: set overdue status
+                        purchaseService.purchaseOverdue(plan.getPurchaseId());
                         // 贷款人还款失败，执行垫付：担保人 -> 投资者
                         transferResult = ThirdPartyOperationInterface.transfer(guarantor.getThirdPartyId(), investor.getThirdPartyId(), plan.getAmount());
                         result.setGuarantorTransferResult(transferResult);
@@ -177,8 +179,6 @@ public class RepayExecutionServiceImpl implements RepayExecutionService {
                             if (!plan.getStatus().equals(RepayPlanStatus.OVERDUE.getStatus())) {
                                 investorMessage = String.format("尊敬的 %s 用户，您投资贷款本月未及时还款，系统已经为您执行逾期流程", investor.getName());
                                 plan.setStatus(RepayPlanStatus.OVERDUE.getStatus());
-                                // calling PurchaseService: set overdue status
-                                purchaseService.purchaseOverdue(plan.getPurchaseId());
                             }
                         }
                     }

@@ -12,8 +12,10 @@ import com.scut.p2ploanplatform.enums.ResultEnum;
 import com.scut.p2ploanplatform.exception.CustomException;
 import com.scut.p2ploanplatform.exception.LoanStatusException;
 import com.scut.p2ploanplatform.service.*;
+import com.scut.p2ploanplatform.utils.AutoTrigger;
 import com.scut.p2ploanplatform.utils.ThirdPartyOperationInterface;
 import com.scut.p2ploanplatform.vo.ResultVo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +29,7 @@ import java.util.List;
 /**
  * @author FatCat
  */
+@Slf4j
 @Service
 //todo: notice
 public class PurchaseServiceImpl implements PurchaseService {
@@ -43,7 +46,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     public PurchaseServiceImpl(PurchaseDao purchaseDao, UserService userService,
                                LoanApplicationService applicationService, RepayService repayService,
                                P2pAccountService p2pAccountService, NoticeService noticeService,
-                               GuarantorService guarantorService) {
+                               GuarantorService guarantorService) throws Exception{
         this.purchaseDao = purchaseDao;
         this.userService = userService;
         this.applicationService = applicationService;
@@ -51,6 +54,8 @@ public class PurchaseServiceImpl implements PurchaseService {
         this.p2pAccountService = p2pAccountService;
         this.noticeService = noticeService;
         this.guarantorService = guarantorService;
+        new AutoTrigger(getClass().getDeclaredMethod("manualFinish"), this, 2, 0, 0, true);
+
     }
 
     @Override
@@ -264,5 +269,23 @@ public class PurchaseServiceImpl implements PurchaseService {
             purchase.setGuarantorName(guarantorService.findGuarantor(purchase.getGuarantorId()).getName());
         }
         return list;
+    }
+
+    @Transactional
+    public void manualFinish()throws SQLException{
+        log.info("检查订单完成状态");
+        List<Purchase> purchaseList;
+        try{
+            purchaseList = purchaseDao.showAllPurchase();
+        }
+        catch (Exception e){
+            throw new SQLException(e);
+        }
+
+        for(Purchase purchase:purchaseList){
+            if(repayService.isRepayCompleted(purchase.getPurchaseId())){
+                accomplishPurchase(purchase.getPurchaseId());
+            }
+        }
     }
 }
