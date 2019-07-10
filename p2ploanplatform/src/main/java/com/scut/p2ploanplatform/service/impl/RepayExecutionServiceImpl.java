@@ -25,7 +25,7 @@ import java.util.List;
 @Slf4j
 @Service
 public class RepayExecutionServiceImpl implements RepayExecutionService {
-    private static final String NOTICE_TITLE = "喵了个咪";
+    private static final String NOTICE_TITLE = "还款通知";
     private boolean isColdStart = true;
 
     @AutowireField
