@@ -152,6 +152,7 @@ public class RepayExecutionServiceImpl implements RepayExecutionService {
                         plan.setStatus(RepayPlanStatus.OVERDUE_SUCCEEDED.getStatus());
                         waterBillService.addRepayRecord(plan.getPlanId(), plan.getPurchaseId(), borrower.getUserId(), guarantor.getGuarantorId(), plan.getRealRepayDate(), plan.getAmount());
                         guarantorMessage = String.format("尊敬的 %s 用户，您担保的贷款人 %s 本月已完成还款，还款金额已经转入您的第三方账号中", guarantor.getName(), borrower.getName());
+                        purchaseService.overdueToSubscribed(plan.getPurchaseId());
                     } else {
                         plan.setStatus((plan.getStatus().equals(RepayPlanStatus.SCHEDULED.getStatus())) ? RepayPlanStatus.SUCCEEDED.getStatus() : RepayPlanStatus.OVERDUE_SUCCEEDED.getStatus());
                         waterBillService.addRepayRecord(plan.getPlanId(), plan.getPurchaseId(), borrower.getUserId(), investor.getUserId(), plan.getRealRepayDate(), plan.getAmount());

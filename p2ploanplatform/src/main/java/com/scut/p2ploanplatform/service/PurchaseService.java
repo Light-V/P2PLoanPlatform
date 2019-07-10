@@ -30,6 +30,12 @@ public interface PurchaseService {
     Boolean purchaseOverdue(Integer purchaseId) throws SQLException,IllegalArgumentException;
 
     /**
+     * 订单逾期（修改订单状态）
+     * @param purchaseId 订单id
+     * @return 操作状态（成功/失败）
+     */
+    Boolean overdueToSubscribed(Integer purchaseId) throws SQLException, IllegalArgumentException;
+    /**
      * 完成订单
      * @param purchaseId 订单Id
      * @return 操作状态（成功/失败)

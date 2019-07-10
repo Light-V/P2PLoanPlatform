@@ -132,6 +132,15 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
+    public Boolean overdueToSubscribed(Integer purchaseId) throws SQLException, IllegalArgumentException {
+        if(purchaseDao.updatePurchaseStatus(purchaseId,LoanStatus.SUBSCRIBED.getStatus())){
+            return true;
+        }else {
+            throw new IllegalArgumentException("invalid purchaseId, non loan purchase found with this purchaseId");
+        }
+    }
+
+    @Override
     public Boolean accomplishPurchase(Integer purchaseId) throws SQLException, IllegalArgumentException {
         try {
             if(purchaseDao.updatePurchaseStatus(purchaseId,LoanStatus.FINISHED.getStatus())){
