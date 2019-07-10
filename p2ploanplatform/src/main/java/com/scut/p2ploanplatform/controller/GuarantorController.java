@@ -37,6 +37,8 @@ public class GuarantorController {
     @Autowired
     LoanApplicationService applicationService;
     @Autowired
+    PurchaseService purchaseService;
+    @Autowired
     CreditService creditService;
     @Autowired
     NoticeService noticeService;
@@ -313,7 +315,7 @@ public class GuarantorController {
 
         PageInfo applicationPageInfo;
         try{
-            applicationPageInfo = applicationService.getOverdueApplicationById(pageNum, pageSize, userId);
+            applicationPageInfo = purchaseService.getOverdueApplicationById(pageNum, pageSize, userId);
             if(applicationPageInfo == null||applicationPageInfo.getTotal()==0){
                 return ResultVoUtil.success(applicationPageInfo);
             }

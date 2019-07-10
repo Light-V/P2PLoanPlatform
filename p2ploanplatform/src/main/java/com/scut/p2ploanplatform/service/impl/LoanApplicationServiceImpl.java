@@ -424,21 +424,6 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
         return new PageInfo<>(applicationList);
     }
 
-    @Override
-    public PageInfo<LoanApplication> getOverdueApplicationById(Integer pageNum, Integer pageSize, String userId) throws SQLException {
-        PageHelper.startPage(pageNum, pageSize);
-        List<LoanApplication> applicationList;
-        try {
-            applicationList = loanApplicationDao.getOverdueApplicationById(userId);
-            applicationList = setUserName(applicationList);
-            applicationList.sort(Comparator.comparing(LoanApplication::getUpdateTime));
-            Collections.reverse(applicationList);
-        }
-        catch (Exception e) {
-            throw new SQLException(e);
-        }
-        return new PageInfo<>(applicationList);
-    }
 
     @Override
     public PageInfo<UserHistory> getUserHistory(Integer pageNum, Integer pageSize, String userId) throws SQLException {

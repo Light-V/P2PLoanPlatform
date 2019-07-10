@@ -22,10 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
-import java.util.Calendar;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+
 /**
  * @author FatCat
  */
@@ -145,6 +143,22 @@ public class PurchaseServiceImpl implements PurchaseService {
         catch (Exception e) {
             throw new SQLException(e);
         }
+    }
+
+    @Override
+    public PageInfo<Purchase> getOverdueApplicationById(Integer pageNum, Integer pageSize, String userId) throws SQLException {
+        PageHelper.startPage(pageNum, pageSize);
+        List<Purchase> purchaseList;
+        try {
+            purchaseList = purchaseDao.getOverduePurchaseById(userId);
+            purchaseList = setUserName(purchaseList);
+            purchaseList.sort(Comparator.comparing(Purchase::getUpdateTime));
+            Collections.reverse(purchaseList);
+        }
+        catch (Exception e) {
+            throw new SQLException(e);
+        }
+        return new PageInfo<>(purchaseList);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.scut.p2ploanplatform.dao;
 
+import com.scut.p2ploanplatform.entity.LoanApplication;
 import com.scut.p2ploanplatform.entity.Purchase;
 //import javafx.application.Application;
 import org.apache.ibatis.annotations.*;
@@ -84,4 +85,14 @@ public interface PurchaseDao {
      */
     @Select("SELECT * FROM `purchase` WHERE `borrower_id` = #{borrowerId} and `status` =#{status}")
     List<Purchase> getPurchaseByBorrowerIdAndStatus(String borrowerId, Integer status);
+
+
+    /**
+     * 查询担保人担保的逾期申请
+     * @param userId 担保人Id
+     * @return 申请的list
+     */
+    @Select("SELECT * FROM `purchase` WHERE `status` = 5 AND `guarantor_id` = #{userId}")
+    List<Purchase> getOverduePurchaseById(String userId);
+
 }
