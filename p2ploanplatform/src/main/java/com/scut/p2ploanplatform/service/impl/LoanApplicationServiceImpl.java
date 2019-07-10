@@ -156,6 +156,12 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
         LoanApplication application;
         try {
             application = loanApplicationDao.getApplicationById(id);
+            Calendar deadline = Calendar.getInstance();
+            deadline.setTime(application.getPurchaseDeadline());
+            deadline.set(Calendar.HOUR_OF_DAY, 23);
+            deadline.add(Calendar.MINUTE, 59 );
+            deadline.add(Calendar.SECOND, 59);
+            application.setPurchaseDeadline(deadline.getTime());
             application.setBorrowerName(userService.findUser(application.getBorrowerId()).getName());
         }
         catch (Exception e) {

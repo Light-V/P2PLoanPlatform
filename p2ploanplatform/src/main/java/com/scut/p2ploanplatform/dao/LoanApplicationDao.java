@@ -124,7 +124,7 @@ public interface LoanApplicationDao {
      * @param now 当前时间
      * @return 申请的list
      */
-    @Select("SELECT * FROM `loan_application` WHERE `status` = 1 AND purchase_deadline < #{now} FOR UPDATE")
+    @Select("SELECT * FROM `loan_application` WHERE `status` < 2 AND purchase_deadline < #{now} FOR UPDATE")
     List<LoanApplication> getApplicationReviewedPassedExpired(Date now);
 
     /**

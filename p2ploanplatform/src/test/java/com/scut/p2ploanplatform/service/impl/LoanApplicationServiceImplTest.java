@@ -194,6 +194,14 @@ public class LoanApplicationServiceImplTest {
     @Test
     @Transactional
     public void getApplicationById() {
+        LoanApplication application1 = new LoanApplication();
+        try{
+            application1=applicationService.getApplicationById(24);
+        }catch (Exception e){
+            fail();
+        }
+
+        Assert.assertNotNull(application1);
 
     }
 
@@ -230,7 +238,7 @@ public class LoanApplicationServiceImplTest {
         }
         PageInfo<LoanApplication> applicationPageInfo = null;
         try{
-            applicationPageInfo= applicationService.getApplicationByGuarantorId("201630664195",1,10);
+            applicationPageInfo= applicationService.getApplicationByGuarantorId("201630666999",1,10);
         }catch (Exception e){
             e.printStackTrace();
             fail();
