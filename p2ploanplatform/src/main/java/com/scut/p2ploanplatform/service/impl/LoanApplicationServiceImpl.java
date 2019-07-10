@@ -7,12 +7,10 @@ import com.scut.p2ploanplatform.dao.PurchaseDao;
 import com.scut.p2ploanplatform.dto.UserHistory;
 import com.scut.p2ploanplatform.entity.LoanApplication;
 import com.scut.p2ploanplatform.entity.Purchase;
-import com.scut.p2ploanplatform.entity.RepayPlan;
 import com.scut.p2ploanplatform.enums.LoanStatus;
 import com.scut.p2ploanplatform.enums.ResultEnum;
 import com.scut.p2ploanplatform.exception.LoanStatusException;
 import com.scut.p2ploanplatform.service.LoanApplicationService;
-import com.scut.p2ploanplatform.service.PurchaseService;
 import com.scut.p2ploanplatform.service.UserService;
 import com.scut.p2ploanplatform.utils.AutoTrigger;
 import lombok.extern.slf4j.Slf4j;
@@ -149,6 +147,19 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
         }
     }
 
+    private List<LoanApplication> changePurchaseDeadline(List<LoanApplication>applicationList)throws SQLException{
+        for(LoanApplication application:applicationList){
+            Calendar deadline = Calendar.getInstance();
+            deadline.setTime(application.getPurchaseDeadline());
+            deadline.set(Calendar.HOUR_OF_DAY, 23);
+            deadline.add(Calendar.MINUTE, 59 );
+            deadline.add(Calendar.SECOND, 59);
+            application.setPurchaseDeadline(deadline.getTime());
+            application.setBorrowerName(userService.findUser(application.getBorrowerId()).getName());
+        }
+        return applicationList;
+    }
+
     @Override
     public LoanApplication getApplicationById(Integer id) throws SQLException, IllegalArgumentException {
         if (id == null)
@@ -183,6 +194,9 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
         catch (Exception e) {
             throw new SQLException(e);
         }
+
+        applicationList = changePurchaseDeadline(applicationList);
+
         return new PageInfo<>(applicationList);
     }
 
@@ -202,6 +216,8 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
             throw new SQLException(e);
         }
 
+        applicationList = changePurchaseDeadline(applicationList);
+
         return new PageInfo<>(applicationList);
     }
 
@@ -220,6 +236,9 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
         catch (Exception e) {
             throw new SQLException(e);
         }
+
+        applicationList = changePurchaseDeadline(applicationList);
+
         return new PageInfo<>(applicationList);
     }
 
@@ -250,6 +269,9 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
         catch (Exception e) {
             throw new SQLException(e);
         }
+
+        applicationList = changePurchaseDeadline(applicationList);
+
         return new PageInfo<>(applicationList);
     }
 
@@ -280,6 +302,9 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
         catch (Exception e) {
             throw new SQLException(e);
         }
+
+        applicationList = changePurchaseDeadline(applicationList);
+
         return new PageInfo<>(applicationList);
     }
 
@@ -296,6 +321,9 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
         catch (Exception e) {
             throw new SQLException(e);
         }
+
+        applicationList = changePurchaseDeadline(applicationList);
+
         return new PageInfo<>(applicationList);
     }
 
@@ -312,6 +340,9 @@ public class LoanApplicationServiceImpl implements LoanApplicationService{
         catch (Exception e) {
             throw new SQLException(e);
         }
+
+        applicationList = changePurchaseDeadline(applicationList);
+
         return new PageInfo<>(applicationList);
     }
 

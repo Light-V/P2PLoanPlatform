@@ -209,8 +209,8 @@ public class PurchaseServiceImplTest {
     @Transactional
     public void showPurchaseByApplicationId() throws Exception{
         Purchase purchase;
-        purchaseService.subscribed(investorId, applications.get(1).getApplicationId(),"123456");
-        purchase = purchaseService.showPurchaseByApplicationId(applications.get(1).getApplicationId());
+//        purchaseService.subscribed(investorId, applications.get(1).getApplicationId(),"123456");
+        purchase = purchaseService.showPurchaseByApplicationId(22);
         Assert.assertNotNull(purchase);
         System.out.println(purchase);
     }

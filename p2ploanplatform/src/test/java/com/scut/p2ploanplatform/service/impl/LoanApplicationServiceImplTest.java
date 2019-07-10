@@ -196,7 +196,7 @@ public class LoanApplicationServiceImplTest {
     public void getApplicationById() {
         LoanApplication application1 = new LoanApplication();
         try{
-            application1=applicationService.getApplicationById(24);
+            application1=applicationService.getApplicationById(22);
         }catch (Exception e){
             fail();
         }
@@ -260,7 +260,7 @@ public class LoanApplicationServiceImplTest {
         }
         PageInfo<LoanApplication> applicationPageInfo = null;
         try{
-            applicationPageInfo= applicationService.getApplicationByBorrowerId("201630664195",3,1,10);
+            applicationPageInfo= applicationService.getApplicationByBorrowerId("201601000000",3,1,10);
         }catch (Exception e){
             e.printStackTrace();
             fail();
